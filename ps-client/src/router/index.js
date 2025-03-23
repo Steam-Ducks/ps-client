@@ -1,13 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import DefaultLayout from '@/layout/DefaultLayout.vue';
 import AdminLayout from '@/layout/AdmintLayout.vue';
-import HomePage from '@/views/HomeView.vue';
-import AdminPage from '@/views/AdminView.vue';
+import HomePage from '@/views/home/HomeIndex.vue';
+import CompanyPage from '@/views/company/CompanyIndex.vue';
+import EmplayeePage from '@/views/employee/EmployeeIndex.vue';
+import timeRecordPage from '@/views/timeRecord/TimeRecordIndex.vue';
+import UserPage from '@/views/users/UserIndex.vue';
 
 const routes = [
   {
     path: '/',
-    component: DefaultLayout,
+    component: AdminLayout,
     children: [
       {
         path: '',
@@ -16,15 +18,45 @@ const routes = [
     ]
   },
   {
-    path: '/admin',
+    path: '/user',
     component: AdminLayout,
     children: [
       {
         path: '',
-        component: AdminPage
+        component: UserPage
       }
     ]
-  }
+  },
+  {
+    path: '/company',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        component: CompanyPage
+      }
+    ]
+  },
+  {
+    path: '/emplayee',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        component: EmplayeePage
+      }
+    ]
+  },
+  {
+    path: '/ponto',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        component: timeRecordPage
+      }
+    ]
+  },
 ];
 
 const router = createRouter({

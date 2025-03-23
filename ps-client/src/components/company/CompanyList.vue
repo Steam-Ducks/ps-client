@@ -1,24 +1,34 @@
 <template>
-  <div v-if="users.length > 0" class="user-list">
-    <ul>
-      <UserItem v-for="user in users" :key="user.userId" :user="user" />
-    </ul>
+  <div v-if="companies.length > 0" class="company-list">
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CNPJ</th>
+          <th>Contato</th>
+          <th> </th>
+        </tr>
+      </thead>
+      <tbody>
+        <CompanyItem v-for="company in companies" :key="company.id" :company="company" />
+      </tbody>
+    </table>
   </div>
-  <div v-else class="no-users-message">
-    <p>Nenhum usuário encontrado. Tente buscar novamente.</p>
+  <div v-else class="no-companies-message">
+    <p>Nenhuma empresa encontrada. Tente buscar novamente.</p>
   </div>
 </template>
 
 <script>
-import UserItem from './CompanyItem.vue'; // Caminho atualizado
+import CompanyItem from './CompanyItem.vue';
 
 export default {
-  name: 'UserList',
+  name: 'CompanyList',
   components: {
-    UserItem,
+    CompanyItem,
   },
   props: {
-    users: {
+    companies: { // Changed from 'users' to 'companies'
       type: Array,
       required: true,
     },
@@ -27,11 +37,11 @@ export default {
 </script>
 
 <style scoped>
-.user-list {
+.company-list { /* Changed from 'user-list' to 'company-list' */
   margin-top: 25px;
 }
 
-.no-users-message {
+.no-companies-message { /* Changed from 'no-users-message' to 'no-companies-message' */
   text-align: center;
   color: #64748b;
   font-size: 1.2rem;

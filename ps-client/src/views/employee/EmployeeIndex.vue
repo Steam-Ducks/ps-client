@@ -1,0 +1,5 @@
+<template>
+
+Colaborador 
+
+</template>
