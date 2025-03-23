@@ -1,21 +1,32 @@
 <template>
-  <div id="app">
-    <PageContainer>
+    <AppHeader />
+    <SideBar />
+    <div class="content">  
       <router-view />
-    </PageContainer>
-    <AppFooter />
-  </div>
+    </div>
 </template>
 
 <script>
-import AppFooter from '@/components/common/AppFooter.vue';
-import PageContainer from '@/components/layout/PageContainer.vue';
+import AppHeader from '@/components/common/AppHeader.vue';
+import SideBar from '@/components/common/SideBar.vue';
 
 export default {
   name: 'AdmintLayout',
   components: {
-    AppFooter,
-    PageContainer,
+    SideBar,
+    AppHeader,
   },
 };
 </script>
+
+<style scoped>
+.content {
+  margin-left: 300px;
+  margin-right: 20px;
+  margin-top:65px;
+  padding: 20px;
+  flex-grow: 1;
+  background-color: #fff;
+  border-radius: 20px;
+}
+</style>
