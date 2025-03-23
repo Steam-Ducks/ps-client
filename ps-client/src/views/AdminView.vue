@@ -29,13 +29,13 @@ export default {
     UsersView,
     FormButton,
   },
-  methods: {
-    showCreateUser() {
-      this.isCreatingUser = true;
-    },
-    hideCreateUser() {
-      this.isCreatingUser = false;
-    },
-  },
 };
 </script>
+<style scoped>
+.admin-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+</style>
