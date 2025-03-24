@@ -1,26 +1,26 @@
 <template>
-  <div class="company-create-view">
+  <div class="emplyee-create-view">
     <div class="button-container">
       <button @click="goBack" class="transparent-button">
         <XMarkIcon class="icon" />
       </button>
     </div>
 
-    <h2> Nova Empresa </h2>
-    <p> Preencha os campos abaixo para cadastrar a empresa </p>
+    <h2> Novo Colaborador </h2>
+    <p> Preencha os campos abaixo para cadastrar o colaborador </p>
 
-    <CompanyForm @company-created="goBack" />
+    <EmployeeForm @employee-created="goBack" />
   </div>
 </template>
 
 <script>
-import CompanyForm from '@/components/company/CompanyForm.vue';
+import EmployeeForm from '@/components/employee/EmployeeForm.vue';
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 
 export default {
-  name: 'CompanyCreate',
+  name: 'EmployeeCreate',
   components: {
-    CompanyForm,
+    EmployeeForm,
     XMarkIcon,
   },
   methods: {
@@ -32,7 +32,7 @@ export default {
 </script>
 
 <style scoped>
-.company-create-view {
+.employee-create-view {
   width: 100%;
 }
 

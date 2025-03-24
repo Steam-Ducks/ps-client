@@ -6,18 +6,37 @@
     </div>
 
     <div class="form-group">
-      CNPJ:
-      <input type="text" id="cnpj" v-model="company.cnpj" required />
+      CNPJ/CPF:
+      <input
+        type="text"
+        id="cnpj"
+        v-model="company.cnpj"
+        :v-mask="cnpjMask"
+        @input="validateCnpj"
+        :maxlength="cnpjMaxLength"
+        :minlength="cnpjMinLength"
+        required
+      />
     </div>
 
     <div class="form-group">
       Contato:
-      <input type="text" id="contact" v-model="company.contact" required />
+      <input
+        type="text"
+        id="contact"
+        v-model="company.contact"
+        :v-mask="phoneMask"
+        @input="validateContact"
+        :maxlength="phoneMaxLength"
+        :minlength="phoneMinLength"
+        required
+      />
     </div>
 
     <div>
       <CreateButton> Cadastrar </CreateButton>
     </div>
+
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
@@ -28,12 +47,19 @@
 import CompanyService from '@/services/CompanyService.js';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
+import { Mask } from 'vue-the-mask';
 
 export default {
   name: 'CompanyForm',
+
   components: {
     CreateButton,
   },
+
+  directives: {
+    Mask,
+  },
+
   emits: ['company-created'],
 
   data() {
@@ -45,6 +71,38 @@ export default {
       },
       errorMessage: '',
     };
+  },
+
+  computed: {
+    // Máscara para CNPJ/CPF
+    cnpjMask() {
+      return this.company.cnpj.replace(/\D/g, '').length <= 11
+        ? '###.###.###-##' // CPF
+        : '##.###.###/####-##'; // CNPJ
+    },
+
+    // Tamanho máximo e mínimo para CPF e CNPJ
+    cnpjMaxLength() {
+      return this.company.cnpj.replace(/\D/g, '').length <= 11 ? 14 : 18;
+    },
+    cnpjMinLength() {
+      return this.company.cnpj.replace(/\D/g, '').length <= 11 ? 11 : 14; //CPF tem 11 digitos, CNPJ tem 14
+    },
+
+    // Máscara para telefone fixo/celular
+    phoneMask() {
+      return this.company.contact.replace(/\D/g, '').length > 10
+        ? '(##) #####-####' // Celular
+        : '(##) ####-####'; // Fixo
+    },
+
+    // Tamanho máximo e mínimo para telefone fixo e celular
+    phoneMaxLength() {
+      return this.company.contact.replace(/\D/g, '').length > 10 ? 15 : 14;
+    },
+    phoneMinLength() {
+      return this.company.contact.replace(/\D/g, '').length > 10 ? 11 : 10; //Celular tem 11 digitos, fixo tem 10
+    },
   },
 
   methods: {
@@ -72,6 +130,16 @@ export default {
         console.error('Erro ao cadastrar empresa:', error);
       }
     },
+
+    // Validação simples de CNPJ/CPF
+    validateCnpj() {
+      // Remove todos os caracteres não numéricos
+      this.company.cnpj = this.company.cnpj.replace(/\D/g, '');
+    },
+    validateContact() {
+      // Remove todos os caracteres não numéricos
+      this.company.contact = this.company.contact.replace(/\D/g, '');
+    }
   },
 };
 </script>
@@ -95,7 +163,7 @@ export default {
 
 .form-group {
   margin-bottom: 20px;
-  width: 100%; /* Make form groups take full width */
+  width: 100%;
 }
 
 label {
@@ -105,8 +173,7 @@ label {
 }
 
 input[type='text'],
-input[type='email'],
-input[type='password'] {
+input[type='number'] {
   width: 100%;
   padding: 12px;
   border: 1px solid #cbd5e1;
@@ -121,6 +188,6 @@ input[type='password'] {
 }
 
 .button-container {
-  margin-top: 20px; /* Add some space above the button */
+  margin-top: 20px;
 }
 </style>
