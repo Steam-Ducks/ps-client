@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CompanyForm from '@/components/company/CompanyForm.vue';
+import CompanyForm from '@/components/company/CompanyForm';
 import { XMarkIcon } from '@heroicons/vue/24/solid';
 
 export default {

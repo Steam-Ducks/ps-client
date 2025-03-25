@@ -29,7 +29,7 @@ export default {
 
 <style scoped>
 td {
-  padding: 10px;
+  padding: 10px 0 10px 0;
   width: 33%;
 }
 
