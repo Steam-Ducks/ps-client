@@ -42,7 +42,6 @@ export default {
 }
 
 .no-employees-message {
-  text-align: center;
   color: #64748b;
   font-size: 1.2rem;
   margin-top: 20px;

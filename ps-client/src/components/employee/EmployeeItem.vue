@@ -49,7 +49,7 @@ td {
 
 .actions {
   text-align: center;
-  position: relative; /* Adicionado para posicionar o .modal corretamente */
+  position: relative; 
 }
 
 .icon {
