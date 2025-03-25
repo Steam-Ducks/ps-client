@@ -1,15 +1,27 @@
 <template>
+
   <form @submit.prevent="submitForm" class="employee-form">
+
+    <!-- Nome -->
     <div class="form-group">
       Nome:
       <input type="text" id="name" v-model="employee.name" placeholder="Nome completo" required />
     </div>
 
+    <!-- CPF -->
     <div class="form-group">
       CPF:
-      <input type="text" id="cpf" v-mask="'###.###.###-##'" v-model="employee.cpf" placeholder="123.456.789-00" required />
+      <input
+        type="text"
+        id="cpf"
+        v-model="employee.cpf"
+        v-mask="cpfMask"
+        placeholder="123.456.789-00"
+        required
+      />
     </div>
 
+    <!-- Empresa -->
     <div class="form-group">
       Empresa:
       <select id="company_id" v-model="employee.company_id" required>
@@ -20,6 +32,7 @@
       </select>
     </div>
 
+    <!-- Cargo -->
     <div class="form-group">
       Cargo:
       <select id="position_id" v-model="employee.position_id" required>
@@ -30,120 +43,138 @@
       </select>
     </div>
 
+    <!-- Remuneração -->
     <div class="form-group">
       Remuneração:
-      <input type="number" id="salary" v-model="employee.salary" placeholder="R$" required/>
+      <input type="text" id="salary" v-model="employee.salary" v-mask="currencyMask" placeholder="R$" required />
     </div>
 
+    <!-- Botão de Cadastrar  -->
     <div class="button-container">
       <CreateButton> Cadastrar </CreateButton>
     </div>
 
+    <!-- Mensagem de erro -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
+
   </form>
+
 </template>
 
 <script>
-import EmployeeService from '@/services/EmployeeService.js';
-import CompanyService from '@/services/CompanyService.js'; 
-import PositionService from '@/services/PositionService.js'; 
-import CreateButton from '@/components/ui/CreateButton.vue';
-import Swal from 'sweetalert2';
-import { Mask } from 'vue-the-mask';
 
-export default {
-  name: 'EmployeeForm',
+  import EmployeeService from '@/services/EmployeeService.js';
+  import CompanyService from '@/services/CompanyService.js';
+  import PositionService from '@/services/PositionService.js';
+  import CreateButton from '@/components/ui/CreateButton.vue';
+  import Swal from 'sweetalert2';
+  import { IMaskDirective } from 'vue-imask';
 
-  components: {
-    CreateButton,
-  },
+  export default {
+    name: 'EmployeeForm',
 
-  directives: {
-    Mask,
-  },
-
-  emits: ['employee-created'],
-
-  data() {
-    return {
-      employee: {
-        name: '',
-        cpf: '',
-        company_id: Number(null), 
-        position_id: Number(null), 
-        salary: '',
-      },
-      errorMessage: '',
-      companies: [],
-      positions: [],
-    };
-  },
-
-  async created() {
-    
-    try {
-            this.companies = await CompanyService.getAllCompanies();
-            this.positions = await PositionService.getAllPositions();
-        }
-
-        catch (error) {
-            console.error('Error fetching companies or positions:', error);
-            this.errorMessage = 'Erro ao carregar empresas ou cargos.';
-        }
-
+    components: {
+      CreateButton,
     },
 
+    directives: {
+      mask: IMaskDirective,
+    },
+
+    emits: ['employee-created'],
+
+    data() {
+      return {
+        
+        employee: {
+          name: '',
+          cpf: '',
+          company_id: null,
+          position_id: null,
+          salary: '',
+        },
+        errorMessage: '',
+        companies: [],
+        positions: [],
+
+        cpfMask: {
+          mask: '000.000.000-00',
+        },
+
+        currencyMask: {
+          mask: Number,
+          scale: 2,
+          thousandsSeparator: '.',
+          radix: ',',
+          mapToRadix: [','],
+        },
+
+      };
+    },
+
+    async created() {
+      try {
+        this.companies = await CompanyService.getAllCompanies();
+        this.positions = await PositionService.getAllPositions();
+      } 
+      catch (error) {
+        console.error('Error fetching companies or positions:', error);
+        this.errorMessage = 'Erro ao carregar empresas ou cargos.';
+      }
+
+    },
 
     methods: {
-        async submitForm() {
-            this.errorMessage = '';
-            if (!this.employee.company_id) {
-                this.errorMessage = 'Por favor, selecione uma empresa.';
-                return;
-            }
-            if (!this.employee.position_id) {
-                this.errorMessage = 'Por favor, selecione um cargo.';
-                return;
-            }
+      async submitForm() {
+        this.errorMessage = '';
+        if (!this.employee.company_id) {
+          this.errorMessage = 'Por favor, selecione uma empresa.';
+          return;
+        }
+        if (!this.employee.position_id) {
+          this.errorMessage = 'Por favor, selecione um cargo.';
+          return;
+        }
 
-            try {
-                await EmployeeService.createEmployee({
-                    name: this.employee.name,
-                    cpf: this.employee.cpf,
-                    companyId: this.employee.company_id, // Changed to company_id
-                    positionId: this.employee.position_id, // Changed to position_id
-                    salary: this.employee.salary
-                });
+        try {
+          await EmployeeService.createEmployee({
+            name: this.employee.name,
+            cpf: this.employee.cpf.replace(/\D/g, ''),
+            companyId: this.employee.company_id,
+            positionId: this.employee.position_id,
+            salary: parseFloat(this.employee.salary.replace(/\./g, '').replace(',', '.')),
+          });
 
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Funcionario criado com sucesso!',
-                    showConfirmButton: false,
-                    timer: 1500,
-                }).then(() => {
-                    this.$emit('employee-created');
-                    this.employee = {
-                        name: '',
-                        cpf: '',
-                        company_id: Number(null), // Changed to Number
-                        position_id: Number(null), // Changed to Number
-                        salary: '',
-                    };
-                });
-            } catch (error) {
-                this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
-                console.error('Erro ao cadastrar funcionario:', error);
-            }
-        },
+          Swal.fire({
+            icon: 'success',
+            title: 'Funcionario criado com sucesso!',
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            this.$emit('employee-created');
+            this.employee = {
+              name: '',
+              cpf: '',
+              company_id: null,
+              position_id: null,
+              salary: '',
+            };
+          });
+        } catch (error) {
+          this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
+          console.error('Erro ao cadastrar funcionario:', error);
+        }
+      },
     },
-};
+
+  };
 </script>
 
 <style scoped>
 
-  .company-form {
+  .employee-form {
     max-width: 500px;
     margin: 0 auto;
     padding: 30px;
@@ -190,5 +221,4 @@ export default {
     text-align: center;
     width: 100%;
   }
-
 </style>

@@ -2,9 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import AdminLayout from '@/layout/AdmintLayout.vue';
 import HomePage from '@/views/home/HomeIndex.vue';
 import CompanyPage from '@/views/company/CompanyIndex.vue';
-import EmplayeePage from '@/views/employee/EmployeeIndex.vue';
+import EmployeePage from '@/views/employee/EmployeeIndex.vue';
 import timeRecordPage from '@/views/timeRecord/TimeRecordIndex.vue';
 import UserPage from '@/views/users/UserIndex.vue';
+import EmployeeFormTest from '@/components/EmployeeFormTest.vue'; 
 
 const routes = [
   {
@@ -38,12 +39,12 @@ const routes = [
     ]
   },
   {
-    path: '/emplayee',
+    path: '/employee',
     component: AdminLayout,
     children: [
       {
         path: '',
-        component: EmplayeePage
+        component: EmployeePage
       }
     ]
   },
@@ -57,6 +58,13 @@ const routes = [
       }
     ]
   },
+
+  {
+    path: '/employee-form-test', // The URL for your test page
+    name: 'employee-form-test',
+    component: EmployeeFormTest, // Use the test component here
+  },
+
 ];
 
 const router = createRouter({

@@ -21,7 +21,7 @@
         </li>
 
         <li class="nav-item">
-          <router-link to="/emplayee" class="nav-link">
+          <router-link to="/employee" class="nav-link">
             <IdentificationIcon class="icon"/>
             <p> Funcionário </p>
           </router-link>

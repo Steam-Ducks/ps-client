@@ -1,42 +1,43 @@
 <template>
   <form @submit.prevent="submitForm" class="company-form">
+    <!-- Nome -->
     <div class="form-group">
       Nome:
       <input type="text" id="name" v-model="company.name" required />
     </div>
 
+    <!-- CNPJ/CPF -->
     <div class="form-group">
       CNPJ/CPF:
       <input
         type="text"
         id="cnpj"
         v-model="company.cnpj"
-        :v-mask="cnpjMask"
-        @input="validateCnpj"
-        :maxlength="cnpjMaxLength"
-        :minlength="cnpjMinLength"
+        v-mask="cnpjMask"
+        placeholder="00.000.000/0000-00"
         required
       />
     </div>
 
+    <!-- Contato -->
     <div class="form-group">
       Contato:
       <input
         type="text"
         id="contact"
         v-model="company.contact"
-        :v-mask="phoneMask"
-        @input="validateContact"
-        :maxlength="phoneMaxLength"
-        :minlength="phoneMinLength"
+        v-mask="phoneMask"
+        placeholder="Telefone"
         required
       />
     </div>
 
+    <!-- Botão de Cadastro -->
     <div>
       <CreateButton> Cadastrar </CreateButton>
     </div>
 
+    <!-- Mensagem de erro -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
@@ -47,7 +48,7 @@
 import CompanyService from '@/services/CompanyService.js';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
-import { Mask } from 'vue-the-mask';
+import { IMaskDirective } from 'vue-imask';
 
 export default {
   name: 'CompanyForm',
@@ -57,7 +58,7 @@ export default {
   },
 
   directives: {
-    Mask,
+    mask: IMaskDirective,
   },
 
   emits: ['company-created'],
@@ -70,47 +71,54 @@ export default {
         contact: '',
       },
       errorMessage: '',
+      cnpjMask: {
+        mask: [
+          {
+            mask: '000.000.000-00',
+            maxLength: 11,
+          },
+          {
+            mask: '00.000.000/0000-00',
+            maxLength: 14,
+          },
+        ],
+        dispatch: (appended, dynamicMasked) => {
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
+          return number.length > 11 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
+        },
+      },
+      phoneMask: {
+        mask: [
+          {
+            mask: '(00) 0000-0000',
+            maxLength: 10,
+          },
+          {
+            mask: '(00) 00000-0000',
+            maxLength: 11,
+          },
+        ],
+        dispatch: (appended, dynamicMasked) => {
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
+          return number.length > 10 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
+        },
+      },
     };
-  },
-
-  computed: {
-    // Máscara para CNPJ/CPF
-    cnpjMask() {
-      return this.company.cnpj.replace(/\D/g, '').length <= 11
-        ? '###.###.###-##' // CPF
-        : '##.###.###/####-##'; // CNPJ
-    },
-
-    // Tamanho máximo e mínimo para CPF e CNPJ
-    cnpjMaxLength() {
-      return this.company.cnpj.replace(/\D/g, '').length <= 11 ? 14 : 18;
-    },
-    cnpjMinLength() {
-      return this.company.cnpj.replace(/\D/g, '').length <= 11 ? 11 : 14; //CPF tem 11 digitos, CNPJ tem 14
-    },
-
-    // Máscara para telefone fixo/celular
-    phoneMask() {
-      return this.company.contact.replace(/\D/g, '').length > 10
-        ? '(##) #####-####' // Celular
-        : '(##) ####-####'; // Fixo
-    },
-
-    // Tamanho máximo e mínimo para telefone fixo e celular
-    phoneMaxLength() {
-      return this.company.contact.replace(/\D/g, '').length > 10 ? 15 : 14;
-    },
-    phoneMinLength() {
-      return this.company.contact.replace(/\D/g, '').length > 10 ? 11 : 10; //Celular tem 11 digitos, fixo tem 10
-    },
   },
 
   methods: {
     async submitForm() {
       this.errorMessage = '';
 
+      // Limpar os dados antes de enviar para o servidor
+      const companyToSubmit = {
+        ...this.company,
+        cnpj: this.company.cnpj.replace(/\D/g, ''),
+        contact: this.company.contact.replace(/\D/g, ''),
+      };
+
       try {
-        await CompanyService.createCompany(this.company);
+        await CompanyService.createCompany(companyToSubmit);
 
         Swal.fire({
           icon: 'success',
@@ -130,16 +138,6 @@ export default {
         console.error('Erro ao cadastrar empresa:', error);
       }
     },
-
-    // Validação simples de CNPJ/CPF
-    validateCnpj() {
-      // Remove todos os caracteres não numéricos
-      this.company.cnpj = this.company.cnpj.replace(/\D/g, '');
-    },
-    validateContact() {
-      // Remove todos os caracteres não numéricos
-      this.company.contact = this.company.contact.replace(/\D/g, '');
-    }
   },
 };
 </script>
