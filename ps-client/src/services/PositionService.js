@@ -24,4 +24,3 @@ const PositionService = {
 }
 
 export default PositionService;
-

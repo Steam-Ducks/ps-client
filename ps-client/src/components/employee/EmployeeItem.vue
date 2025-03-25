@@ -1,8 +1,8 @@
 <template>
   <tr>
-    <td>{{ company.name }}</td>
-    <td>{{ company.cnpj }}</td>
-    <td>{{ company.contact }}</td>
+    <td>{{ employee.name }}</td>
+    <td>{{ employee.cpf }}</td>
+    <td>{{ employee.cargo }}</td>
     <td class="actions">
       <EllipsisHorizontalIcon class="icon" @click="toggleOptionsButton"/>
       <div v-if="isOptionsButton" class="modal">
@@ -17,13 +17,13 @@ import { EllipsisHorizontalIcon } from '@heroicons/vue/24/solid';
 import OptionsButton from '@/components/ui/OptionsButton.vue';
 
 export default {
-  name: 'CompanyItem',
+  name: 'EmployeeItem',
   components: {
     EllipsisHorizontalIcon,
     OptionsButton,
   },
   props: {
-    company: {
+    employee: {
       type: Object,
       required: true,
     },
@@ -42,10 +42,14 @@ export default {
 </script>
 
 <style scoped>
+td {
+  padding: 10px;
+  width: 33%;
+}
 
 .actions {
   text-align: center;
-  position: relative; /* Adicionado para posicionar o .modal corretamente */
+  position: relative; 
 }
 
 .icon {
@@ -60,4 +64,5 @@ export default {
   z-index: 10;
   right: 0; 
 }
+
 </style>

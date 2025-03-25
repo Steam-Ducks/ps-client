@@ -7,7 +7,7 @@
     </div>
 
     <h2> Nova Empresa </h2>
-    <p> Preencha os campos abaixo para cadastrar sua empresa </p>
+    <p> Preencha os campos abaixo para cadastrar a empresa </p>
 
     <CompanyForm @company-created="goBack" />
   </div>
@@ -34,12 +34,18 @@ export default {
 <style scoped>
 .company-create-view {
   width: 100%;
+  position: relative;
 }
 
 .button-container {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
+  position: absolute;  
+  top: 0;  
+  right: 0;  
+  z-index: 10; 
+  padding: 10px;
 }
 
 .transparent-button {

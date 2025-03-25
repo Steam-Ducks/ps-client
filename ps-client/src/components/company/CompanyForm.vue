@@ -1,23 +1,43 @@
 <template>
   <form @submit.prevent="submitForm" class="company-form">
+    <!-- Nome -->
     <div class="form-group">
       Nome:
       <input type="text" id="name" v-model="company.name" required />
     </div>
 
+    <!-- CNPJ/CPF -->
     <div class="form-group">
-      CNPJ:
-      <input type="text" id="cnpj" v-model="company.cnpj" required />
+      CNPJ/CPF:
+      <input
+        type="text"
+        id="cnpj"
+        v-model="company.cnpj"
+        v-mask="cnpjMask"
+        placeholder="00.000.000/0000-00"
+        required
+      />
     </div>
 
+    <!-- Contato -->
     <div class="form-group">
       Contato:
-      <input type="text" id="contact" v-model="company.contact" required />
+      <input
+        type="text"
+        id="contact"
+        v-model="company.contact"
+        v-mask="phoneMask"
+        placeholder="Telefone"
+        required
+      />
     </div>
 
+    <!-- Botão de Cadastro -->
     <div>
       <CreateButton> Cadastrar </CreateButton>
     </div>
+
+    <!-- Mensagem de erro -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
@@ -28,12 +48,19 @@
 import CompanyService from '@/services/CompanyService.js';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
+import { IMaskDirective } from 'vue-imask';
 
 export default {
   name: 'CompanyForm',
+
   components: {
     CreateButton,
   },
+
+  directives: {
+    mask: IMaskDirective,
+  },
+
   emits: ['company-created'],
 
   data() {
@@ -44,6 +71,38 @@ export default {
         contact: '',
       },
       errorMessage: '',
+      cnpjMask: {
+        mask: [
+          {
+            mask: '000.000.000-00',
+            maxLength: 11,
+          },
+          {
+            mask: '00.000.000/0000-00',
+            maxLength: 14,
+          },
+        ],
+        dispatch: (appended, dynamicMasked) => {
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
+          return number.length > 11 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
+        },
+      },
+      phoneMask: {
+        mask: [
+          {
+            mask: '(00) 0000-0000',
+            maxLength: 10,
+          },
+          {
+            mask: '(00) 00000-0000',
+            maxLength: 11,
+          },
+        ],
+        dispatch: (appended, dynamicMasked) => {
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
+          return number.length > 10 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
+        },
+      },
     };
   },
 
@@ -51,8 +110,15 @@ export default {
     async submitForm() {
       this.errorMessage = '';
 
+      // Limpar os dados antes de enviar para o servidor
+      const companyToSubmit = {
+        ...this.company,
+        cnpj: this.company.cnpj.replace(/\D/g, ''),
+        contact: this.company.contact.replace(/\D/g, ''),
+      };
+
       try {
-        await CompanyService.createCompany(this.company);
+        await CompanyService.createCompany(companyToSubmit);
 
         Swal.fire({
           icon: 'success',
@@ -95,7 +161,7 @@ export default {
 
 .form-group {
   margin-bottom: 20px;
-  width: 100%; /* Make form groups take full width */
+  width: 100%;
 }
 
 label {
@@ -105,8 +171,7 @@ label {
 }
 
 input[type='text'],
-input[type='email'],
-input[type='password'] {
+input[type='number'] {
   width: 100%;
   padding: 12px;
   border: 1px solid #cbd5e1;
@@ -121,6 +186,6 @@ input[type='password'] {
 }
 
 .button-container {
-  margin-top: 20px; /* Add some space above the button */
+  margin-top: 20px;
 }
 </style>
