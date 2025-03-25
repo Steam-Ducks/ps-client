@@ -48,9 +48,6 @@ export default {
   margin-top: 20px;
 }
 
-th {
-  text-align: left;
-  color: #350453;
-}
+
 
 </style>

@@ -28,16 +28,7 @@ export default {
 </script>
 
 <style scoped>
-td {
-  padding: 10px 0 10px 0;
-  width: 33%;
-  color: #828282;
-}
 
-td:first-child {
-  color: #350453;
-  font-weight: 500;
-}
 .actions {
   text-align: center;
 }

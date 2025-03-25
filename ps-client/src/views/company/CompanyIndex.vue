@@ -33,6 +33,10 @@
     width: 700px;
     font-size: 20px;
   }
+
+  .modal-content-position {
+    width: 560px;
+  }
 </style>
 
 <template>
@@ -66,7 +70,7 @@
   </div>
 
   <div v-else-if="isCreatingPosition" class="modal">
-    <div class="modal-content">
+    <div class="modal-content modal-content-position">
       <PositionCreate @go-back="hideCreatePosition" />
     </div>
   </div>

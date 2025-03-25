@@ -64,7 +64,6 @@
   
   <style scoped>
   .position-form {
-    max-width:700px;
     margin: 0 auto;
     background-color: #ffffff;
     display: flex;
@@ -72,16 +71,13 @@
     align-items: center;
   }
   
-  .form-title {
-    text-align: center;
-    color: #1e293b;
-    margin-bottom: 30px;
-  }
   
   .form-group {
-    padding: 25px;
-    margin-bottom: 20px;
-    width: 100%; /* Make form groups take full width */
+    padding: 10px 0 25px;
+    margin-bottom: 0px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 300;
   }
   
   label {
@@ -90,16 +86,17 @@
     color: #334155;
   }
   
-  input[type='text'],
-  input[type='email'],
-  input[type='password'] {
+  input[type='text'] {
+    margin-top: 6px;
     width: 100%;
     padding: 12px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
+
   }
+
   
   .error-message {
     color: #dc2626;
@@ -109,5 +106,8 @@
   .button-container {
     margin-top: 20px; /* Add some space above the button */
   }
+
+
+ 
   </style>
   

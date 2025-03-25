@@ -2,12 +2,14 @@
     <div class="position-create-view">
         <div class="button-container">
             <button @click="goBack" class="transparent-button">
-            <XMarkIcon class="icon" />
-        </button>
-    </div>
-
-    <h2> Novo Cargo </h2>
-        <PositionForm @position-created="goBack"/>
+              <XMarkIcon class="icon" />
+            </button>
+        </div>
+        <div class="contents">
+          <h2> Novo Cargo </h2>
+          <PositionForm @position-created="goBack"/>
+        </div>
+        
     </div>
 </template>
 
@@ -33,13 +35,15 @@
 <style scoped>
 .position-create-view {
   width: 100%;
-  padding: 0px 10px 0px 10px;
 }
 
 .button-container {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 20px;
+  align-items: center;
+}
+.contents {
+  padding: 0 24px 8px;
 }
 
 .transparent-button {
@@ -53,4 +57,9 @@
   width: 28px;
   height: 28px;
 }
+
+h2 {
+  margin-top: -10px;
+}
+
 </style>
