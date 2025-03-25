@@ -7,31 +7,38 @@
       <ul class="nav-bar" >
 
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <router-link to="/" class="nav-link">
             <HomeIcon class="icon" />
             <p>Home</p>
-          </a>
+          </router-link>
         </li>
 
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <router-link to="/company" class="nav-link">
             <BuildingOffice2Icon class="icon"/>
             <p>Empresas</p>
-          </a>
+          </router-link>
         </li>
 
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <router-link to="/employee" class="nav-link">
             <IdentificationIcon class="icon"/>
             <p> Funcionário </p>
-          </a>
+          </router-link>
         </li>
 
         <li class="nav-item">
-          <a href="#" class="nav-link">
+          <router-link to="/ponto" class="nav-link">
             <CalendarDateRangeIcon class="icon"/>
             <p> Espelho de ponto </p>
-          </a>
+          </router-link>
+        </li>
+
+        <li class="nav-item">
+          <router-link to="/user" class="nav-link">
+            <UserIcon class="icon"/>
+            <p> Usuário </p>
+          </router-link>
         </li>
 
       </ul>
@@ -46,6 +53,7 @@ import { HomeIcon } from '@heroicons/vue/24/solid'
 import { BuildingOffice2Icon } from '@heroicons/vue/24/solid'
 import { IdentificationIcon } from '@heroicons/vue/24/solid'
 import { CalendarDateRangeIcon } from '@heroicons/vue/24/solid'
+import { UserIcon } from '@heroicons/vue/24/solid'
 
 export default {
   name: 'SideBar',
@@ -55,6 +63,7 @@ export default {
     BuildingOffice2Icon,
     IdentificationIcon,
     CalendarDateRangeIcon,
+    UserIcon,
   }
 };
 </script>
@@ -85,7 +94,7 @@ export default {
 
 .logo-bottom {
   width: 80px;
-  margin-top: 350px;
+  margin-top: 280px;
 }
 
   .nav-bar{
