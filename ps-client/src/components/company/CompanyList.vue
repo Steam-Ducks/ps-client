@@ -50,5 +50,7 @@ export default {
 
 th {
   text-align: left;
+  color: #350453;
 }
+
 </style>
