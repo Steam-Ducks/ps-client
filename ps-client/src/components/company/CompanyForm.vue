@@ -83,7 +83,7 @@ export default {
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
+          const number = dynamicMasked.value ;
           return number.length > 11 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
         },
       },
@@ -99,7 +99,7 @@ export default {
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
+          const number = dynamicMasked.value
           return number.length > 10 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
         },
       },
@@ -113,8 +113,8 @@ export default {
       // Limpar os dados antes de enviar para o servidor
       const companyToSubmit = {
         ...this.company,
-        cnpj: this.company.cnpj.replace(/\D/g, ''),
-        contact: this.company.contact.replace(/\D/g, ''),
+        cnpj: this.company.cnpj,
+        contact: this.company.contact,
       };
 
       try {
@@ -134,9 +134,9 @@ export default {
           };
         });
       } catch (error) {
-        this.errorMessage = 'Erro ao cadastrar empresa. Tente novamente.';
-        console.error('Erro ao cadastrar empresa:', error);
-      }
+    this.errorMessage = error.message;
+    console.error("Erro:", error.message);
+  }
     },
   },
 };
