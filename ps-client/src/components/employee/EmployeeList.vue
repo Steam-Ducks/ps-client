@@ -3,10 +3,10 @@
     <table>
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Nome Completo</th>
           <th>CPF</th>
-          <th>cargo</th>
-          <th> </th>
+          <th>Cargo</th>
+          <th> Empresa </th>
         </tr>
       </thead>
       <tbody>
