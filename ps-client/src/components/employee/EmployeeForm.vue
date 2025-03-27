@@ -81,10 +81,6 @@
       <CreateButton> Cadastrar </CreateButton>
     </div>
 
-    <!-- Mensagem de erro -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
   </form>
 </template>
 
@@ -172,10 +168,6 @@
           this.errorMessage = 'Por favor, selecione um cargo.';
           return;
         }
-        if (!this.selectedFile) {
-          this.errorMessage = 'Por favor, selecione uma imagem.';
-          return;
-        }
 
         try {
           const timestamp = new Date().getTime();
@@ -183,7 +175,7 @@
           const fileExtension = this.selectedFile.name.split('.').pop();
           const uniqueFileName = `employee_${timestamp}_${random}.${fileExtension}`;
 
-          this.employee.photo = `img/employees/${uniqueFileName}`;
+          this.employee.photo = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/public/userfiles/photos/${uniqueFileName}`;
 
           this.moveImageToAssets(this.selectedFile, uniqueFileName);
 
@@ -223,7 +215,14 @@
             this.selectedFile = null;
           });
         } catch (error) {
-          this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao cadastrar funcionário!',
+            text: error.message,
+            showConfirmButton: false,
+            timer: 3500,
+          })
           console.error('Erro ao cadastrar funcionario:', error);
         }
       },
@@ -263,10 +262,6 @@
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
-  }
-
-  .error-message {
-    color: #dc2626;
   }
 
   .button-container {

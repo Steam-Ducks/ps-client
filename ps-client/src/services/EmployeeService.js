@@ -1,6 +1,5 @@
 import axios from 'axios'; // Biblioteca para fazer requisições HTTP.
 
-const UPLOAD_IMAGE_URL = 'http://localhost:8080/api/upload-image'; // URL para upload de imagem
 const API_URL = 'http://localhost:8080/api/employees'; // Aonde o bootstrap está disponibilizando os dados
 
 const EmployeeService = { // Aonde colocamos as funções para as requisições
@@ -35,19 +34,26 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
 
   async uploadEmployeePhotoToSupabase(file, uniqueFileName) {
     try {
+      // Prepare the form data with the file to upload
       const formData = new FormData();
-      formData.append('photo', file, uniqueFileName);
-
-      const response = await axios.post(UPLOAD_IMAGE_URL, formData, {
+      formData.append('file', file, uniqueFileName); // Use the file directly from input
+  
+      // Send the request to Supabase
+      const path = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/userfiles/photos/${uniqueFileName}`
+      console.log(path)
+      const response = await axios.post(`https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/userfiles/photos/${uniqueFileName}`, formData, {
         headers: {
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzY2p1ZXlrbXd4eHpvYW56Y29vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTcyNzMzMiwiZXhwIjoyMDU3MzAzMzMyfQ.QjlIc7Il28PgOkiBc8a_zES9ZNysrxN9W7fSYmDoZ8s', // Your Supabase JWT token
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('Imagem enviada com sucesso para o backend e Supabase!');
-      return response.data; // Retorna a resposta do backend (pode ser o caminho da imagem no Supabase)
+  
+      console.log('Image uploaded successfully to Supabase!');
+      return response.data; // Return the response (it will contain the file details, like the URL)
     } catch (error) {
-      console.error('Erro ao enviar imagem para o backend e Supabase:', error);
-      const errorMessage = error.response?.data?.message || "Erro desconhecido ao enviar imagem para o backend e Supabase.";
+      console.log(uniqueFileName)
+      console.error('Error uploading image to Supabase:', error);
+      const errorMessage = error.response?.data?.message || 'Unknown error uploading image to Supabase.';
       throw new Error(errorMessage);
     }
   },
