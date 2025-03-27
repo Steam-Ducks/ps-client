@@ -14,7 +14,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
     }
   },
 
-  async getAllEmployees(){ // Changed the method name to 'getAllEmployees'
+  async getAllEmployees(){
     try {
       const response = await axios.get(`${API_URL}`);
       return response.data; 
@@ -34,11 +34,9 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
 
   async uploadEmployeePhotoToSupabase(file, uniqueFileName) {
     try {
-      // Prepare the form data with the file to upload
       const formData = new FormData();
-      formData.append('file', file, uniqueFileName); // Use the file directly from input
+      formData.append('file', file, uniqueFileName);
   
-      // Send the request to Supabase
       const path = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/userfiles/photos/${uniqueFileName}`
       console.log(path)
       const response = await axios.post(`https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/userfiles/photos/${uniqueFileName}`, formData, {
@@ -49,7 +47,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       });
   
       console.log('Image uploaded successfully to Supabase!');
-      return response.data; // Return the response (it will contain the file details, like the URL)
+      return response.data;
     } catch (error) {
       console.log(uniqueFileName)
       console.error('Error uploading image to Supabase:', error);

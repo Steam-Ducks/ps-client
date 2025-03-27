@@ -46,8 +46,8 @@ export default {
 <style scoped>
 
 img {
-  width: 64px;
-  height: 64px;
+  width: 44px;
+  height: 44px;
   object-fit: cover;
   object-position: center;
   border-radius: 50%;

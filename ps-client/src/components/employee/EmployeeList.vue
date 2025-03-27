@@ -3,7 +3,7 @@
     <table>
       <thead>
         <tr>
-          <th>Foto</th>
+          <th></th>
           <th>Nome Completo</th>
           <th>CPF</th>
           <th>Cargo</th>
@@ -47,8 +47,6 @@ export default {
   font-size: 1.2rem;
   margin-top: 20px;
 }
-th:first-child {
-  text-align: center;
-}
+
 
 </style>

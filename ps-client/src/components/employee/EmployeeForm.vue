@@ -30,6 +30,7 @@
         id="cpf"
         v-model="employee.cpf"
         v-mask="cpfMask"
+        minlength="14"
         placeholder="123.456.789-00"
         required
       />
@@ -159,13 +160,24 @@
       },
 
       async submitForm() {
-        this.errorMessage = '';
-        if (!this.employee.company_id) {
-          this.errorMessage = 'Por favor, selecione uma empresa.';
-          return;
+        let errorMessage = '';
+
+        if (!this.selectedFile) {
+          errorMessage = 'Por favor, anexe uma foto!';
+        } else if (!this.employee.company_id) {
+          errorMessage = 'Por favor, selecione uma empresa.';
+        } else if (!this.employee.position_id) {
+          errorMessage = 'Por favor, selecione um cargo.';
         }
-        if (!this.employee.position_id) {
-          this.errorMessage = 'Por favor, selecione um cargo.';
+
+        if (errorMessage) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Faltam informações',
+            text: errorMessage,
+            showConfirmButton: false,
+            timer: 2500,
+          });
           return;
         }
 

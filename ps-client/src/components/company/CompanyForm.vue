@@ -14,6 +14,7 @@
         id="cnpj"
         v-model="company.cnpj"
         v-mask="cnpjMask"
+        minlength="11"
         placeholder="00.000.000/0000-00"
         required
       />
@@ -83,7 +84,7 @@ export default {
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = dynamicMasked.value ;
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
           return number.length > 11 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
         },
       },
@@ -99,7 +100,7 @@ export default {
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = dynamicMasked.value
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
           return number.length > 10 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
         },
       },
@@ -108,8 +109,20 @@ export default {
 
   methods: {
     async submitForm() {
-      this.errorMessage = '';
+      let errorMessage = '';
 
+      console.log(this.company.cnpj.length)
+        if (this.company.cnpj.length != 14 && this.company.cnpj.length != 18) {
+          errorMessage = 'CNPJ/CPF Inválidos';
+          Swal.fire({
+            icon: 'warning',
+            title: 'Faltam informações',
+            text: errorMessage,
+            showConfirmButton: false,
+            timer: 2500,
+          });
+          return;
+        } 
       // Limpar os dados antes de enviar para o servidor
       const companyToSubmit = {
         ...this.company,
@@ -134,9 +147,14 @@ export default {
           };
         });
       } catch (error) {
-    this.errorMessage = error.message;
-    console.error("Erro:", error.message);
-  }
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao cadastar Empresa',
+          text: error.message,
+          showConfirmButton: false,
+          timer: 3500,
+        })
+      }
     },
   },
 };
