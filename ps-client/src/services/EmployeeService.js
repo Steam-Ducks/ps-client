@@ -9,7 +9,8 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       const response = await axios.post(`${API_URL}`, createEmployee);
       return response.data; 
     } catch (error) {
-      throw new Error('Erro ao criar empresa: ' + error.message);
+      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar funcionário"
+      throw new Error(errorMessage);
     }
   },
 

@@ -43,7 +43,6 @@ export default {
 
 <style scoped>
 td {
-  padding: 10px;
   width: 33%;
 }
 
