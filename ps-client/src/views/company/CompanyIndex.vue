@@ -45,3 +45,44 @@ export default {
 
 };
 </script>
+<<<<<<< Updated upstream
+=======
+
+<style scoped>
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .buttons {
+    display: flex;
+    gap: 10px; 
+    font-family: Nunito;
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    width: 700px;
+    font-size: 20px;
+  }
+</style>
+>>>>>>> Stashed changes

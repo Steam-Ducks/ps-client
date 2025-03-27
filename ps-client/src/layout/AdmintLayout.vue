@@ -24,7 +24,7 @@ export default {
   margin-left: 300px;
   margin-right: 20px;
   margin-top:65px;
-  padding: 20px;
+  padding: 0 40px 40px 40px;
   flex-grow: 1;
   background-color: #fff;
   border-radius: 20px;

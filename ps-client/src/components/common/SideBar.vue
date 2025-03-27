@@ -72,6 +72,8 @@ export default {
     border: 1px solid #ccc;
     z-index:2;
     padding: 10px;
+    color: #551a8b;
+    font-family: Nunito;
   }
 
   img{
@@ -85,7 +87,9 @@ export default {
 
 .logo-bottom {
   width: 80px;
-  margin-top: 350px;
+  padding-bottom: 17px;
+  width: 70px;
+  margin-top: 110%;
 }
 
   .nav-bar{
@@ -102,6 +106,9 @@ export default {
     text-decoration: none;
     font-size: 18px;
     border-radius: 10px;
+    color: #551a8b;
+    font-family: Nunito;
+    padding: 0 10px 0 10px;
   }
 
   .nav-link:hover {
@@ -114,5 +121,18 @@ export default {
     margin-right: 10px;
   }
 
-  
+  .nav-footer{
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height:43%;
+  }
+
+  .nav-header{
+    height:14%;
+  }
+
+  .nav-section{
+    height:43%;
+  }
 </style>
