@@ -1,6 +1,9 @@
 <template>
   <div class="side-bar">
-    <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+
+    <div class="nav-header">
+      <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+    </div>
 
     <div class="nav-section">
       
@@ -44,7 +47,10 @@
       </ul>
     </div>
 
-    <img src="@/assets/SteamDucksLogo.png" alt="Logo" class="logo-bottom">
+    <div class="nav-footer">
+      <img src="@/assets/SteamDucksLogo.png" alt="Logo" class="logo-bottom">
+    </div>
+
   </div>
 </template>
 
@@ -74,13 +80,15 @@ export default {
     text-align: center;
     background-color: #fff;
     width: 261px;
-    height: 100vh;
+    height: 100%;
     position: fixed; 
     top: 0; 
     left: 0;
     border: 1px solid #ccc;
     z-index:2;
     padding: 10px;
+    color: #551a8b;
+    font-family: Nunito;
   }
 
   img{
@@ -94,7 +102,7 @@ export default {
 
 .logo-bottom {
   width: 80px;
-  margin-top: 150%;
+  padding-bottom: 17px;
 }
 
   .nav-bar{
@@ -111,6 +119,9 @@ export default {
     text-decoration: none;
     font-size: 18px;
     border-radius: 10px;
+    color: #551a8b;
+    font-family: Nunito;
+    padding: 0 10px 0 10px;
   }
 
   .nav-link:hover {
@@ -123,5 +134,18 @@ export default {
     margin-right: 10px;
   }
 
-  
+  .nav-footer{
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height:43%;
+  }
+
+  .nav-header{
+    height:14%;
+  }
+
+  .nav-section{
+    height:43%;
+  }
 </style>

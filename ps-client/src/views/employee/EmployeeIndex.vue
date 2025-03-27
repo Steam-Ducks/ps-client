@@ -102,15 +102,14 @@
     }
   
     .modal-content {
-      width: 700;
-      height: 917;
+      width: 25%;
+      height: 80%;
       top: 81px;
       left: 633px;
       border-radius: 20px;
       background-color: #FFFFFF;
-      padding-left: 70px;
-      padding-right: 70px;
-      padding-top:30px;
+      padding-left: 50px;
+      padding-right: 50px;
       padding-bottom:30px;
     }
 

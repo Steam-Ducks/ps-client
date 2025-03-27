@@ -1,14 +1,25 @@
 <template>
-
   <form @submit.prevent="submitForm" class="employee-form">
 
-    <!-- foto -->
-    <img src="https://blogdebrinquedo.com.br/wp-content/uploads/2024/02/20240208boneco-nendoroid-bob-minions-02.jpg" class="profiele-picture"/>
+    <div class="image-preview-container">
+        <!-- foto --> 
+        <img :src="previewImage || defaultProfilePicture" class="profile-picture" alt="Profile Picture"/>
+        <input type="file" id="photo" accept="image/*" @change="onFileChange" class="selector"/>
+        <label for="photo" class="upload-button">
+          Selecionar Foto
+        </label>
+    </div>
 
     <!-- Nome -->
     <div class="form-group">
       Nome:
-      <input type="text" id="name" v-model="employee.name" placeholder="Nome completo" required />
+      <input
+        type="text"
+        id="name"
+        v-model="employee.name"
+        placeholder="Nome completo"
+        required
+      />
     </div>
 
     <!-- CPF -->
@@ -28,8 +39,11 @@
     <div class="form-group">
       Empresa:
       <select id="company_id" v-model="employee.company_id" required>
-        <option value="" disabled>Selecione uma empresa</option>
-        <option v-for="company in companies" :key="company.id" :value="parseInt(company.id)">
+        <option
+          v-for="company in companies"
+          :key="company.id"
+          :value="parseInt(company.id)"
+        >
           {{ company.name }}
         </option>
       </select>
@@ -39,8 +53,11 @@
     <div class="form-group">
       Cargo:
       <select id="position_id" v-model="employee.position_id" required>
-        <option value="" disabled>Selecione um cargo</option>
-        <option v-for="position in positions" :key="position.id" :value="parseInt(position.id)">
+        <option
+          v-for="position in positions"
+          :key="position.id"
+          :value="parseInt(position.id)"
+        >
           {{ position.name }}
         </option>
       </select>
@@ -49,7 +66,14 @@
     <!-- Remuneração -->
     <div class="form-group">
       Remuneração:
-      <input type="text" id="salary" v-model="employee.salary" v-mask="currencyMask" placeholder="R$" required />
+      <input
+        type="text"
+        id="salary"
+        v-model="employee.salary"
+        v-mask="currencyMask"
+        placeholder="R$"
+        required
+      />
     </div>
 
     <!-- Botão de Cadastrar  -->
@@ -61,13 +85,10 @@
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
-
   </form>
-
 </template>
 
 <script>
-
   import EmployeeService from '@/services/EmployeeService.js';
   import CompanyService from '@/services/CompanyService.js';
   import PositionService from '@/services/PositionService.js';
@@ -90,27 +111,27 @@
 
     data() {
       return {
-        
         employee: {
           name: '',
           cpf: '',
           company_id: null,
           position_id: null,
           salary: '',
+          photo: null,
         },
         errorMessage: '',
         companies: [],
         positions: [],
-
+        previewImage: null,
+        defaultProfilePicture:
+          'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png',
         cpfMask: {
           mask: '000.000.000-00',
         },
-
         currencyMask: {
           mask: Number,
           scale: 2,
         },
-
       };
     },
 
@@ -118,15 +139,27 @@
       try {
         this.companies = await CompanyService.getAllCompanies();
         this.positions = await PositionService.getAllPositions();
-      } 
-      catch (error) {
+      } catch (error) {
         console.error('Error fetching companies or positions:', error);
         this.errorMessage = 'Erro ao carregar empresas ou cargos.';
       }
-
     },
 
     methods: {
+      onFileChange(event) {
+
+        const file = event.target.files[0];
+
+        if (file) {
+          this.employee.photo = file; 
+          this.previewImage = URL.createObjectURL(file); 
+        } 
+        else {
+          this.employee.photo = null;
+          this.previewImage = null;
+        }
+      },
+
       async submitForm() {
         this.errorMessage = '';
         if (!this.employee.company_id) {
@@ -139,20 +172,26 @@
         }
 
         try {
-          await EmployeeService.createEmployee({
-            name: this.employee.name,
-            cpf: this.employee.cpf,
-            companyId: this.employee.company_id,
-            positionId: this.employee.position_id,
-            salary: parseFloat(this.employee.salary),
-          });
+          const formData = new FormData();
+          formData.append('name', this.employee.name);
+          formData.append('cpf', this.employee.cpf);
+          formData.append('companyId', this.employee.company_id);
+          formData.append('positionId', this.employee.position_id);
+          formData.append('salary', parseFloat(this.employee.salary));
+          if (this.employee.photo) {
+            formData.append('photo', this.employee.photo);
+          }
+
+          await EmployeeService.createEmployee(formData);
 
           Swal.fire({
             icon: 'success',
             title: 'Funcionario criado com sucesso!',
             showConfirmButton: false,
             timer: 1500,
-          }).then(() => {
+          })
+          
+          .then(() => {
             this.$emit('employee-created');
             this.employee = {
               name: '',
@@ -160,69 +199,98 @@
               company_id: null,
               position_id: null,
               salary: '',
+              photo: null,
             };
+            this.previewImage = null;
           });
-        } catch (error) {
-            this.errorMessage = error.message;
-            console.error("Erro:", error.message);
+        } 
+        
+        catch (error) {
+          this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
+          console.error('Erro ao cadastrar funcionario:', error);
         }
+
       },
     },
 
   };
+
 </script>
 
 <style scoped>
+.employee-form {
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .employee-form {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 30px;
-    background-color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+.form-title {
+  text-align: center;
+  color: #1e293b;
+}
 
-  .form-title {
-    text-align: center;
-    color: #1e293b;
-    margin-bottom: 30px;
-  }
+.form-group {
+  width: 100%;
+  margin-bottom: 8px;
+}
 
-  .form-group {
-    width: 100%;
-  }
+label {
+  display: block;
+  color: #334155;
+  margin-bottom: 5px;
+}
 
-  label {
-    display: block;
-    color: #334155;
-  }
+input[type='text'],
+input[type='number'],
+select {
+  width: 100%;
+  height: 30px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
 
-  input[type='text'],
-  input[type='number'],
-  select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 1rem;
-    box-sizing: border-box;
-  }
+.error-message {
+  color: #dc2626;
+  margin-top: 15px;
+}
 
-  .error-message {
-    color: #dc2626;
-    margin-top: 15px;
-  }
+.button-container {
+  text-align: center;
+  width: 100%;
+}
 
-  .button-container {
-    text-align: center;
-    width: 100%;
-  }
+.profile-picture {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
 
-  .profiele-picture{
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-  }
+.image-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.image-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.upload-button {
+  cursor: pointer;
+  color: #6F08AF;
+}
+
+.selector{
+  display: none;
+}
+
 </style>
