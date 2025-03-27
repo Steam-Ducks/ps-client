@@ -43,12 +43,10 @@
   .button-container {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 20px;
     position: absolute;  
     top: 0;  
     right: 0;  
     z-index: 10; 
-    padding: 10px;
   }
 
   .transparent-button {

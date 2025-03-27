@@ -132,6 +132,7 @@
           mask: Number,
           scale: 2,
         },
+        selectedFile: null,
       };
     },
 
@@ -147,17 +148,18 @@
 
     methods: {
       onFileChange(event) {
-
         const file = event.target.files[0];
+        this.selectedFile = file;
 
         if (file) {
-          this.employee.photo = file; 
-          this.previewImage = URL.createObjectURL(file); 
-        } 
-        else {
-          this.employee.photo = null;
+          this.previewImage = URL.createObjectURL(file);
+        } else {
           this.previewImage = null;
         }
+      },
+
+      moveImageToAssets(file, uniqueFileName) {
+        console.log(`Simulando mover ${file.name} para assets/img/employees/${uniqueFileName}`);
       },
 
       async submitForm() {
@@ -170,19 +172,36 @@
           this.errorMessage = 'Por favor, selecione um cargo.';
           return;
         }
+        if (!this.selectedFile) {
+          this.errorMessage = 'Por favor, selecione uma imagem.';
+          return;
+        }
 
         try {
-          const formData = new FormData();
-          formData.append('name', this.employee.name);
-          formData.append('cpf', this.employee.cpf);
-          formData.append('companyId', this.employee.company_id);
-          formData.append('positionId', this.employee.position_id);
-          formData.append('salary', parseFloat(this.employee.salary));
-          if (this.employee.photo) {
-            formData.append('photo', this.employee.photo);
-          }
+          const timestamp = new Date().getTime();
+          const random = Math.floor(Math.random() * 1000);
+          const fileExtension = this.selectedFile.name.split('.').pop();
+          const uniqueFileName = `employee_${timestamp}_${random}.${fileExtension}`;
 
-          await EmployeeService.createEmployee(formData);
+          this.employee.photo = `img/employees/${uniqueFileName}`;
+
+          this.moveImageToAssets(this.selectedFile, uniqueFileName);
+
+          // Cria o objeto para enviar como JSON
+          const employeeToSubmit = {
+            name: this.employee.name,
+            cpf: this.employee.cpf,
+            companyId: this.employee.company_id,
+            positionId: this.employee.position_id,
+            salary: parseFloat(this.employee.salary),
+            photo: this.employee.photo,
+          };
+
+          // Envia os dados do funcionário
+          await EmployeeService.createEmployee(employeeToSubmit);
+
+          // Envia a imagem separadamente
+          await EmployeeService.uploadEmployeePhotoToSupabase(this.selectedFile, uniqueFileName);
 
           Swal.fire({
             icon: 'success',
@@ -190,7 +209,6 @@
             showConfirmButton: false,
             timer: 1500,
           })
-          
           .then(() => {
             this.$emit('employee-created');
             this.employee = {
@@ -202,95 +220,88 @@
               photo: null,
             };
             this.previewImage = null;
+            this.selectedFile = null;
           });
-        } 
-        
-        catch (error) {
+        } catch (error) {
           this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
           console.error('Erro ao cadastrar funcionario:', error);
         }
-
       },
     },
-
   };
-
 </script>
 
 <style scoped>
-.employee-form {
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .employee-form {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.form-title {
-  text-align: center;
-  color: #1e293b;
-}
+  .form-title {
+    text-align: center;
+    color: #1e293b;
+  }
 
-.form-group {
-  width: 100%;
-  margin-bottom: 8px;
-}
+  .form-group {
+    width: 100%;
+    margin-bottom: 8px;
+  }
 
-label {
-  display: block;
-  color: #334155;
-  margin-bottom: 5px;
-}
+  label {
+    display: block;
+    color: #334155;
+  }
 
-input[type='text'],
-input[type='number'],
-select {
-  width: 100%;
-  height: 30px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
+  input[type='text'],
+  input[type='number'],
+  select {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
 
-.error-message {
-  color: #dc2626;
-  margin-top: 15px;
-}
+  .error-message {
+    color: #dc2626;
+  }
 
-.button-container {
-  text-align: center;
-  width: 100%;
-}
+  .button-container {
+    text-align: center;
+    width: 100%;
+  }
 
-.profile-picture {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
+  .profile-picture {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
 
-.image-selector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
+  .image-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
 
-.image-preview-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
+  .image-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
 
-.upload-button {
-  cursor: pointer;
-  color: #6F08AF;
-}
+  .upload-button {
+    cursor: pointer;
+    color: #6F08AF;
+  }
 
-.selector{
-  display: none;
-}
-
+  .selector{
+    display: none;
+  }
 </style>
