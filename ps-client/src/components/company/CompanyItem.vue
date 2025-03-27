@@ -42,10 +42,6 @@ export default {
 </script>
 
 <style scoped>
-td {
-  padding: 10px;
-  width: 33%;
-}
 
 .actions {
   text-align: center;

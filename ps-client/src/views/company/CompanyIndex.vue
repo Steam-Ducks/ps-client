@@ -7,14 +7,15 @@
     </div>
 
     <div class="buttons">
-      <ReportButton>
-        <BriefcaseIcon class="icon"/>
-      </ReportButton> 
-      
+
       <ReportButton>
         <DocumentArrowDownIcon/>
       </ReportButton> 
-       
+
+      <CreateButton @click="showCreatePosition">
+        + Novo Cargo
+      </CreateButton> 
+      
       <CreateButton @click="showCreateCompany">
         + Nova Empresa
       </CreateButton>
@@ -27,8 +28,16 @@
     </div>
   </div>
 
+  <div v-else-if="isCreatingPosition" class="modal">
+    <div class="modal-content modal-content-position">
+      <PositionCreate @go-back="hideCreatePosition" />
+    </div>
+  </div>
+
   <CompanyList :companies="companies"/>
     
+  
+
   
   </template>
 
@@ -36,8 +45,9 @@
 import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
-import { BriefcaseIcon } from '@heroicons/vue/24/solid';
+//import { BriefcaseIcon } from '@heroicons/vue/24/solid';
 import CompanyCreate from './CompanyCreate.vue';  
+import PositionCreate from '@/views/position/PositionCreate.vue';  
 import CompanyList from '@/components/company/CompanyList.vue';
 import CompanyService from '@/services/CompanyService';
 
@@ -46,14 +56,16 @@ export default {
   components: {
     ReportButton,
     DocumentArrowDownIcon,
-    BriefcaseIcon,
+    //BriefcaseIcon,
     CreateButton,
     CompanyCreate,
+    PositionCreate,
     CompanyList,
   },
   data() {
     return {
       isCreatingCompany: false,
+      isCreatingPosition: false,
       companies: [],
     };
   },
@@ -61,6 +73,7 @@ export default {
     this.fetchCompanies(); 
   },
   methods: {
+    // ::::::::::::: Company :::::::::::::
     showCreateCompany() {
       this.isCreatingCompany = true;
     },
@@ -75,6 +88,16 @@ export default {
         console.error('Erro ao buscar empresas:', error);
       }
     },
+
+    // ::::::::::::: Position :::::::::::::
+
+    showCreatePosition() {
+      this.isCreatingPosition = true;
+    },
+    hideCreatePosition() {
+      this.isCreatingPosition = false;
+    }
+    
   },
 };
 </script>

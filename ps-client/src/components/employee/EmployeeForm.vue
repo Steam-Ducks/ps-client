@@ -163,8 +163,8 @@
             };
           });
         } catch (error) {
-          this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
-          console.error('Erro ao cadastrar funcionario:', error);
+            this.errorMessage = error.message;
+            console.error("Erro:", error.message);
         }
       },
     },

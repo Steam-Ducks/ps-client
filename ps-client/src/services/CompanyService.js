@@ -4,14 +4,16 @@ const API_URL = 'http://localhost:8080/api/companies'; // Aonde o bootstrap est�
 
 const CompanyService = { // Aonde colocamos as funções para as requisições
   
-  async createCompany(createCompany){
+  async createCompany(createCompany) {
     try {
       const response = await axios.post(`${API_URL}`, createCompany);
       return response.data; 
     } catch (error) {
-      throw new Error('Erro ao criar empresa: ' + error.message);
+      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar empresa.";
+      throw new Error(errorMessage);
     }
-  },
+  }
+  ,
 
   async getAllCompanies(){
     try {
