@@ -96,7 +96,7 @@ export default {
 
 .logo-bottom {
   width: 70px;
-  margin-top: 180%;
+  margin-top: 110%;
 }
 
   .nav-bar{
