@@ -1,8 +1,9 @@
 <template>
   <tr>
-    <td>{{ employee.name }}</td>
-    <td>{{ employee.cpf }}</td>
-    <td>{{ employee.cargo }}</td>
+    <td class="name">{{ employee.name }}</td>
+    <td class="cpf">{{ employee.cpf }}</td>
+    <td class="position">{{ employee.position.name }}</td>
+    <td class="company">{{ employee.company.name }}</td>
     <td class="actions">
       <EllipsisHorizontalIcon class="icon" @click="toggleOptionsButton"/>
       <div v-if="isOptionsButton" class="modal">
@@ -42,8 +43,21 @@ export default {
 </script>
 
 <style scoped>
-td {
+
+.name {
   width: 33%;
+}
+
+.cpf {
+  width: 15%;
+}
+
+.position {
+  width: 25%;
+}
+
+.company {
+  width: 27%;
 }
 
 .actions {

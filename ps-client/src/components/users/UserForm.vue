@@ -29,7 +29,7 @@ import FormButton from '@/components/ui/FormButton.vue';
 export default {
   name: 'UserForm',
   components: {
-    FormButton, // Add the component here
+    FormButton, 
   },
   emits: ['user-created'],
   data() {
@@ -44,10 +44,9 @@ export default {
   },
   methods: {
     async submitForm() {
-      this.errorMessage = ''; // Limpa a mensagem de erro
+      this.errorMessage = ''; 
       try {
         await UserService.createUser(this.user);
-        // Limpa o formulário após o sucesso
         this.user = {
           username: '',
           email: '',
