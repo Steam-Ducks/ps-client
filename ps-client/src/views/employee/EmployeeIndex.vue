@@ -3,7 +3,7 @@
   
       <div class="Title">
         <h1> Funcionários </h1>
-        <p> Veja abaixo os Funcionários já cadastradas. Para adicionar um novo funcionario, clique no botão + Novo Funcioanrio. </p>
+        <p> Veja abaixo os Funcionários já cadastradas. Para adicionar um novo funcionario, clique no botão + Novo Funcionário. </p>
       </div>
   
       <div class="buttons">
@@ -13,7 +13,7 @@
         </ReportButton> 
          
         <CreateButton @click="showCreateEmployee">
-          + Novo Funcioanrio
+          + Novo Funcionário
         </CreateButton>
       </div>
     </div>

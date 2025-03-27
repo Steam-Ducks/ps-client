@@ -43,14 +43,17 @@ export default {
 
   .nav-link:hover {
     background-color: #f0f0f0;
+
   }
 
   .nav-link{
     height: 100%;
     align-items: center;
     justify-content: center; 
-    padding: 0 10px;
+    margin: 0 30px;
     text-decoration: none;
+    color: #551a8b;
+    font-family: Nunito;
   }
   
 </style>
