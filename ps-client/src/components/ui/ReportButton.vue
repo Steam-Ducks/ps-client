@@ -20,5 +20,10 @@
         width: 35px;
         border-radius: 8px;
         cursor: pointer; 
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        border: none;
+    }
+    button:hover{
+        background-color: #7d30ad;
     }
 </style>
