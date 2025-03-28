@@ -114,6 +114,10 @@ export default {
       let errorMessage = '';
 
       var cnpjLimpo = this.company.cnpj.replace(/\D/g, '').trim()
+      if (cnpjLimpo > 14)
+      {
+        cnpjLimpo = cnpjLimpo.slice(0, 14);
+      }
       console.log(cnpjLimpo.length)
         if (cnpjLimpo.length != 11 && cnpjLimpo.length != 14) {
           errorMessage = 'CNPJ/CPF Inválidos';
@@ -133,6 +137,8 @@ export default {
       } else {
         cnpjFormatado = cnpjLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
       }
+
+      
       const companyToSubmit = {
         ...this.company,
         cnpj: cnpjFormatado,

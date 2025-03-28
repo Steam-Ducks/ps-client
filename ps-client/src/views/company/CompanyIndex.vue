@@ -24,7 +24,7 @@
   
   <div v-if="isCreatingCompany" class="modal">
     <div class="modal-content">
-      <CompanyCreate @go-back="hideCreateCompany" />
+      <CompanyCreate @go-back="hideCreateCompany" @company-created="fetchCompanies"/>
     </div>
   </div>
 
