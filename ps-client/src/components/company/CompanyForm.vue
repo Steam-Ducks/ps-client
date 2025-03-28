@@ -38,10 +38,6 @@
       <CreateButton> Cadastrar </CreateButton>
     </div>
 
-    <!-- Mensagem de erro -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
   </form>
 </template>
 
@@ -76,11 +72,11 @@ export default {
         mask: [
           {
             mask: '000.000.000-00',
-            maxLength: 11,
+            length: 11,
           },
           {
             mask: '00.000.000/0000-00',
-            maxLength: 14,
+            length: 14,
           },
         ],
         dispatch: (appended, dynamicMasked) => {
@@ -106,13 +102,20 @@ export default {
       },
     };
   },
-
+  watch: {
+    'company.cnpj': function (novoValor) {
+      if (novoValor) {
+        this.company.cnpj = novoValor.replace(/\D/g, '');
+      }
+    }
+  },
   methods: {
     async submitForm() {
       let errorMessage = '';
 
-      console.log(this.company.cnpj.length)
-        if (this.company.cnpj.length != 14 && this.company.cnpj.length != 18) {
+      var cnpjLimpo = this.company.cnpj.replace(/\D/g, '').trim()
+      console.log(cnpjLimpo.length)
+        if (cnpjLimpo.length != 11 && cnpjLimpo.length != 14) {
           errorMessage = 'CNPJ/CPF Inválidos';
           Swal.fire({
             icon: 'warning',
@@ -123,10 +126,16 @@ export default {
           });
           return;
         } 
-      // Limpar os dados antes de enviar para o servidor
+      // Formatar os dados antes de enviar para o servidor
+      let cnpjFormatado;
+      if (cnpjLimpo.length === 11) {
+        cnpjFormatado = cnpjLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      } else {
+        cnpjFormatado = cnpjLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+      }
       const companyToSubmit = {
         ...this.company,
-        cnpj: this.company.cnpj,
+        cnpj: cnpjFormatado,
         contact: this.company.contact,
       };
 
