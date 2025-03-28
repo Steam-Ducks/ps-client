@@ -11,7 +11,7 @@
         <ReportButton>
           <DocumentArrowDownIcon/>
         </ReportButton> 
-         
+      
         <CreateButton @click="showCreateEmployee">
           + Novo Funcionário
         </CreateButton>
@@ -64,7 +64,7 @@
       },
       async fetchEmployee() {
         try {
-          const data = await EmployeeService.getAllEmployees(); // Changed the method name to 'getAllEmployees'
+          const data = await EmployeeService.getAllEmployees();
           this.employees = data; 
         } catch (error) {
           console.error('Erro ao buscar empresas:', error);

@@ -30,7 +30,7 @@
         id="cpf"
         v-model="employee.cpf"
         v-mask="cpfMask"
-        minlength="14"
+        length="11"
         placeholder="123.456.789-00"
         required
       />
@@ -155,19 +155,22 @@
         }
       },
 
-      moveImageToAssets(file, uniqueFileName) {
-        console.log(`Simulando mover ${file.name} para assets/img/employees/${uniqueFileName}`);
-      },
-
       async submitForm() {
         let errorMessage = '';
 
+        var cpfLimpo = this.employee.cpf.replace(/\D/g, '').trim();
+        console.log(cpfLimpo);
+        console.log(cpfLimpo.length);
+
+        if (cpfLimpo.length > 11) {
+          console.log("teste")
+          cpfLimpo = cpfLimpo.slice(0, 11);
+        }
         if (!this.selectedFile) {
           errorMessage = 'Por favor, anexe uma foto!';
-        } else if (!this.employee.company_id) {
-          errorMessage = 'Por favor, selecione uma empresa.';
-        } else if (!this.employee.position_id) {
-          errorMessage = 'Por favor, selecione um cargo.';
+        }
+        if (cpfLimpo.length !== 11) {
+          errorMessage = 'CPF Inválido'
         }
 
         if (errorMessage) {
@@ -180,6 +183,7 @@
           });
           return;
         }
+        let cpfFormatado = cpfLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
 
         try {
           const timestamp = new Date().getTime();
@@ -194,7 +198,7 @@
           // Cria o objeto para enviar como JSON
           const employeeToSubmit = {
             name: this.employee.name,
-            cpf: this.employee.cpf,
+            cpf: cpfFormatado,
             companyId: this.employee.company_id,
             positionId: this.employee.position_id,
             salary: parseFloat(this.employee.salary),

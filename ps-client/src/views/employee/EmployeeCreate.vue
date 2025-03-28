@@ -28,6 +28,7 @@
     methods: {
       goBack() {
         this.$emit('go-back');
+        this.$emit('employee-created');
       },
     },
   };
