@@ -154,7 +154,7 @@ export default {
 
         Swal.fire({
           icon: 'success',
-          title: 'Empresa criada com sucesso!',
+          title: 'Empresa cadastrada com sucesso!',
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
