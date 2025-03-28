@@ -2,6 +2,9 @@
 
   <form @submit.prevent="submitForm" class="employee-form">
 
+    <!-- foto -->
+    <img src="https://blogdebrinquedo.com.br/wp-content/uploads/2024/02/20240208boneco-nendoroid-bob-minions-02.jpg" class="profiele-picture"/>
+
     <!-- Nome -->
     <div class="form-group">
       Nome:
@@ -106,9 +109,6 @@
         currencyMask: {
           mask: Number,
           scale: 2,
-          thousandsSeparator: '.',
-          radix: ',',
-          mapToRadix: [','],
         },
 
       };
@@ -141,10 +141,10 @@
         try {
           await EmployeeService.createEmployee({
             name: this.employee.name,
-            cpf: this.employee.cpf.replace(/\D/g, ''),
+            cpf: this.employee.cpf,
             companyId: this.employee.company_id,
             positionId: this.employee.position_id,
-            salary: parseFloat(this.employee.salary.replace(/\./g, '').replace(',', '.')),
+            salary: parseFloat(this.employee.salary),
           });
 
           Swal.fire({
@@ -163,8 +163,8 @@
             };
           });
         } catch (error) {
-          this.errorMessage = 'Erro ao cadastrar funcionario. Tente novamente.';
-          console.error('Erro ao cadastrar funcionario:', error);
+            this.errorMessage = error.message;
+            console.error("Erro:", error.message);
         }
       },
     },
@@ -191,13 +191,11 @@
   }
 
   .form-group {
-    margin-bottom: 20px;
     width: 100%;
   }
 
   label {
     display: block;
-    margin-bottom: 8px;
     color: #334155;
   }
 
@@ -220,5 +218,11 @@
   .button-container {
     text-align: center;
     width: 100%;
+  }
+
+  .profiele-picture{
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
   }
 </style>

@@ -112,6 +112,7 @@ export default {
   .buttons {
     display: flex;
     gap: 10px; 
+    font-family: Nunito;
   }
 
   .modal {
