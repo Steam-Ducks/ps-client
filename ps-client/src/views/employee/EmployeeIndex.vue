@@ -102,15 +102,17 @@
     }
   
     .modal-content {
-      width: 25%;
-      height: 80%;
+      width: 30%;
+      max-width: 600px;
+      min-height: 300px;
+      max-height: 90vh;
       top: 81px;
       left: 633px;
       border-radius: 20px;
       background-color: #FFFFFF;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-bottom:30px;
+      padding: 30px 50px;
     }
+
+   
 
 </style>
