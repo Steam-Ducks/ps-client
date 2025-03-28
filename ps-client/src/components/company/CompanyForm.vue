@@ -14,6 +14,8 @@
         id="cnpj"
         v-model="company.cnpj"
         v-mask="cnpjMask"
+        minlength="11"
+        maxlength="18"
         placeholder="00.000.000/0000-00"
         required
       />
@@ -36,11 +38,6 @@
     <div>
       <CreateButton> Cadastrar </CreateButton>
     </div>
-
-    <!-- Mensagem de erro -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
   </form>
 </template>
 
@@ -49,6 +46,8 @@ import CompanyService from '@/services/CompanyService.js';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
 import { IMaskDirective } from 'vue-imask';
+import { validate as validateCpf } from 'gerador-validador-cpf';
+import { cnpj as validateCnpj } from 'cpf-cnpj-validator';
 
 export default {
   name: 'CompanyForm',
@@ -75,16 +74,21 @@ export default {
         mask: [
           {
             mask: '000.000.000-00',
-            maxLength: 11,
+            length: 14,
           },
           {
             mask: '00.000.000/0000-00',
-            maxLength: 14,
+            length: 18,
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
-          return number.length > 11 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
+          const number = dynamicMasked.value + appended;
+          return number.length > 14
+            ? dynamicMasked.compiledMasks[1]
+            : dynamicMasked.compiledMasks[0];
+        },
+        onAccept: (value, maskRef) => {
+          maskRef.updateValue();
         },
       },
       phoneMask: {
@@ -99,22 +103,50 @@ export default {
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
-          return number.length > 10 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
+          const number = dynamicMasked.value + appended;
+          return number.length > 10
+            ? dynamicMasked.compiledMasks[1]
+            : dynamicMasked.compiledMasks[0];
         },
       },
     };
   },
-
+  watch: {
+    'company.cnpj': function (novoValor) {
+      if (novoValor) {
+        this.company.cnpj = novoValor;
+      }
+    },
+  },
   methods: {
     async submitForm() {
-      this.errorMessage = '';
+      let errorMessage = '';
 
-      // Limpar os dados antes de enviar para o servidor
+      let cnpjLimpo = this.company.cnpj.replace(/\D/g, ''); // Remove non-numeric characters
+
+      if (this.company.cnpj.length !== 14 && this.company.cnpj.length !== 18) {
+        errorMessage = 'CNPJ/CPF Inválido';
+        this.showErrorAlert(errorMessage);
+        return;
+      }
+
+      let isValid = false;
+      if (cnpjLimpo.length === 11) {
+        isValid = validateCpf(cnpjLimpo);
+      } else {
+        isValid = validateCnpj.isValid(cnpjLimpo);
+      }
+
+      if (!isValid) {
+        errorMessage = 'CNPJ/CPF Inválido';
+        this.showErrorAlert(errorMessage);
+        return;
+      }
+
       const companyToSubmit = {
         ...this.company,
-        cnpj: this.company.cnpj.replace(/\D/g, ''),
-        contact: this.company.contact.replace(/\D/g, ''),
+        cnpj: this.company.cnpj,
+        contact: this.company.contact,
       };
 
       try {
@@ -134,9 +166,23 @@ export default {
           };
         });
       } catch (error) {
-        this.errorMessage = 'Erro ao cadastrar empresa. Tente novamente.';
-        console.error('Erro ao cadastrar empresa:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao cadastar Empresa',
+          text: error.message,
+          showConfirmButton: false,
+          timer: 3500,
+        });
       }
+    },
+    showErrorAlert(errorMessage) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltam informações',
+        text: errorMessage,
+        showConfirmButton: false,
+        timer: 2500,
+      });
     },
   },
 };
