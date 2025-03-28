@@ -7,8 +7,8 @@
       </button>
     </div>
 
-    <h2> Novo Colaborador </h2>
-    <p> Preencha os campos abaixo para cadastrar o colaborador </p>
+    <h2> Novo Funcionário </h2>
+    <p> Preencha os campos abaixo para cadastrar o Funcionário </p>
   
     <EmployeeForm @employee-created="goBack" />
   </div>

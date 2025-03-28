@@ -16,7 +16,7 @@
     </table>
   </div>
   <div v-else class="no-employee-message">
-    <p>Nenhum funcionario encontrado. Tente buscar novamente.</p>
+    <p>Nenhum funcionário encontrado. Tente buscar novamente.</p>
   </div>
 </template>
 
