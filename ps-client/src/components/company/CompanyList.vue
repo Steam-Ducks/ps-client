@@ -3,7 +3,7 @@
     <table>
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Nome da empresa</th>
           <th>CNPJ</th>
           <th>Contato</th>
           <th> </th>
@@ -41,8 +41,10 @@ export default {
   margin-top: 25px;
 }
 
+table {
+  width: 100%;
+}
 .no-companies-message { /* Changed from 'no-users-message' to 'no-companies-message' */
-  text-align: center;
   color: #64748b;
   font-size: 1.2rem;
   margin-top: 20px;
