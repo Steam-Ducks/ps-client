@@ -54,28 +54,29 @@ img {
 }
 
 .image {
-  width: 6%;
+  width: 5%;
   text-align: center;
 }
 .name {
-  width: 27%;
+  width: 16%;
 }
 
 .cpf {
-  width: 15%;
+  width: 16%;
 }
 
 .position {
-  width: 25%;
+  width: 20%;
 }
 
 .company {
-  width: 27%;
+  width: 10%;
 }
 
 .actions {
   text-align: center;
   position: relative; 
+  width: 6%;
 }
 
 .icon {
