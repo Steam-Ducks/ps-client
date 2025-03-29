@@ -1,5 +1,8 @@
 <template>
-  <tr>
+  <tr
+  :key="company.id"
+  :class="{ 'even-row': index % 2 === 0 }"
+  >
     <td class="name" >{{ company.name }}</td>
     <td class="cnpj" >{{ company.cnpj }}</td>
     <td class="contact" >{{ company.contact }}</td>
@@ -44,19 +47,23 @@ export default {
 <style scoped>
 
 .name {
-  width: 35%;
+  width: 32%;
+  padding-left: 1%;
 }
 
 .cnpj {
-  width: 35%;
+  width: 32%;
+  padding-left: 1%;
 }
 
 .contact {
-  width: 35%;
+  width: 32%;
+  padding-left: 1%;
 }
 .actions {
   text-align: center;
-  position: relative; /* Adicionado para posicionar o .modal corretamente */
+  position: relative; 
+  width: 10%;
 }
 
 .icon {
@@ -70,5 +77,9 @@ export default {
   background-color: white;
   z-index: 10;
   right: 0; 
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9; 
 }
 </style>

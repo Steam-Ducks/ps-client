@@ -237,6 +237,7 @@
 </script>
 
 <style scoped>
+
   .employee-form {
     background-color: #ffffff;
     display: flex;
@@ -305,4 +306,5 @@
   .selector{
     display: none;
   }
+
 </style>

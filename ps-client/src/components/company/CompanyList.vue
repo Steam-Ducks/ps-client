@@ -43,6 +43,7 @@ export default {
 
 table {
   width: 100%;
+  border-collapse: collapse;
 }
 .no-companies-message {
   color: #64748b;
@@ -50,6 +51,7 @@ table {
   margin-top: 20px;
 }
 
-
-
+th{
+  padding-left: 1%;
+}
 </style>

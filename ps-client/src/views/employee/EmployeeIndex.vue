@@ -75,6 +75,7 @@
 </script>
   
 <style scoped>
+
     .head {
       display: flex;
       justify-content: space-between;
@@ -105,14 +106,21 @@
       width: 30%;
       max-width: 600px;
       min-height: 300px;
-      max-height: 90vh;
       top: 81px;
       left: 633px;
       border-radius: 20px;
       background-color: #FFFFFF;
       padding: 30px 50px;
+      max-height: 90vh;
+      overflow-y: auto;  
     }
 
-   
+    .modal-content::-webkit-scrollbar {
+      display: none;
+    }
 
+    .Title{
+      width: 50%;
+    }
+   
 </style>
