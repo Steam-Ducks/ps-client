@@ -14,7 +14,7 @@
         id="cnpj"
         v-model="company.cnpj"
         v-mask="cnpjMask"
-        minlength="11"
+        minlength="14"
         maxlength="18"
         placeholder="00.000.000/0000-00"
         required
@@ -122,8 +122,6 @@ export default {
     async submitForm() {
       let errorMessage = '';
 
-      let cnpjLimpo = this.company.cnpj.replace(/\D/g, ''); // Remove non-numeric characters
-
       if (this.company.cnpj.length !== 14 && this.company.cnpj.length !== 18) {
         errorMessage = 'CNPJ/CPF Inválido';
         this.showErrorAlert(errorMessage);
@@ -131,10 +129,10 @@ export default {
       }
 
       let isValid = false;
-      if (cnpjLimpo.length === 11) {
-        isValid = validateCpf(cnpjLimpo);
+      if (this.company.cnpj.length === 14) {
+        isValid = validateCpf(this.company.cnpj);
       } else {
-        isValid = validateCnpj.isValid(cnpjLimpo);
+        isValid = validateCnpj.isValid(this.company.cnpj);
       }
 
       if (!isValid) {
