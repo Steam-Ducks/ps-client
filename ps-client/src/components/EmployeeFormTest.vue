@@ -21,9 +21,4 @@
   };
   </script>
   
-  <style scoped>
-  .employee-form-test-page {
-    padding: 20px;
-  }
-  </style>
   

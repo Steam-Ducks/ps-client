@@ -26,6 +26,7 @@ export default {
   methods: {
     goBack() {
       this.$emit('go-back');
+      this.$emit('company-created');
     },
   },
 };

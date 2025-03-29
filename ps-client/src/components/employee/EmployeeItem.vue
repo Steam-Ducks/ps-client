@@ -1,5 +1,6 @@
 <template>
   <tr>
+    <td class="image"><img :src="employee.photo" alt="foto de perfil" /></td>
     <td class="name">{{ employee.name }}</td>
     <td class="cpf">{{ employee.cpf }}</td>
     <td class="position">{{ employee.position.name }}</td>
@@ -44,8 +45,20 @@ export default {
 
 <style scoped>
 
+img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+}
+
+.image {
+  width: 6%;
+  text-align: center;
+}
 .name {
-  width: 33%;
+  width: 27%;
 }
 
 .cpf {
@@ -77,5 +90,4 @@ export default {
   z-index: 10;
   right: 0; 
 }
-
 </style>

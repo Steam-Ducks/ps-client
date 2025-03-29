@@ -1,8 +1,8 @@
 <template>
   <tr>
-    <td>{{ company.name }}</td>
-    <td>{{ company.cnpj }}</td>
-    <td>{{ company.contact }}</td>
+    <td class="name" >{{ company.name }}</td>
+    <td class="cnpj" >{{ company.cnpj }}</td>
+    <td class="contact" >{{ company.contact }}</td>
     <td class="actions">
       <EllipsisHorizontalIcon class="icon" @click="toggleOptionsButton"/>
       <div v-if="isOptionsButton" class="modal">
@@ -43,6 +43,17 @@ export default {
 
 <style scoped>
 
+.name {
+  width: 35%;
+}
+
+.cnpj {
+  width: 35%;
+}
+
+.contact {
+  width: 35%;
+}
 .actions {
   text-align: center;
   position: relative; /* Adicionado para posicionar o .modal corretamente */
