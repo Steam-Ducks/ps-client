@@ -3,7 +3,7 @@
   
       <div class="Title">
         <h1> Funcionários </h1>
-        <p> Veja abaixo os Funcionários já cadastradas. Para adicionar um novo funcionario, clique no botão + Novo Funcionário. </p>
+        <p> Veja abaixo os Funcionários já cadastradas. Para adicionar um novo funcionário, clique no botão + Novo Funcionário. </p>
       </div>
   
       <div class="buttons">
@@ -11,7 +11,7 @@
         <ReportButton>
           <DocumentArrowDownIcon/>
         </ReportButton> 
-         
+      
         <CreateButton @click="showCreateEmployee">
           + Novo Funcionário
         </CreateButton>
@@ -64,7 +64,7 @@
       },
       async fetchEmployee() {
         try {
-          const data = await EmployeeService.getAllEmployees(); // Changed the method name to 'getAllEmployees'
+          const data = await EmployeeService.getAllEmployees();
           this.employees = data; 
         } catch (error) {
           console.error('Erro ao buscar empresas:', error);
@@ -102,16 +102,17 @@
     }
   
     .modal-content {
-      width: 700;
-      height: 917;
+      width: 30%;
+      max-width: 600px;
+      min-height: 300px;
+      max-height: 90vh;
       top: 81px;
       left: 633px;
       border-radius: 20px;
       background-color: #FFFFFF;
-      padding-left: 70px;
-      padding-right: 70px;
-      padding-top:30px;
-      padding-bottom:30px;
+      padding: 30px 50px;
     }
+
+   
 
 </style>

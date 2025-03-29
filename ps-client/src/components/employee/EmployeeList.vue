@@ -3,6 +3,7 @@
     <table>
       <thead>
         <tr>
+          <th></th>
           <th>Nome Completo</th>
           <th>CPF</th>
           <th>Cargo</th>
@@ -15,7 +16,7 @@
     </table>
   </div>
   <div v-else class="no-employee-message">
-    <p>Nenhum funcionario encontrado. Tente buscar novamente.</p>
+    <p>Nenhum funcionário encontrado. Tente buscar novamente.</p>
   </div>
 </template>
 
@@ -46,4 +47,6 @@ export default {
   font-size: 1.2rem;
   margin-top: 20px;
 }
+
+
 </style>

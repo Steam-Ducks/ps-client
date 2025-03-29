@@ -1,14 +1,25 @@
 <template>
-
   <form @submit.prevent="submitForm" class="employee-form">
 
-    <!-- foto -->
-    <img src="https://blogdebrinquedo.com.br/wp-content/uploads/2024/02/20240208boneco-nendoroid-bob-minions-02.jpg" class="profiele-picture"/>
+    <div class="image-preview-container">
+        <!-- foto --> 
+        <img :src="previewImage || defaultProfilePicture" class="profile-picture" alt="Profile Picture"/>
+        <input type="file" id="photo" accept="image/*" @change="onFileChange" class="selector"/>
+        <label for="photo" class="upload-button">
+          Selecionar Foto
+        </label>
+    </div>
 
     <!-- Nome -->
     <div class="form-group">
       Nome:
-      <input type="text" id="name" v-model="employee.name" placeholder="Nome completo" required />
+      <input
+        type="text"
+        id="name"
+        v-model="employee.name"
+        placeholder="Nome completo"
+        required
+      />
     </div>
 
     <!-- CPF -->
@@ -20,6 +31,7 @@
         v-model="employee.cpf"
         v-mask="cpfMask"
         placeholder="123.456.789-00"
+        maxlength="14"
         required
       />
     </div>
@@ -28,8 +40,11 @@
     <div class="form-group">
       Empresa:
       <select id="company_id" v-model="employee.company_id" required>
-        <option value="" disabled>Selecione uma empresa</option>
-        <option v-for="company in companies" :key="company.id" :value="parseInt(company.id)">
+        <option
+          v-for="company in companies"
+          :key="company.id"
+          :value="parseInt(company.id)"
+        >
           {{ company.name }}
         </option>
       </select>
@@ -39,8 +54,11 @@
     <div class="form-group">
       Cargo:
       <select id="position_id" v-model="employee.position_id" required>
-        <option value="" disabled>Selecione um cargo</option>
-        <option v-for="position in positions" :key="position.id" :value="parseInt(position.id)">
+        <option
+          v-for="position in positions"
+          :key="position.id"
+          :value="parseInt(position.id)"
+        >
           {{ position.name }}
         </option>
       </select>
@@ -49,7 +67,14 @@
     <!-- Remuneração -->
     <div class="form-group">
       Remuneração:
-      <input type="text" id="salary" v-model="employee.salary" v-mask="currencyMask" placeholder="R$" required />
+      <input
+        type="text"
+        id="salary"
+        v-model="employee.salary"
+        v-mask="currencyMask"
+        placeholder="R$"
+        required
+      />
     </div>
 
     <!-- Botão de Cadastrar  -->
@@ -57,23 +82,17 @@
       <CreateButton> Cadastrar </CreateButton>
     </div>
 
-    <!-- Mensagem de erro -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
   </form>
-
 </template>
 
 <script>
-
   import EmployeeService from '@/services/EmployeeService.js';
   import CompanyService from '@/services/CompanyService.js';
   import PositionService from '@/services/PositionService.js';
   import CreateButton from '@/components/ui/CreateButton.vue';
   import Swal from 'sweetalert2';
   import { IMaskDirective } from 'vue-imask';
+  import { validate as validateCpf } from 'gerador-validador-cpf';
 
   export default {
     name: 'EmployeeForm',
@@ -90,27 +109,28 @@
 
     data() {
       return {
-        
         employee: {
           name: '',
           cpf: '',
           company_id: null,
           position_id: null,
           salary: '',
+          photo: null,
         },
         errorMessage: '',
         companies: [],
         positions: [],
-
+        previewImage: null,
+        defaultProfilePicture:
+          'https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png',
         cpfMask: {
           mask: '000.000.000-00',
         },
-
         currencyMask: {
           mask: Number,
           scale: 2,
         },
-
+        selectedFile: null,
       };
     },
 
@@ -118,41 +138,76 @@
       try {
         this.companies = await CompanyService.getAllCompanies();
         this.positions = await PositionService.getAllPositions();
-      } 
-      catch (error) {
+      } catch (error) {
         console.error('Error fetching companies or positions:', error);
         this.errorMessage = 'Erro ao carregar empresas ou cargos.';
       }
-
     },
 
     methods: {
-      async submitForm() {
-        this.errorMessage = '';
-        if (!this.employee.company_id) {
-          this.errorMessage = 'Por favor, selecione uma empresa.';
-          return;
+      onFileChange(event) {
+        const file = event.target.files[0];
+        this.selectedFile = file;
+
+        if (file) {
+          this.previewImage = URL.createObjectURL(file);
+        } else {
+          this.previewImage = null;
         }
-        if (!this.employee.position_id) {
-          this.errorMessage = 'Por favor, selecione um cargo.';
+      },
+
+      async submitForm() {
+        let errorMessage = '';
+
+        if (!this.selectedFile) {
+          errorMessage = 'Por favor, anexe uma foto!';
+        }
+        console.log(this.employee.cpf)
+        if (!validateCpf(this.employee.cpf)) {
+        errorMessage = 'CPF Inválido';
+        }
+
+        if (errorMessage) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Faltam informações',
+            text: errorMessage,
+            showConfirmButton: false,
+            timer: 2500,
+          });
           return;
         }
 
         try {
-          await EmployeeService.createEmployee({
-            name: this.employee.name,
-            cpf: this.employee.cpf,
-            companyId: this.employee.company_id,
-            positionId: this.employee.position_id,
-            salary: parseFloat(this.employee.salary),
-          });
+          const timestamp = new Date().getTime();
+          const random = Math.floor(Math.random() * 1000);
+          const fileExtension = this.selectedFile.name.split('.').pop();
+          const uniqueFileName = `employee_${timestamp}_${random}.${fileExtension}`;
+
+          this.employee.photo = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/public/userfiles/photos/${uniqueFileName}`;
+          
+          const employeeToSubmit = {
+              name: this.employee.name,
+              cpf: this.employee.cpf,
+              companyId: this.employee.company_id,
+              positionId: this.employee.position_id,
+              salary: parseFloat(this.employee.salary),
+              photo: this.employee.photo,
+          };
+
+          // Envia os dados do funcionário
+          await EmployeeService.createEmployee(employeeToSubmit);
+
+          // Envia a imagem
+          await EmployeeService.uploadEmployeePhotoToSupabase(this.selectedFile, uniqueFileName);
 
           Swal.fire({
             icon: 'success',
-            title: 'Funcionario criado com sucesso!',
+            title: 'Funcionário cadastrado com sucesso!',
             showConfirmButton: false,
             timer: 1500,
-          }).then(() => {
+          })
+          .then(() => {
             this.$emit('employee-created');
             this.employee = {
               name: '',
@@ -160,24 +215,29 @@
               company_id: null,
               position_id: null,
               salary: '',
+              photo: null,
             };
+            this.previewImage = null;
+            this.selectedFile = null;
           });
         } catch (error) {
-            this.errorMessage = error.message;
-            console.error("Erro:", error.message);
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao cadastrar funcionário!',
+            text: error.message,
+            showConfirmButton: false,
+            timer: 3500,
+          })
+          console.error('Erro ao cadastrar funcionário:', error);
         }
       },
     },
-
   };
 </script>
 
 <style scoped>
-
   .employee-form {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 30px;
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -187,11 +247,11 @@
   .form-title {
     text-align: center;
     color: #1e293b;
-    margin-bottom: 30px;
   }
 
   .form-group {
     width: 100%;
+    margin-bottom: 8px;
   }
 
   label {
@@ -203,16 +263,11 @@
   input[type='number'],
   select {
     width: 100%;
-    padding: 12px;
+    height: 30px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
-  }
-
-  .error-message {
-    color: #dc2626;
-    margin-top: 15px;
   }
 
   .button-container {
@@ -220,9 +275,34 @@
     width: 100%;
   }
 
-  .profiele-picture{
+  .profile-picture {
     width: 100px;
     height: 100px;
     border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+  }
+
+  .image-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .image-preview-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+
+  .upload-button {
+    cursor: pointer;
+    color: #6F08AF;
+  }
+
+  .selector{
+    display: none;
   }
 </style>

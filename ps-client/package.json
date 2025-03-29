@@ -11,6 +11,8 @@
     "@heroicons/vue": "^2.2.0",
     "axios": "^1.8.3",
     "core-js": "^3.8.3",
+    "cpf-cnpj-validator": "^1.0.3",
+    "gerador-validador-cpf": "^6.0.0",
     "imask": "^7.6.1",
     "sweetalert2": "^11.17.2",
     "vue": "^3.2.13",

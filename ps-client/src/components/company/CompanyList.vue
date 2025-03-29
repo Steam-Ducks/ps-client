@@ -3,7 +3,7 @@
     <table>
       <thead>
         <tr>
-          <th>Nome</th>
+          <th>Nome da empresa</th>
           <th>CNPJ</th>
           <th>Contato</th>
           <th> </th>
@@ -28,7 +28,7 @@ export default {
     CompanyItem,
   },
   props: {
-    companies: { // Changed from 'users' to 'companies'
+    companies: {
       type: Array,
       required: true,
     },
@@ -37,12 +37,14 @@ export default {
 </script>
 
 <style scoped>
-.company-list { /* Changed from 'user-list' to 'company-list' */
+.company-list {
   margin-top: 25px;
 }
 
-.no-companies-message { /* Changed from 'no-users-message' to 'no-companies-message' */
-  text-align: center;
+table {
+  width: 100%;
+}
+.no-companies-message {
   color: #64748b;
   font-size: 1.2rem;
   margin-top: 20px;

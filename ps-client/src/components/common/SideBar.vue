@@ -1,6 +1,9 @@
 <template>
   <div class="side-bar">
-    <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+
+    <div class="nav-header">
+      <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+    </div>
 
     <div class="nav-section">
       
@@ -44,7 +47,10 @@
       </ul>
     </div>
 
-    <img src="@/assets/SteamDucksLogo.png" alt="Logo" class="logo-bottom">
+    <div class="nav-footer">
+      <img src="@/assets/SteamDucksLogo.png" alt="Logo" class="logo-bottom">
+    </div>
+
   </div>
 </template>
 
@@ -74,7 +80,7 @@ export default {
     text-align: center;
     background-color: #fff;
     width: 261px;
-    height: 100vh;
+    height: 100%;
     position: fixed; 
     top: 0; 
     left: 0;
@@ -95,8 +101,8 @@ export default {
 }
 
 .logo-bottom {
-  width: 70px;
-  margin-top: 110%;
+  width: 80px;
+  padding-bottom: 17px;
 }
 
   .nav-bar{
@@ -128,5 +134,18 @@ export default {
     margin-right: 10px;
   }
 
-  
+  .nav-footer{
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    height:43%;
+  }
+
+  .nav-header{
+    height:14%;
+  }
+
+  .nav-section{
+    height:43%;
+  }
 </style>

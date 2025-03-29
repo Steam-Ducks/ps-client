@@ -14,6 +14,7 @@
         id="cnpj"
         v-model="company.cnpj"
         v-mask="cnpjMask"
+        minlength="11"
         placeholder="00.000.000/0000-00"
         required
       />
@@ -37,10 +38,6 @@
       <CreateButton> Cadastrar </CreateButton>
     </div>
 
-    <!-- Mensagem de erro -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
   </form>
 </template>
 
@@ -75,15 +72,15 @@ export default {
         mask: [
           {
             mask: '000.000.000-00',
-            maxLength: 11,
+            length: 11,
           },
           {
             mask: '00.000.000/0000-00',
-            maxLength: 14,
+            length: 14,
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = dynamicMasked.value ;
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
           return number.length > 11 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
         },
       },
@@ -99,21 +96,52 @@ export default {
           },
         ],
         dispatch: (appended, dynamicMasked) => {
-          const number = dynamicMasked.value
+          const number = (dynamicMasked.value + appended).replace(/\D/g, '');
           return number.length > 10 ? dynamicMasked.compiledMasks[1] : dynamicMasked.compiledMasks[0];
         },
       },
     };
   },
-
+  watch: {
+    'company.cnpj': function (novoValor) {
+      if (novoValor) {
+        this.company.cnpj = novoValor.replace(/\D/g, '');
+      }
+    }
+  },
   methods: {
     async submitForm() {
-      this.errorMessage = '';
+      let errorMessage = '';
 
-      // Limpar os dados antes de enviar para o servidor
+      var cnpjLimpo = this.company.cnpj.replace(/\D/g, '').trim()
+      if (cnpjLimpo > 14)
+      {
+        cnpjLimpo = cnpjLimpo.slice(0, 14);
+      }
+      console.log(cnpjLimpo.length)
+        if (cnpjLimpo.length != 11 && cnpjLimpo.length != 14) {
+          errorMessage = 'CNPJ/CPF Inválidos';
+          Swal.fire({
+            icon: 'warning',
+            title: 'Faltam informações',
+            text: errorMessage,
+            showConfirmButton: false,
+            timer: 2500,
+          });
+          return;
+        } 
+      // Formatar os dados antes de enviar para o servidor
+      let cnpjFormatado;
+      if (cnpjLimpo.length === 11) {
+        cnpjFormatado = cnpjLimpo.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+      } else {
+        cnpjFormatado = cnpjLimpo.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+      }
+
+      
       const companyToSubmit = {
         ...this.company,
-        cnpj: this.company.cnpj,
+        cnpj: cnpjFormatado,
         contact: this.company.contact,
       };
 
@@ -134,9 +162,14 @@ export default {
           };
         });
       } catch (error) {
-    this.errorMessage = error.message;
-    console.error("Erro:", error.message);
-  }
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao cadastar Empresa',
+          text: error.message,
+          showConfirmButton: false,
+          timer: 3500,
+        })
+      }
     },
   },
 };

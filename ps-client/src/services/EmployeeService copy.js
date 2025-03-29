@@ -9,7 +9,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       const response = await axios.post(`${API_URL}`, createEmployee);
       return response.data; 
     } catch (error) {
-      throw new Error('Erro ao criar cadastro de funcionario: ' + error.message);
+      throw new Error('Erro ao criar cadastro de funcionário: ' + error.message);
     }
   },
 
@@ -18,7 +18,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       const response = await axios.get(`${API_URL}`);
       return response.data; 
     } catch (error) {
-      throw new Error('Erro ao listar cadastros de funcionarios: ' + error.message);
+      throw new Error('Erro ao listar cadastros de funcionários: ' + error.message);
     }
   },
 
@@ -27,7 +27,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       const response = await axios.get(`${API_URL}/${employeeId}`);
       return response.data; 
     } catch (error) {
-      throw new Error('Erro ao achar cadastro de funcionario: ' + error.message);
+      throw new Error('Erro ao achar cadastro de funcionário: ' + error.message);
     }
   },
 
