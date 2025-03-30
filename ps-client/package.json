@@ -14,6 +14,7 @@
     "cpf-cnpj-validator": "^1.0.3",
     "gerador-validador-cpf": "^6.0.0",
     "imask": "^7.6.1",
+    "Pontual": "file:",
     "sweetalert2": "^11.17.2",
     "vue": "^3.2.13",
     "vue-imask": "^7.6.1",
