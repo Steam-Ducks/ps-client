@@ -4,7 +4,7 @@
     <div class="image-preview-container">
         <!-- foto --> 
         <img :src="previewImage || defaultProfilePicture" class="profile-picture" alt="Profile Picture"/>
-        <input type="file" id="photo" accept="image/*" @change="onFileChange" class="selector"/>
+        <input type="file" id="photo" accept="image/png, image/jpeg" @change="onFileChange" class="selector"/>
         <label for="photo" class="upload-button">
           Selecionar Foto
         </label>
@@ -179,27 +179,19 @@
         }
 
         try {
-          const timestamp = new Date().getTime();
-          const random = Math.floor(Math.random() * 1000);
-          const fileExtension = this.selectedFile.name.split('.').pop();
-          const uniqueFileName = `employee_${timestamp}_${random}.${fileExtension}`;
-
-          this.employee.photo = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/public/userfiles/photos/${uniqueFileName}`;
-          
+          const photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
+    
           const employeeToSubmit = {
               name: this.employee.name,
               cpf: this.employee.cpf,
               companyId: this.employee.company_id,
               positionId: this.employee.position_id,
               salary: parseFloat(this.employee.salary),
-              photo: this.employee.photo,
+              photo: photoUrl,
           };
 
           // Envia os dados do funcionário
           await EmployeeService.createEmployee(employeeToSubmit);
-
-          // Envia a imagem
-          await EmployeeService.uploadEmployeePhotoToSupabase(this.selectedFile, uniqueFileName);
 
           Swal.fire({
             icon: 'success',

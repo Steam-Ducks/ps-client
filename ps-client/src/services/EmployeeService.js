@@ -32,27 +32,20 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
     }
   },
 
-  async uploadEmployeePhotoToSupabase(file, uniqueFileName) {
+  async uploadEmployeePhoto(file) {
     try {
       const formData = new FormData();
-      formData.append('file', file, uniqueFileName);
+      formData.append('file', file);
   
-      const path = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/userfiles/photos/${uniqueFileName}`
-      console.log(path)
-      const response = await axios.post(`https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/userfiles/photos/${uniqueFileName}`, formData, {
-        headers: {
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlzY2p1ZXlrbXd4eHpvYW56Y29vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MTcyNzMzMiwiZXhwIjoyMDU3MzAzMzMyfQ.QjlIc7Il28PgOkiBc8a_zES9ZNysrxN9W7fSYmDoZ8s', // Your Supabase JWT token
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.post(
+        `${API_URL}/uploadPhoto`,
+        formData,
+      );
   
-      console.log('Image uploaded successfully to Supabase!');
-      return response.data;
+      return response.data.photoUrl;
     } catch (error) {
-      console.log(uniqueFileName)
-      console.error('Error uploading image to Supabase:', error);
-      const errorMessage = error.response?.data?.message || 'Unknown error uploading image to Supabase.';
-      throw new Error(errorMessage);
+      const msg = error.response?.data?.message || 'Erro no upload da imagem';
+      throw new Error(msg);
     }
   },
 
