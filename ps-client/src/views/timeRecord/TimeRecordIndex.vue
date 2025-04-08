@@ -144,7 +144,7 @@ export default {
   
   async mounted() {
     this.employees = await EmployeeService.getAllEmployees();
-    
+
     $(this.$refs.employeeSelect).select2({
         placeholder: '🔎 Selecione um funcionário',
         });
@@ -256,5 +256,4 @@ export default {
         width: 100%;
         padding-top: 2%
     }
-
 </style>
