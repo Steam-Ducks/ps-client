@@ -1,5 +1,6 @@
 <template>
   <form @submit.prevent="submitForm" class="company-form">
+
     <!-- Nome -->
     <div class="form-group">
       Nome:
@@ -38,6 +39,7 @@
     <div>
       <CreateButton> Cadastrar </CreateButton>
     </div>
+
   </form>
 </template>
 
@@ -118,6 +120,7 @@ export default {
       }
     },
   },
+  
   methods: {
     async submitForm() {
       let errorMessage = '';

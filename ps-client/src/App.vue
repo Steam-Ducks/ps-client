@@ -28,4 +28,5 @@
         text-align: left;
         color: #350453;
     }
+    
 </style>
