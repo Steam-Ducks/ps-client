@@ -5,13 +5,13 @@
 
 Antes de começar, certifique-se de que o [Node.js](https://nodejs.org/) esteja instalado em sua máquina.
 
-> ⚠️ **Importante:** Para executar os comandos `npm`, é necessário estar na pasta do projeto chamada `ps-serve`.
+> ⚠️ **Importante:** Para executar os comandos `npm`, é necessário estar na pasta do projeto chamada `ps-client`.
 
 ---
 
 ## 📥 Instalação das Dependências
 
-Abra o terminal, navegue até a pasta `ps-serve` e execute:
+Abra o terminal, navegue até a pasta `ps-client` e execute:
 
 ```bash
 npm install
