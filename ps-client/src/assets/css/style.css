@@ -1,5 +1,11 @@
-  body{
-    font-family: sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+.root {
+  font-family: Nunito !important;
+}
+
+body{
+    font-family: Nunito;
   }
 
   .photo{
@@ -44,7 +50,7 @@
   }
 
   .dataTables_wrapper {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Nunito';
   margin: 20px 0;
 }
 
@@ -113,6 +119,7 @@ table.dataTable tbody tr:hover {
 }
 
 nav{
+  font-family: Nunito;
   text-align: right;
   gap: 5px;
   display: flex; 
