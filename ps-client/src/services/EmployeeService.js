@@ -23,9 +23,9 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
     }
   },
 
-  async getEmployeeById(employeeId){
+  async getEmployeeById(id){
     try {
-      const response = await axios.get(`${API_URL}/${employeeId}`);
+      const response = await axios.get(`${API_URL}/${id}`);
       return response.data; 
     } catch (error) {
       throw new Error('Erro ao achar empresa: ' + error.message);

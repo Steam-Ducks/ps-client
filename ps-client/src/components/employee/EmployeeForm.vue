@@ -39,7 +39,7 @@
     <!-- Empresa -->
     <div class="form-group">
       Empresa:
-      <select id="company_id" v-model="employee.company_id" required>
+      <select id="company_id" v-model="employee.company_id" ref="companySelect" required>
         <option
           v-for="company in companies"
           :key="company.id"
@@ -53,7 +53,7 @@
     <!-- Cargo -->
     <div class="form-group">
       Cargo:
-      <select id="position_id" v-model="employee.position_id" required>
+      <select id="position_id" v-model="employee.position_id" ref="positionSelect" required>
         <option
           v-for="position in positions"
           :key="position.id"
@@ -93,6 +93,10 @@
   import Swal from 'sweetalert2';
   import { IMaskDirective } from 'vue-imask';
   import { validate as validateCpf } from 'gerador-validador-cpf';
+  import $ from 'jquery';
+  import 'select2';
+  import 'select2/dist/css/select2.css'; 
+
 
   export default {
     name: 'EmployeeForm',
@@ -142,6 +146,28 @@
         console.error('Error fetching companies or positions:', error);
         this.errorMessage = 'Erro ao carregar empresas ou cargos.';
       }
+    },
+
+    mounted() {
+      $(this.$refs.companySelect).select2({
+        placeholder: 'Selecione uma empresa',
+      });
+
+      $(this.$refs.positionSelect).select2({
+        placeholder: 'Selecione um cargo',
+      });
+
+      $(this.$refs.companySelect).on('change', () => {
+        this.employee.company_id = $(this.$refs.companySelect).val();
+      });
+
+      $(this.$refs.positionSelect).on('change', () => {
+        this.employee.position_id = $(this.$refs.positionSelect).val();
+      });
+    },
+    beforeUnmount(){
+      $(this.$refs.companySelect).select2('destroy');
+      $(this.$refs.positionSelect).select2('destroy');
     },
 
     methods: {

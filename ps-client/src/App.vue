@@ -3,7 +3,7 @@
 </template>
 
 <style>
-
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
     nav-link {
         color: #551a8b;
         font-family: Nunito;
@@ -28,4 +28,5 @@
         text-align: left;
         color: #350453;
     }
+    
 </style>

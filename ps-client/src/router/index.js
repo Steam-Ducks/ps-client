@@ -5,7 +5,7 @@ import CompanyPage from '@/views/company/CompanyIndex.vue';
 import EmployeePage from '@/views/employee/EmployeeIndex.vue';
 import timeRecordPage from '@/views/timeRecord/TimeRecordIndex.vue';
 import UserPage from '@/views/users/UserIndex.vue';
-import EmployeeFormTest from '@/components/EmployeeFormTest.vue'; 
+import Test from '@/components/Test.vue'; 
 
 const routes = [
   {
@@ -60,9 +60,9 @@ const routes = [
   },
 
   {
-    path: '/employee-form-test', // The URL for your test page
-    name: 'employee-form-test',
-    component: EmployeeFormTest, // Use the test component here
+    path: '/Test', 
+    name: 'Test',
+    component: Test, 
   },
 
 ];
