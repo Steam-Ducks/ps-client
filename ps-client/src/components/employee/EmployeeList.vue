@@ -1,10 +1,13 @@
 <template>
   <div v-if="employees && employees.length > 0" class="employee-list">
     <DataTable
-      :data="formattedemployees"
-      :columns="columns"
-      :options="tableOptions"
+    ref="dataTable"
+    :key="tableKey"
+    :data="formattedemployees"
+    :columns="columns"
+    :options="tableOptions"
     />
+
   </div>
   <div v-else class="no-employee-message">
     <p>Nenhum funcionário encontrado. Tente buscar novamente.</p>
@@ -14,6 +17,14 @@
 <script>
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
+import Buttons from 'datatables.net-buttons';
+import 'datatables.net-buttons/js/buttons.html5.js';
+import 'datatables.net-buttons-dt/css/buttons.dataTables.css';
+
+DataTable.use(DataTablesCore);
+DataTablesCore.use(Buttons);
+
+
 
 export default {
   name: 'EmployeeList',
@@ -45,10 +56,21 @@ export default {
         ],
         tableOptions: {
           responsive: true,
+          select: true,
+          lengthMenu: [10],
+          buttons: [
+            {
+              extend: 'excel',
+              title: 'teste',
+              exportOptions: {
+                columns: [1, 2]
+              }
+            }
+          ],
           language: {
             url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
           },
-          dom: '<"top"f>rt<"bottom"lip><"clear">',
+          dom: 'Bftip',
         },
       };
     },
@@ -62,9 +84,6 @@ export default {
           company: employee.company.name,
         }));
       },
-    },
-    mounted() {
-      DataTable.use(DataTablesCore);
     },
     watch: {
       employee() {

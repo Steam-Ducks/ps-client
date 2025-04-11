@@ -30,7 +30,8 @@
     "sweetalert2": "^11.17.2",
     "vue": "^3.2.13",
     "vue-imask": "^7.6.1",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
