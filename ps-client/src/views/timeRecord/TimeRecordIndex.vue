@@ -115,6 +115,9 @@ export default {
       employees: [],
       selectedEmployeeId: "",
       selectedEmployee: null,
+      startDate: '', 
+      endDate: '',  
+      timeRecords: [],
     };
   },
   computed: {
@@ -127,12 +130,20 @@ export default {
   },
   methods: {
         async searchTimeRecords() {
-            this.selectedEmployee = null;
-            try {
-                this.selectedEmployee = await EmployeeService.getEmployeeById(this.selectedEmployeeId);
-            } catch (error) {
+            
+        if (!this.selectedEmployeeId) {
+            alert('Por favor, selecione um funcionário.');
+            return;
+        }
+        this.selectedEmployee = null;
+        try {
+            this.selectedEmployee = await EmployeeService.getEmployeeById(this.selectedEmployeeId);
+        } catch (error) {
             console.error('Erro ao buscar dados do espelho de ponto:', error);
-            }
+            alert('Erro ao buscar dados. Verifique o console.');
+            this.selectedEmployee = null;
+        } finally {
+        }
         },
         formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
@@ -144,11 +155,16 @@ export default {
   
   async mounted() {
     this.employees = await EmployeeService.getAllEmployees();
-    
-    $(this.$refs.employeeSelect).select2({
+    this.$nextTick(() => {
+        const selectElement = $(this.$refs.employeeSelect);
+
+        selectElement.select2({
         placeholder: '🔎 Selecione um funcionário',
+        }).on('change', (e) => {
+          this.selectedEmployeeId = e.target.value;
         });
-    },
+        }
+    )}
 };
 </script>
 
