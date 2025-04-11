@@ -37,23 +37,20 @@ export default {
 
   .icon {
     width: 28px; 
-    height: 28px;
-    margin-top: 10px;
   }
 
   .nav-link:hover {
     background-color: #f0f0f0;
-
   }
 
   .nav-link{
     height: 100%;
     align-items: center;
     justify-content: center; 
-    margin: 0 30px;
     text-decoration: none;
-    color: #551a8b;
+    color: #6F08AF;
     font-family: Nunito;
+    margin-right: 10px;
   }
   
 </style>
