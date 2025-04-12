@@ -20,6 +20,15 @@
           <input type="password" id="password" v-model="user.password" required />
         </div>
 
+        <!--tipo usuario-->
+        <div class="form-group">
+          Tipo do Usuário
+          <select v-model="user.is_admin" id="is_admin" required>
+            <option :value="true">Administrador</option>
+            <option :value="false">Padrão</option>
+          </select>
+        </div>
+
       <FormButton type="primary" class="submit-button">Cadastrar</FormButton>
       
       <div v-if="errorMessage" class="error-message">
@@ -49,6 +58,7 @@ export default {
         username: '',
         email: '',
         password: '',
+        is_admin: null,
       },
       errorMessage: '',
     };
@@ -72,6 +82,7 @@ export default {
           username: '',
           email: '',
           password: '',
+          is_admin: null,
         };
       });
 
@@ -127,6 +138,7 @@ export default {
     color: #334155;
   }
 
+  select, 
   input[type='text'],
   input[type='email'], 
     input[type='password'] {
