@@ -91,6 +91,7 @@
     <div class="default" v-else>
         Selecione um funcionário para visualizar os apontamentos
     </div>
+    
 
 </div>
 </template>
