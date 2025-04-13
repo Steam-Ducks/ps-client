@@ -75,14 +75,16 @@
         <div class="apontamento">
             <table>
                 <thead>
-                    <th>Data</th>
-                    <th>Turno</th>
-                    <th>Horas previstas</th>
-                    <th>Entrada 1</th>
-                    <th>Saída 1</th>
-                    <th>Saída 2</th>
-                    <th>Saída 2</th>
-                    <th>Total trabalhado</th>
+                    <tr>
+                        <th>Data</th>
+                        <th>Turno</th>
+                        <th>Horas previstas</th>
+                        <th>Entrada 1</th>
+                        <th>Saída 1</th>
+                        <th>Saída 2</th>
+                        <th>Saída 2</th>
+                        <th>Total trabalhado</th>
+                    </tr>
                 </thead>
             </table>
         </div>
@@ -143,8 +145,7 @@ export default {
             console.error('Erro ao buscar dados do espelho de ponto:', error);
             alert('Erro ao buscar dados. Verifique o console.');
             this.selectedEmployee = null;
-        } finally {
-        }
+        } 
         },
         formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
