@@ -37,7 +37,7 @@
           </router-link>
         </li>
 
-        <li class="nav-item">
+        <li v-if="isAdmin"  class="nav-item">
           <router-link to="/user" class="nav-link">
             <UserIcon class="icon"/>
             <p> Usuário </p>
@@ -70,7 +70,13 @@ export default {
     IdentificationIcon,
     CalendarDateRangeIcon,
     UserIcon,
-  }
+  },
+  data() {
+    return {
+      isAdmin: true,
+    };
+  },
+  
 };
 </script>
 

@@ -64,6 +64,17 @@
       </select>
     </div>
 
+    <!-- Data de início -->
+    <div class="form-group">
+    Data de início:
+      <input
+        type="date"
+        id="start_date"
+        v-model="employee.start_date"
+        required
+      />
+    </div>
+
     <!-- Remuneração -->
     <div class="form-group">
       Remuneração:
@@ -120,6 +131,7 @@
           position_id: null,
           salary: '',
           photo: null,
+          start_date: null,
         },
         errorMessage: '',
         companies: [],
@@ -214,6 +226,7 @@
               positionId: this.employee.position_id,
               salary: parseFloat(this.employee.salary),
               photo: photoUrl,
+              startDate: this.employee.start_date,
           };
 
           // Envia os dados do funcionário
@@ -234,6 +247,7 @@
               position_id: null,
               salary: '',
               photo: null,
+              start_date: null,
             };
             this.previewImage = null;
             this.selectedFile = null;
@@ -279,6 +293,7 @@
   }
 
   input[type='text'],
+  input[type='date'],
   input[type='number'],
   select {
     width: 100%;
@@ -287,6 +302,7 @@
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
+    color: rgb(68,68,68)
   }
 
   .button-container {
@@ -324,5 +340,9 @@
   .selector{
     display: none;
   }
+  
+  input[type="date"]:invalid{
+        color: rgb(153,153,153);
+    }
 
 </style>
