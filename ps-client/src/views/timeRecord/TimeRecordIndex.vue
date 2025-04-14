@@ -18,10 +18,6 @@
         </option>
     </select>
 
-    <ReportButton>
-      <DocumentArrowDownIcon/>
-    </ReportButton>
-
     <label for="start-date">Início</label>
     <input type="date" id="start-date" v-model="startDate"/>
 
@@ -31,9 +27,15 @@
     <button @click="searchTimeRecords">
         Buscar
     </button>
+
+    <ReportButton>
+      <DocumentArrowDownIcon/>
+    </ReportButton>
+
     </div>
 
     <div v-if="selectedEmployee">
+
         <div class="info">
 
             <div class="Employee"> 
@@ -77,15 +79,31 @@
                 <thead>
                     <tr>
                         <th>Data</th>
-                        <th>Turno</th>
-                        <th>Horas previstas</th>
                         <th>Entrada 1</th>
                         <th>Saída 1</th>
-                        <th>Saída 2</th>
-                        <th>Saída 2</th>
+                        <th v-if="hasAnyEntrada2">Entrada 2</th>
+                        <th v-if="hasAnySaida2">Saída 2</th>
+                        <th v-if="hasAnyEntrada3">Entrada 3</th>
+                        <th v-if="hasAnySaida3">Saída 3</th>
                         <th>Total trabalhado</th>
                     </tr>
                 </thead>
+                <tbody>
+                    <tr v-if="processedTimeRecords.length === 0">
+                        <td :colspan="8" style="text-align: center;">Nenhum registro encontrado para o período selecionado.</td>
+                    </tr>
+                    <tr v-for="(record, index) in processedTimeRecords" :key="index">
+                        <td class="data">{{ record.date }}</td>
+                        <td class="marcacao">{{ record.entrada1 }}</td>
+                        <td class="marcacao">{{ record.saida1 }}</td>
+                        <td class="marcacao"  v-if="hasAnyEntrada2">{{ record.entrada2 }}</td>
+                        <td class="marcacao"  v-if="hasAnyEntrada2">{{ record.saida2 }}</td>
+                        <td class="marcacao"  v-if="hasAnyEntrada3">{{ record.entrada3 }}</td>
+                        <td class="marcacao"  v-if="hasAnyEntrada3">{{ record.saida3 }}</td>
+
+                        <td class="total-trabalhado">{{ record.totalTrabalhado }}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -103,6 +121,7 @@
 import ReportButton from '@/components/ui/ReportButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
+import Swal from 'sweetalert2';
 import $ from 'jquery';
 import 'select2';
 import 'select2/dist/css/select2.css'; 
@@ -121,52 +140,253 @@ export default {
       startDate: '', 
       endDate: '',  
       timeRecords: [],
+      processedTimeRecords: [],
     };
   },
   computed: {
+    // Lista os funcionarios no select
     employeeslist() {
       return this.employees.map((employee) => ({
         id: employee.id,
         name: employee.name,
       }));
     },
+    hasAnyEntrada2() {
+        return this.processedTimeRecords.some(record => record.entrada2);
+    },
+    hasAnySaida2() {
+        return this.processedTimeRecords.some(record => record.saida2);
+    },
+    hasAnyEntrada3() {
+        return this.processedTimeRecords.some(record => record.entrada3);
+    },
+    hasAnySaida3() {
+        return this.processedTimeRecords.some(record => record.saida3);
+    },
   },
+  
   methods: {
-        async searchTimeRecords() {
-            
+
+    // Seleciona o funcionáro e busca os pontos
+    async searchTimeRecords() {
+
         if (!this.selectedEmployeeId) {
-            alert('Por favor, selecione um funcionário.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Por favor, selecione um funcionário',
+                showConfirmButton: false,
+                timer: 1500,
+            });
             return;
         }
+
+        // Reseta o estado antes de buscar novos dados
         this.selectedEmployee = null;
+        this.timeRecords = [];
+        this.processedTimeRecords = [];
+
         try {
+
             this.selectedEmployee = await EmployeeService.getEmployeeById(this.selectedEmployeeId);
+
+            // Busca todos os pontos
+                const responseData = [
+                    { "id": 1, "dateTime": "2025-01-10T08:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 2, "dateTime": "2025-01-10T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 3, "dateTime": "2025-01-11T08:15:00", "isEdited": true, "employeeId": 87 },
+                    { "id": 4, "dateTime": "2025-01-11T17:10:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 5, "dateTime": "2025-01-12T08:05:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 6, "dateTime": "2025-01-12T16:55:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 7, "dateTime": "2025-01-13T08:10:00", "isEdited": true, "employeeId": 87 },
+                    { "id": 8, "dateTime": "2025-01-13T17:05:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 9, "dateTime": "2025-01-14T08:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 10, "dateTime": "2025-01-14T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 11, "dateTime": "2025-01-15T08:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 12, "dateTime": "2025-01-15T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 13, "dateTime": "2025-01-16T08:10:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 14, "dateTime": "2025-01-16T17:10:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 15, "dateTime": "2025-01-17T08:20:00", "isEdited": true, "employeeId": 87 },
+                    { "id": 16, "dateTime": "2025-01-17T17:15:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 17, "dateTime": "2025-01-18T08:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 18, "dateTime": "2025-01-18T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 19, "dateTime": "2025-01-19T08:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 20, "dateTime": "2025-01-19T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 21, "dateTime": "2025-01-20T08:05:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 22, "dateTime": "2025-01-20T16:55:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 23, "dateTime": "2025-01-21T08:10:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 24, "dateTime": "2025-01-21T17:05:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 25, "dateTime": "2025-01-22T08:00:00", "isEdited": true, "employeeId": 87 },
+                    { "id": 26, "dateTime": "2025-01-22T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 27, "dateTime": "2025-01-23T08:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 28, "dateTime": "2025-01-23T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 29, "dateTime": "2025-01-24T08:10:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 30, "dateTime": "2025-01-24T17:10:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 31, "dateTime": "2025-01-25T08:20:00", "isEdited": true, "employeeId": 87 },
+                    { "id": 32, "dateTime": "2025-01-25T17:15:00", "isEdited": false, "employeeId": 87 }
+                ];
+
+                this.timeRecords = responseData;
+
+            // Filtra os pontos que foram obtidos
+                this.timeRecords = responseData.filter(record => {
+                    
+                    const matchesEmployee = record.employeeId == 87; //Depois trocar para o selectedEmployeeId 
+
+                    // Pega os primeiros 10 caracteres de dateTime yyyy-mm-dd
+                    const recordDateStr = record.dateTime.substring(0, 10);
+
+                    // Filtra as datas entre maior ou igual a startDate e menor ou igual a endDate
+                    const matchesStartDate = !this.startDate || recordDateStr >= this.startDate;
+                    const matchesEndDate = !this.endDate || recordDateStr <= this.endDate;
+
+                    return matchesEmployee && matchesStartDate && matchesEndDate;
+                });
+
+            // Variável com os dados filtrados
+            this.processedTimeRecords = this.processRecordsForTable(this.timeRecords);
+
+
         } catch (error) {
-            console.error('Erro ao buscar dados do espelho de ponto:', error);
-            alert('Erro ao buscar dados. Verifique o console.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao buscar dados',
+                text: error?.response?.data?.message || error.message,
+                showConfirmButton: false,
+                timer: 3500,
+            });
+            console.error("Erro em searchTimeRecords:", error);
             this.selectedEmployee = null;
-        } 
-        },
+            this.timeRecords = [];
+            this.processedTimeRecords = [];
+        }
+    },
+
+    // Trata os pontos para aparecerem na tabela
+    processRecordsForTable(records) {
+        try {
+            // Junta os pontos que foram feitos no mesmo dia
+            const groupedByDate = records.reduce((acc, record) => {
+
+                // Verifica se é uma string com o dia, se não for ignora
+                if (!record || typeof record.dateTime !== 'string' || record.dateTime.length < 10) {
+                    return acc;
+                }
+
+                // Armazena a parte da data do datetime yyyy-mm-dd
+                const dateStr = record.dateTime.substring(0, 10);
+                if (!acc[dateStr]) {
+                    acc[dateStr] = [];
+                }
+
+                // Retorna o acumulador atualizado para a próxima iteração.
+                acc[dateStr].push(record);
+                return acc;
+            },{});
+
+            // Separa as horas das marcações
+            const tableRows = Object.keys(groupedByDate)
+                // Para cada registro em um mesmo dia, deixa em ordem crescente
+                .map(dateStr => {
+                    const dailyRecords = groupedByDate[dateStr].sort((a, b) =>
+                        new Date(a.dateTime) - new Date(b.dateTime) 
+                    );
+
+                    // Cria a linha para a tabela
+                    const row = {
+                        date: this.formatDate(dateStr),
+                        entrada1: dailyRecords[0] ? this.formatTime(dailyRecords[0].dateTime) : null,
+                        saida1:   dailyRecords[1] ? this.formatTime(dailyRecords[1].dateTime) : null,
+                        entrada2: dailyRecords[2] ? this.formatTime(dailyRecords[2].dateTime) : null,
+                        saida2:   dailyRecords[3] ? this.formatTime(dailyRecords[3].dateTime) : null,
+                        entrada3: dailyRecords[4] ? this.formatTime(dailyRecords[4].dateTime) : null,
+                        saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
+                        totalTrabalhado: this.calculateTotalWorked(dailyRecords),
+                    };
+                    return row;
+                })
+                // Função para ordenar datas
+                .sort((a, b) => {
+                    try {
+                        // separa as datas em variaveis diferentes pra comparação
+                        const datePartsA = a.date.split('/');
+                        const datePartsB = b.date.split('/');
+
+                         // Cria objetos Date no formato YYYY-MM-DD
+                        const dateA = new Date(`${datePartsA[2]}-${datePartsA[1]}-${datePartsA[0]}`);
+                        const dateB = new Date(`${datePartsB[2]}-${datePartsB[1]}-${datePartsB[0]}`);
+
+                         // Compara as datas. Retorna negativo se A < B, positivo se A > B, 0 se A == B.
+                        return dateA - dateB;
+                        
+                    } catch (sortError) {
+                            return 0;
+                    }
+                });
+            return tableRows;
+
+        } catch (error) {
+            return [];
+        }
+    },
+
+    // Reorganiza a data para exibição
+    formatDate(dateString) {
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    },
+
+    // Pega o dateTime do array e retorna apenas as horas
+    formatTime(dateTimeString) {
+        return dateTimeString.substring(11, 16);
+    },
+
+    // Calcula o tempo trabalhado
+    calculateTotalWorked(dailyRecords) {
+        let totalMillis = 0;
+        // Calcula período 1 (Entrada 1 - Saída 1)
+        if (dailyRecords[0] && dailyRecords[1]) {
+            totalMillis += new Date(dailyRecords[1].dateTime) - new Date(dailyRecords[0].dateTime);
+        }
+        // Calcula período 2 (Entrada 2 - Saída 2)
+        if (dailyRecords[2] && dailyRecords[3]) {
+            totalMillis += new Date(dailyRecords[3].dateTime) - new Date(dailyRecords[2].dateTime);
+        }
+        // Calcula período 3 (Entrada 3 - Saída 3)
+        if (dailyRecords[4] && dailyRecords[5]) {
+            totalMillis += new Date(dailyRecords[5].dateTime) - new Date(dailyRecords[4].dateTime);
+        }
+        if (totalMillis <= 0) return '00:00';
+        
+        // Converte a soma das horas para a formatação correta
+        const totalSeconds = Math.floor(totalMillis / 1000);    
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    },
+
+    // Converte o dinheiro em reais
         formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
         }).format(value);
-        }
-    },
+        },
+  },
   
   async mounted() {
+    // Busca todos os funcionários
     this.employees = await EmployeeService.getAllEmployees();
+
+    // Transforma o select em select2
     this.$nextTick(() => {
         const selectElement = $(this.$refs.employeeSelect);
-
         selectElement.select2({
         placeholder: '🔎 Selecione um funcionário',
         }).on('change', (e) => {
           this.selectedEmployeeId = e.target.value;
         });
-        }
-    )}
+    })
+  },
 };
 </script>
 
@@ -273,6 +493,26 @@ export default {
     .default{
         width: 100%;
         padding-top: 2%
+    }
+
+    .data{
+        width:12.5%;
+        text-align: center;
+    }
+
+    .Previsto{
+        width:12.5%;
+        text-align: center;
+    }
+
+    .marcacao{
+        width:12.5%;
+        text-align: center;
+    }
+
+    .total-trabalhado{
+        width:12.5%;
+        text-align: center;
     }
 
 </style>
