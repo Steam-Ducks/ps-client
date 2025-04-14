@@ -1,7 +1,7 @@
 <template>
   <div class="side-bar">
 
-    <div class="nav-header">
+    <div>
       <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
     </div>
 
@@ -37,7 +37,7 @@
           </router-link>
         </li>
 
-        <li class="nav-item">
+        <li v-if="isAdmin"  class="nav-item">
           <router-link to="/user" class="nav-link">
             <UserIcon class="icon"/>
             <p> Usuário </p>
@@ -70,11 +70,17 @@ export default {
     IdentificationIcon,
     CalendarDateRangeIcon,
     UserIcon,
-  }
+  },
+  data() {
+    return {
+      isAdmin: true,
+    };
+  },
+  
 };
 </script>
 
-<style scoped>
+<style >
 
   .side-bar {
     text-align: center;
@@ -87,17 +93,17 @@ export default {
     border: 1px solid #ccc;
     z-index:2;
     padding: 10px;
-    color: #551a8b;
+    color: #6F08AF;
     font-family: Nunito;
   }
 
-  img{
+  /* img{
     width: 200px;
-  }
+  } */
 
   .logo-top {
-  width: 200px;
-  margin-bottom: 20px;
+  width: 70%;
+  /**margin-bottom: 20px;*/
 }
 
 .logo-bottom {
@@ -107,9 +113,8 @@ export default {
 
   .nav-bar{
     list-style-type: none;
-    border-top: 1px solid #ccc;
     padding: 0;
-    margin: 0;
+    margin-top: 20px;
     width: 100%;
   }
 
@@ -119,7 +124,7 @@ export default {
     text-decoration: none;
     font-size: 18px;
     border-radius: 10px;
-    color: #551a8b;
+    color: #6F08AF;
     font-family: Nunito;
     padding: 0 10px 0 10px;
   }
@@ -141,9 +146,9 @@ export default {
     height:43%;
   }
 
-  .nav-header{
+  /* .nav-header{
     height:14%;
-  }
+  } */
 
   .nav-section{
     height:43%;

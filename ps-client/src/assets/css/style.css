@@ -1,5 +1,11 @@
-  body{
-    font-family: sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+.root {
+  font-family: Nunito !important;
+}
+
+body{
+    font-family: Nunito;
   }
 
   .photo{
@@ -30,11 +36,7 @@
     width: 10%;
   }
 
-  .dt-length,
-  .dt-info{
-    display:none;
-  }
-
+  
   .dt-search{
     text-align: right;
   }
@@ -44,7 +46,7 @@
   }
 
   .dataTables_wrapper {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Nunito';
   margin: 20px 0;
 }
 
@@ -126,7 +128,16 @@ table.dataTable tbody tr:hover {
   background-color: #f1f5f9;
 } 
 
+.dt-input,
+.dt-paging-button,
+.dt-paging-button {
+  color:#6F08AF;
+  border: 1.5px solid #6F08AF;
+  background-color: transparent;
+}
+
 nav{
+  font-family: Nunito;
   text-align: right;
   gap: 5px;
   display: flex; 

@@ -4,7 +4,7 @@
     <div class="image-preview-container">
         <!-- foto --> 
         <img :src="previewImage || defaultProfilePicture" class="profile-picture" alt="Profile Picture"/>
-        <input type="file" id="photo" accept="image/*" @change="onFileChange" class="selector"/>
+        <input type="file" id="photo" accept="image/png, image/jpeg" @change="onFileChange" class="selector"/>
         <label for="photo" class="upload-button">
           Selecionar Foto
         </label>
@@ -64,6 +64,17 @@
       </select>
     </div>
 
+    <!-- Data de início -->
+    <div class="form-group">
+    Data de início:
+      <input
+        type="date"
+        id="start_date"
+        v-model="employee.start_date"
+        required
+      />
+    </div>
+
     <!-- Remuneração -->
     <div class="form-group">
       Remuneração:
@@ -120,6 +131,7 @@
           position_id: null,
           salary: '',
           photo: null,
+          start_date: null,
         },
         errorMessage: '',
         companies: [],
@@ -205,27 +217,20 @@
         }
 
         try {
-          const timestamp = new Date().getTime();
-          const random = Math.floor(Math.random() * 1000);
-          const fileExtension = this.selectedFile.name.split('.').pop();
-          const uniqueFileName = `employee_${timestamp}_${random}.${fileExtension}`;
-
-          this.employee.photo = `https://iscjueykmwxxzoanzcoo.supabase.co/storage/v1/object/public/userfiles/photos/${uniqueFileName}`;
-          
+          const photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
+    
           const employeeToSubmit = {
               name: this.employee.name,
               cpf: this.employee.cpf,
               companyId: this.employee.company_id,
               positionId: this.employee.position_id,
               salary: parseFloat(this.employee.salary),
-              photo: this.employee.photo,
+              photo: photoUrl,
+              startDate: this.employee.start_date,
           };
 
           // Envia os dados do funcionário
           await EmployeeService.createEmployee(employeeToSubmit);
-
-          // Envia a imagem
-          await EmployeeService.uploadEmployeePhotoToSupabase(this.selectedFile, uniqueFileName);
 
           Swal.fire({
             icon: 'success',
@@ -242,6 +247,7 @@
               position_id: null,
               salary: '',
               photo: null,
+              start_date: null,
             };
             this.previewImage = null;
             this.selectedFile = null;
@@ -287,6 +293,7 @@
   }
 
   input[type='text'],
+  input[type='date'],
   input[type='number'],
   select {
     width: 100%;
@@ -295,6 +302,7 @@
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
+    color: rgb(68,68,68)
   }
 
   .button-container {
@@ -332,5 +340,9 @@
   .selector{
     display: none;
   }
+  
+  input[type="date"]:invalid{
+        color: rgb(153,153,153);
+    }
 
 </style>
