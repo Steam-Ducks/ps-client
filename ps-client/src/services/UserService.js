@@ -5,25 +5,41 @@ const AUTH_URL = `${API_URL}/auth`;
 const USERS_URL = `${API_URL}/users`;
 
 const UserService = {
-  // Helper to get the token from localStorage
   getToken() {
-    return localStorage.getItem('token');
+    const token = localStorage.getItem('token');
+    if (!token || token.trim() === '') {
+      console.error('JWT token is missing or empty');
+      return null;
+    }
+    return token;
   },
 
-  // Helper to set the Authorization header
+  getIsAdmin() {
+    const isAdmin = localStorage.getItem('isAdmin');
+    return isAdmin === 'true';
+  },
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('isAdmin');
+  },
+
   getAuthHeaders() {
     const token = this.getToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   },
 
-  // Login method
   async login(credentials) {
     try {
       const response = await axios.post(`${AUTH_URL}/login`, credentials);
-      const { token } = response.data;
+      const { accessToken, isAdmin } = response.data;
 
-      // Save the token to localStorage
-      localStorage.setItem('token', token);
+      if (!accessToken) {
+        throw new Error('No access token received from the backend');
+      }
+
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('isAdmin', isAdmin);
 
       return response.data;
     } catch (error) {
@@ -32,13 +48,11 @@ const UserService = {
     }
   },
 
-  // Register method
   async register(userData) {
     try {
       const response = await axios.post(`${AUTH_URL}/register`, userData);
       const { token } = response.data;
 
-      // Save the token to localStorage
       localStorage.setItem('token', token);
 
       return response.data;
@@ -48,7 +62,6 @@ const UserService = {
     }
   },
 
-  // Get all users (authenticated)
   async getAllUsers() {
     try {
       const response = await axios.get(`${USERS_URL}`, {
@@ -61,7 +74,6 @@ const UserService = {
     }
   },
 
-  // Get user by ID (authenticated)
   async getUserById(userId) {
     try {
       const response = await axios.get(`${USERS_URL}/${userId}`, {
@@ -74,7 +86,6 @@ const UserService = {
     }
   },
 
-  // Create user (authenticated)
   async createUser(userData) {
     try {
       const response = await axios.post(`${USERS_URL}`, userData, {
