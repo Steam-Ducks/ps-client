@@ -2,7 +2,9 @@
   <div class="side-bar">
 
     <div>
-      <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+      <router-link to="/home">
+        <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+      </router-link>
     </div>
 
     <div class="nav-section">
@@ -10,7 +12,7 @@
       <ul class="nav-bar" >
 
         <li class="nav-item">
-          <router-link to="/" class="nav-link">
+          <router-link to="/home" class="nav-link">
             <HomeIcon class="icon" />
             <p>Home</p>
           </router-link>
