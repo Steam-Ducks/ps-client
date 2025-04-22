@@ -77,10 +77,37 @@ body{
   border-color: #3b82f6 !important;
 }
 
+.dt-paging {
+  margin-top: 20px;
+}
+
+.dt-paging-button {
+  color:#6F08AF;
+  border: 1px solid #6F08AF;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+}
+
+.dt-paging-button.previous,
+.dt-paging-button.next {
+  width: 70px;
+  border: none;
+  background-color: #f1d4fc;
+}
+
+.dt-paging-button.last,
+.dt-paging-button.first{
+  display: none;
+}
+
 .dt-paging-button:hover,
 .dt-paging-button:hover,
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #f9eefe !important;
+  background: #6F08AF !important;
+  color: #f0f0f0;
+  transition: 0.2s;
 }
 
 table.dataTable thead th {
@@ -108,7 +135,6 @@ table.dataTable tbody tr:hover {
   border: 1.5px solid #6F08AF;
   background-color: transparent;
 }
-
 
 nav{
   font-family: Nunito;
