@@ -438,6 +438,7 @@ export default {
     // Transforma o select em select2
     this.$nextTick(() => {
         const selectElement = $(this.$refs.employeeSelect);
+
         selectElement.select2({
         placeholder: '🔎 Selecione um funcionário',
         }).on('change', (e) => {
@@ -572,5 +573,4 @@ export default {
         width:12.5%;
         text-align: center;
     }
-
 </style>
