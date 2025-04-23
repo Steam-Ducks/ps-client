@@ -8,6 +8,11 @@
         color: #551a8b;
         font-family: Nunito;
     }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
     body {
         background-color: #e8e8e8;
         color: #6F08AF;
