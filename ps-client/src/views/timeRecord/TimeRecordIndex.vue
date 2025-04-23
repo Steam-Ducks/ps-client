@@ -24,12 +24,8 @@
     <label for="end-date">Fim</label>
     <input type="date" id="end-date" v-model="endDate"/>
 
-    <button @click="searchTimeRecords">
-        Buscar
-    </button>
-
-    <ReportButton>
-      <DocumentArrowDownIcon/>
+    <ReportButton @click="searchTimeRecords">
+        <MagnifyingGlassIcon/>
     </ReportButton>
 
     </div>
@@ -64,6 +60,22 @@
                     <p class="label">Salario/hora</p>
                 </div>
             </div>
+
+            <div>
+                <div style="margin: 10px">
+                    <ReportButton>
+                        <DocumentArrowDownIcon/>
+                    </ReportButton>
+                </div>
+                <div style="display: flex; gap: 3%; margin-left: 5px;">
+                    <button @click="removeColuna">
+                        -
+                    </button>
+                    <button @click="adicionaColuna">
+                        +
+                    </button>
+                </div>
+            </div>
         </div>
 
         <div class="apontamento">
@@ -73,32 +85,54 @@
                         <th>Data</th>
                         <th>Entrada 1</th>
                         <th>Saída 1</th>
-                        <th v-if="hasAnyEntrada2">Entrada 2</th>
-                        <th v-if="hasAnySaida2">Saída 2</th>
-                        <th v-if="hasAnyEntrada3">Entrada 3</th>
-                        <th v-if="hasAnySaida3">Saída 3</th>
+                        <th v-if="hasAnyEntrada2 || marcacaoCount > 0">Entrada 2</th>
+                        <th v-if="hasAnyEntrada2 || marcacaoCount > 0">Saída 2</th>
+                        <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Entrada 3</th>
+                        <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Saída 3</th>
                         <th>Total trabalhado</th>
                         <th>Total a receber</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="processedTimeRecords.length === 0">
-                        <td :colspan="8" style="text-align: center;">Nenhum registro encontrado para o período selecionado.</td>
+                        <td :colspan="3 + (hasAnyEntrada2 ? 2 : 0) + (hasAnyEntrada3 ? 2 : 0) + 2" style="text-align: center;">Nenhum registro encontrado para o período selecionado.</td>
                     </tr>
                     <tr v-for="(record, index) in processedTimeRecords" :key="index">
-                        <td class="data">{{ record.date }}</td>
-                        <td class="marcacao">{{ record.entrada1 }}</td>
-                        <td class="marcacao">{{ record.saida1 }}</td>
-                        <td class="marcacao"  v-if="hasAnyEntrada2">{{ record.entrada2 }}</td>
-                        <td class="marcacao"  v-if="hasAnyEntrada2">{{ record.saida2 }}</td>
-                        <td class="marcacao"  v-if="hasAnyEntrada3">{{ record.entrada3 }}</td>
-                        <td class="marcacao"  v-if="hasAnyEntrada3">{{ record.saida3 }}</td>
-
-                        <td class="total-trabalhado">{{ record.totalTrabalhadoDia }}</td>
-                        <td class="total-trabalhado">{{ record.totalSalaryDay }}</td>
+                        <td class="data">
+                            {{ record.date }}
+                        </td>
+                        <td class="marcacao">
+                            <input class="ponto" :value="record.entrada1 ?? '--:--'"/>
+                        </td>
+                        <td class="marcacao">
+                            <input class="ponto" :value="record.saida1 ?? '--:--'"/>
+                        </td>
+                        <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
+                            <input class="ponto" :value="record.entrada2 ?? '--:--'"/>
+                        </td>
+                        <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
+                            <input class="ponto" :value="record.saida2 ?? '--:--'"/>
+                        </td>
+                        <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
+                            <input class="ponto" :value="record.entrada3 ?? '--:--'"/>
+                        </td>
+                        <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
+                            <input class="ponto" :value="record.saida3 ?? '--:--'"/>
+                        </td>
+                        <td class="total-trabalhado">
+                            {{ record.totalTrabalhadoDia }}
+                        </td>
+                        <td class="total-trabalhado">
+                            {{ record.totalSalaryDay }}
+                        </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="footer">
+            <button class="save">
+                salvar
+            </button>
         </div>
     </div>
    
@@ -114,6 +148,7 @@
 
 import ReportButton from '@/components/ui/ReportButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
 import Swal from 'sweetalert2';
 import $ from 'jquery';
@@ -125,6 +160,7 @@ export default {
   components: {
     ReportButton,
     DocumentArrowDownIcon,
+    MagnifyingGlassIcon,
   },
   data() {
     return {
@@ -135,6 +171,7 @@ export default {
       endDate: '',  
       timeRecords: [],
       processedTimeRecords: [],
+      marcacaoCount: 0,
     };
   },
   computed: {
@@ -148,14 +185,8 @@ export default {
     hasAnyEntrada2() {
         return this.processedTimeRecords.some(record => record.entrada2);
     },
-    hasAnySaida2() {
-        return this.processedTimeRecords.some(record => record.saida2);
-    },
     hasAnyEntrada3() {
         return this.processedTimeRecords.some(record => record.entrada3);
-    },
-    hasAnySaida3() {
-        return this.processedTimeRecords.some(record => record.saida3);
     },
 
     // Calcula o total de horas trabalhadas no período selecionado
@@ -227,6 +258,8 @@ export default {
                 const responseData = [
                     { "id": 1, "dateTime": "2025-01-10T08:00:00", "isEdited": false, "employeeId": 87 },
                     { "id": 2, "dateTime": "2025-01-10T17:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 2, "dateTime": "2025-01-10T18:00:00", "isEdited": false, "employeeId": 87 },
+                    { "id": 2, "dateTime": "2025-01-10T19:00:00", "isEdited": false, "employeeId": 87 },
                     { "id": 3, "dateTime": "2025-01-11T08:15:00", "isEdited": true, "employeeId": 87 },
                     { "id": 4, "dateTime": "2025-01-11T17:10:00", "isEdited": false, "employeeId": 87 },
                     { "id": 5, "dateTime": "2025-01-12T08:05:00", "isEdited": false, "employeeId": 87 },
@@ -364,6 +397,18 @@ export default {
         }
     },
 
+    adicionaColuna(){
+        if(this.marcacaoCount < 2){
+            this.marcacaoCount++
+        }
+    },
+
+    removeColuna(){
+        if (this.marcacaoCount > 0) {
+            this.marcacaoCount--;
+        }
+    },
+
     // Reorganiza a data para exibição
     formatDate(dateString) {
         const [year, month, day] = dateString.split('-');
@@ -446,6 +491,24 @@ export default {
         });
     })
   },
+
+  watch: {
+    processedTimeRecords: {
+      handler(newRecords) {
+        const hasEntrada3 = newRecords.some(record => record.entrada3);
+        const hasEntrada2 = newRecords.some(record => record.entrada2);
+
+        if (hasEntrada3) {
+          this.marcacaoCount = 2;
+        } else if (hasEntrada2) {
+          this.marcacaoCount = 1;
+        } else {
+          this.marcacaoCount = 0;
+        }
+      },
+      immediate: true, 
+    }
+  },
 };
 </script>
 
@@ -459,6 +522,7 @@ export default {
         width: 40%;
         height: 35px;
         border-radius: 5px;
+        color: inherit;
     }
 
     .tools{
@@ -572,5 +636,35 @@ export default {
     .total-trabalhado{
         width:12.5%;
         text-align: center;
+    }
+
+    .ponto {
+        border: none; 
+        width: 100%;
+        text-align: center;
+        font-family: inherit;
+        box-shadow: none;
+    }
+
+    .save{
+        border: 5px;
+        padding: 0.7%;
+        border-radius: 10%;
+        background-color:#5b007d;
+        color: white;
+    }
+
+    .footer{
+        padding-left: 3%;
+        padding-top: 10px;
+    }
+
+    input[type="date"]{
+        height: 25px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-family: inherit;
+        color: inherit;
+        box-shadow: none;
     }
 </style>
