@@ -19,7 +19,19 @@
 
           <!-- Password -->
           <div class="form-group">
-            <input type="password" id="password" v-model="credentials.password" required placeholder="********" />
+            <input
+                :type="showPassword ? 'text' : 'password'"
+                id="password"
+                v-model="credentials.password"
+                required
+                placeholder="********"
+                maxlength="15"
+                minlength="8"
+            />
+            <span class="toggle-password" @click="togglePasswordVisibility">
+              <EyeIcon v-if="!showPassword" class="icon" />
+              <EyeSlashIcon v-else class="icon" />
+            </span>
           </div>
 
           <!-- Submit Button -->
@@ -46,10 +58,11 @@
 <script>
 import UserService from '@/services/UserService';
 import CreateButton from "@/components/ui/CreateButton.vue";
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/solid';
 
 export default {
   name: 'LogIn',
-  components: { CreateButton },
+  components: { CreateButton, EyeIcon, EyeSlashIcon },
 
   data() {
     return {
@@ -58,9 +71,13 @@ export default {
         password: '',
       },
       errorMessage: '',
+      showPassword: false,
     };
   },
   methods: {
+    togglePasswordVisibility() {
+      this.showPassword = !this.showPassword;
+    },
     async handleLogin() {
       this.errorMessage = '';
       try {
@@ -176,17 +193,34 @@ export default {
 }
 
 .form-group {
+  position: relative;
   margin-bottom: 15px;
 }
 
 input[type='email'],
-input[type='password'] {
+input[type='password'],
+input[type='text'] {
   width: 90%;
   padding: 10px;
+  padding-right: 40px;
   border: 1px solid #cbd5e1;
   border-radius: 10px;
   font-size: 1rem;
   box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 55%;
+  right: 25px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
 }
 
 button {
