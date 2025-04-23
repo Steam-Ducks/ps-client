@@ -17,13 +17,13 @@
         <!-- senha -->
         <div class="form-group">
           Senha:
-          <input type="password" id="password" v-model="user.password" required />
+          <input type="password" id="password" v-model="user.password" maxlength="15" minlength="8" required />
         </div>
 
         <!--tipo usuario-->
         <div class="form-group">
           Tipo do Usuário
-          <select v-model="user.is_admin" id="is_admin" required>
+          <select v-model="user.isAdmin" id="isAdmin" required>
             <option :value="true">Administrador</option>
             <option :value="false">Padrão</option>
           </select>
@@ -58,7 +58,7 @@ export default {
         username: '',
         email: '',
         password: '',
-        is_admin: null,
+        isAdmin: null,
       },
       errorMessage: '',
     };
@@ -82,7 +82,7 @@ export default {
           username: '',
           email: '',
           password: '',
-          is_admin: null,
+          isAdmin: null,
         };
       });
 
