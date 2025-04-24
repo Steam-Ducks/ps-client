@@ -77,7 +77,7 @@
 
     <!-- Remuneração -->
     <div class="form-group">
-      Remuneração:
+      Remuneração (por hora):
       <input
           type="text"
           id="salary"

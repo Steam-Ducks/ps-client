@@ -1,81 +1,67 @@
-import axios from 'axios';
+import axios from 'axios'; // Biblioteca para fazer requisições HTTP.
+import UserService from '@/services/UserService'; // Serviço para obter os cabeçalhos de autenticação.
 
-// Crie uma instância do axios com a URL base da sua API
-const api = axios.create({
-  baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8091',
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+const API_URL = 'http://localhost:8080/api/employees'; // Aonde o bootstrap está disponibilizando os dados
 
-class EmployeeService {
-  async getAllEmployees() {
+const EmployeeService = { // Aonde colocamos as funções para as requisições
+
+  async createEmployee(createEmployee) {
     try {
-      const response = await api.get('/employees');
+      const response = await axios.post(`${API_URL}`, createEmployee, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
       return response.data;
     } catch (error) {
-      console.error('Error fetching employees:', error);
-      throw error;
+      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar funcionário";
+      throw new Error(errorMessage);
     }
-  }
+  },
+
+  async getAllEmployees() {
+    try {
+      const response = await axios.get(`${API_URL}`, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error('Erro ao listar empresas: ' + error.message);
+    }
+  },
 
   async getEmployeeById(id) {
     try {
-      const response = await api.get(`/employees/${id}`);
+      const response = await axios.get(`${API_URL}/${id}`, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
       return response.data;
     } catch (error) {
-      console.error(`Error fetching employee with id ${id}:`, error);
-      throw error;
+      throw new Error('Erro ao achar empresa: ' + error.message);
     }
-  }
-
-  async createEmployee(employee) {
-    try {
-      const response = await api.post('/employees', employee);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating employee:', error);
-      throw error;
-    }
-  }
-
-  async updateEmployee(employee) {
-    try {
-      const response = await api.put(`/employees/${employee.id}`, employee);
-      return response.data;
-    } catch (error) {
-      console.error(`Error updating employee with id ${employee.id}:`, error);
-      throw error;
-    }
-  }
-
-  async deleteEmployee(id) {
-    try {
-      const response = await api.delete(`/employees/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(`Error deleting employee with id ${id}:`, error);
-      throw error;
-    }
-  }
+  },
 
   async uploadEmployeePhoto(file) {
     try {
       const formData = new FormData();
-      formData.append('photo', file);
+      formData.append('file', file);
 
-      const response = await api.post('/employees/upload-photo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const response = await axios.post(
+          `${API_URL}/uploadPhoto`,
+          formData,
+          {
+            headers: {
+              ...UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+      );
 
       return response.data.photoUrl;
     } catch (error) {
-      console.error('Error uploading employee photo:', error);
-      throw error;
+      const msg = error.response?.data?.message || 'Erro no upload da imagem';
+      throw new Error(msg);
     }
-  }
-}
+  },
 
-export default new EmployeeService();
+};
+
+export default EmployeeService;
