@@ -1,54 +1,81 @@
-import axios from 'axios'; // Biblioteca para fazer requisições HTTP.
+import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/employees'; // Aonde o bootstrap está disponibilizando os dados
+// Crie uma instância do axios com a URL base da sua API
+const api = axios.create({
+  baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8091',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
-const EmployeeService = { // Aonde colocamos as funções para as requisições
-  
-  async createEmployee(createEmployee){
+class EmployeeService {
+  async getAllEmployees() {
     try {
-      const response = await axios.post(`${API_URL}`, createEmployee);
-      return response.data; 
+      const response = await api.get('/employees');
+      return response.data;
     } catch (error) {
-      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar funcionário"
-      throw new Error(errorMessage);
+      console.error('Error fetching employees:', error);
+      throw error;
     }
-  },
+  }
 
-  async getAllEmployees(){
+  async getEmployeeById(id) {
     try {
-      const response = await axios.get(`${API_URL}`);
-      return response.data; 
+      const response = await api.get(`/employees/${id}`);
+      return response.data;
     } catch (error) {
-      throw new Error('Erro ao listar empresas: ' + error.message);
+      console.error(`Error fetching employee with id ${id}:`, error);
+      throw error;
     }
-  },
+  }
 
-  async getEmployeeById(id){
+  async createEmployee(employee) {
     try {
-      const response = await axios.get(`${API_URL}/${id}`);
-      return response.data; 
+      const response = await api.post('/employees', employee);
+      return response.data;
     } catch (error) {
-      throw new Error('Erro ao achar empresa: ' + error.message);
+      console.error('Error creating employee:', error);
+      throw error;
     }
-  },
+  }
+
+  async updateEmployee(employee) {
+    try {
+      const response = await api.put(`/employees/${employee.id}`, employee);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating employee with id ${employee.id}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteEmployee(id) {
+    try {
+      const response = await api.delete(`/employees/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error deleting employee with id ${id}:`, error);
+      throw error;
+    }
+  }
 
   async uploadEmployeePhoto(file) {
     try {
       const formData = new FormData();
-      formData.append('file', file);
-  
-      const response = await axios.post(
-        `${API_URL}/uploadPhoto`,
-        formData,
-      );
-  
+      formData.append('photo', file);
+
+      const response = await api.post('/employees/upload-photo', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
       return response.data.photoUrl;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Erro no upload da imagem';
-      throw new Error(msg);
+      console.error('Error uploading employee photo:', error);
+      throw error;
     }
-  },
+  }
+}
 
-};
-
-export default EmployeeService;
+export default new EmployeeService();

@@ -3,9 +3,10 @@ import AdminLayout from '@/layout/AdmintLayout.vue';
 import HomePage from '@/views/home/HomeIndex.vue';
 import CompanyPage from '@/views/company/CompanyIndex.vue';
 import EmployeePage from '@/views/employee/EmployeeIndex.vue';
+import EmployeeEdit from '@/views/employee/EmployeeEdit.vue';
 import timeRecordPage from '@/views/timeRecord/TimeRecordIndex.vue';
 import UserPage from '@/views/users/UserIndex.vue';
-import Test from '@/components/Test.vue'; 
+import Test from '@/components/Test.vue';
 
 const routes = [
   {
@@ -45,7 +46,12 @@ const routes = [
       {
         path: '',
         component: EmployeePage
-      }
+      },
+      { path: '/employees/edit/:id',
+        name: 'EmployeeEdit',
+        component: EmployeeEdit,
+        props: true,
+      },
     ]
   },
   {
@@ -58,13 +64,11 @@ const routes = [
       }
     ]
   },
-
   {
-    path: '/Test', 
+    path: '/Test',
     name: 'Test',
-    component: Test, 
-  },
-
+    component: Test
+  }
 ];
 
 const router = createRouter({

@@ -1,120 +1,90 @@
 <template>
-  <div v-if="employees && employees.length > 0" class="employee-list">
-    <DataTable
-    ref="dataTable"
-    :key="tableKey"
-    :data="formattedemployees"
-    :columns="columns"
-    :options="tableOptions"
-    />
-
-  </div>
-  <div v-else class="no-employee-message">
-    <p>Nenhum funcionário encontrado. Tente buscar novamente.</p>
+  <div class="employee-list">
+    <table>
+      <thead>
+      <tr>
+        <th>Nome completo</th>
+        <th>CPF</th>
+        <th>Cargo</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="employee in employees" :key="employee.id">
+        <td>{{ employee.name }}</td>
+        <td>{{ employee.cpf }}</td>
+        <td>{{ employee.position?.name }}</td>
+        <td class="actions">
+          <button @click="editEmployee(employee.id)" class="edit-button">
+            Editar
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <script>
-import DataTable from 'datatables.net-vue3';
-import DataTablesCore from 'datatables.net';
-import Buttons from 'datatables.net-buttons';
-import 'datatables.net-buttons/js/buttons.html5.js';
-import 'datatables.net-buttons-dt/css/buttons.dataTables.css';
-
-DataTable.use(DataTablesCore);
-DataTablesCore.use(Buttons);
-
-
-
 export default {
   name: 'EmployeeList',
-  components: {
-    DataTable,
-  },
   props: {
     employees: {
       type: Array,
-      required: true,
-    },
+      required: true
+    }
   },
-  data() {
-      return {
-        tableKey: 0,
-        columns: [
-          { title: ' ',
-            data: 'foto',
-            orderable: false, 
-            render: (data) => {
-              return `<img src="${data}" alt="Foto de perfil" class="photo"/>`;
-            },
-            class:'image'
-          },
-          { title: 'Nome completo', data: 'name', class:'name' },
-          { title: 'CPF', data: 'cpf', class:'cpf' },
-          { title: 'Cargo', data: 'position', class:'position' },
-          { title: 'Empresa', data: 'company', class:'company' },
-        ],
-        tableOptions: {
-          responsive: true,
-          select: true,
-          lengthMenu: [10],
-          buttons: [
-            {
-              extend: 'excel',
-              title: 'teste',
-              exportOptions: {
-                columns: [1, 2]
-              }
-            }
-          ],
-          language: {
-            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
-          },
-          dom: 'Bftip',
-        },
-      };
-    },
-    computed: {
-      formattedemployees() {
-        return this.employees.map((employee) => ({
-          foto: employee.photo,
-          name: employee.name,
-          cpf: employee.cpf,
-          position: employee.position.name,
-          company: employee.company.name,
-        }));
-      },
-    },
-    watch: {
-      employee() {
-        this.tableKey += 1;
-      },
-    },
-    beforeUnmount() {
-      if (this.$refs.dataTable?.dt) {
-        this.$refs.dataTable.dt.destroy(true);
-      }
-    },
-  };
+  emits: ['edit-employee'],
+  methods: {
+    editEmployee(id) {
+      this.$emit('edit-employee', id);
+    }
+  }
+};
 </script>
 
 <style scoped>
 .employee-list {
-  margin-top: 25px;
+  width: 100%;
+  overflow-x: auto;
 }
 
-.no-employees-message {
-  color: #64748b;
-  font-size: 1.2rem;
+table {
+  width: 100%;
+  border-collapse: collapse;
   margin-top: 20px;
 }
 
-.img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  object-position: center;
-  border-radius: 50%;
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
 }
 
+th {
+  color: #475569;
+  font-weight: 600;
+}
+
+tr:hover {
+  background-color: #f1f5f9;
+}
+
+.actions {
+  text-align: right;
+}
+
+.edit-button {
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  color: #6F08AF;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.edit-button:hover {
+  background-color: #e5e7eb;
+}
 </style>

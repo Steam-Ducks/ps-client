@@ -34,8 +34,8 @@ const UserService = { // Aonde colocamos as funções para as requisições
       const response = await axios.post(`${API_URL}`, userData);
       return response.data;
     } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      throw error;
+      const erroMassage = error.response ?.data ?.message || "Erro ao criar usuario"
+      throw new Error(erroMassage);
     }
   },
 

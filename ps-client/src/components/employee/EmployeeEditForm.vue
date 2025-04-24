@@ -97,9 +97,9 @@
 </template>
 
 <script>
-import EmployeeService from '@/services/EmployeeService.js';
-import CompanyService from '@/services/CompanyService.js';
-import PositionService from '@/services/PositionService.js';
+import EmployeeService from '@/services/EmployeeService';
+import CompanyService from '@/services/CompanyService';
+import PositionService from '@/services/PositionService';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
 import { IMaskDirective } from 'vue-imask';
