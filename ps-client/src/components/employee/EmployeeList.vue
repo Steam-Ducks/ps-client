@@ -16,7 +16,7 @@
         <td>{{ employee.position?.name }}</td>
         <td class="actions">
           <button @click="editEmployee(employee.id)" class="edit-button">
-            Editar
+            &#8230;
           </button>
         </td>
       </tr>
@@ -72,19 +72,30 @@ tr:hover {
 
 .actions {
   text-align: right;
+  position: relative;
 }
 
 .edit-button {
-  background-color: #f3f4f6;
+  background-color: #4a0673;
+  color: white;
   border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  color: #6F08AF;
+  border-radius: 50%;
   cursor: pointer;
-  font-weight: 500;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .edit-button:hover {
-  background-color: #e5e7eb;
+  background-color: #330450;
+  transform: scale(1.1);
 }
 </style>

@@ -33,6 +33,7 @@
           placeholder="123.456.789-00"
           maxlength="14"
           required
+          disabled
       />
     </div>
 
@@ -77,7 +78,7 @@
 
     <!-- Remuneração -->
     <div class="form-group">
-      Remuneração:
+      Remuneração por hora trabalhada:
       <input
           type="text"
           id="salary"
@@ -103,7 +104,8 @@ import PositionService from '@/services/PositionService';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
 import { IMaskDirective } from 'vue-imask';
-import { validate as validateCpf } from 'gerador-validador-cpf';
+// Removendo a importação não utilizada
+// import { validate as validateCpf } from 'gerador-validador-cpf';
 import $ from 'jquery';
 import 'select2';
 import 'select2/dist/css/select2.css';
@@ -260,65 +262,67 @@ export default {
       }
     },
 
-    async submitForm() {
-      let errorMessage = '';
-
-      // Validar CPF
-      if (!validateCpf(this.employee.cpf)) {
-        errorMessage = 'CPF Inválido';
-      }
-
-      if (errorMessage) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Informação inválida',
-          text: errorMessage,
-          showConfirmButton: false,
-          timer: 2500,
-        });
-        return;
-      }
-
+    submitForm() {
       try {
         let photoUrl = this.employee.photo;
 
-        // Só faz upload da foto se uma nova foi selecionada
-        if (this.photoChanged && this.selectedFile) {
-          photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
-        }
+        // Preparar os dados para envio
+        const prepareData = async () => {
+          // Só faz upload da foto se uma nova foi selecionada
+          if (this.photoChanged && this.selectedFile) {
+            try {
+              photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
+            } catch (error) {
+              console.error('Error uploading photo:', error);
+              throw error;
+            }
+          }
 
-        const employeeToSubmit = {
-          id: this.employee.id,
-          name: this.employee.name,
-          cpf: this.employee.cpf,
-          companyId: this.employee.company_id,
-          positionId: this.employee.position_id,
-          salary: parseFloat(this.employee.salary),
-          photo: photoUrl,
-          startDate: this.employee.start_date,
+          const employeeToSubmit = {
+            id: this.employee.id,
+            name: this.employee.name,
+            cpf: this.employee.cpf,
+            companyId: this.employee.company_id,
+            positionId: this.employee.position_id,
+            salary: parseFloat(this.employee.salary),
+            photo: photoUrl,
+            startDate: this.employee.start_date,
+          };
+
+          return employeeToSubmit;
         };
 
-        // Atualiza os dados do funcionário
-        await EmployeeService.updateEmployee(employeeToSubmit);
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Funcionário atualizado com sucesso!',
-          showConfirmButton: false,
-          timer: 1500,
-        })
-            .then(() => {
-              this.$emit('employee-updated');
-            });
+        // Executar a atualização
+        prepareData().then(employeeToSubmit => {
+          return EmployeeService.updateEmployee(employeeToSubmit);
+        }).then(() => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Funcionário atualizado com sucesso!',
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            this.$emit('employee-updated');
+          });
+        }).catch(error => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro ao atualizar funcionário!',
+            text: error.message || 'Ocorreu um erro ao tentar atualizar o funcionário.',
+            showConfirmButton: false,
+            timer: 3500,
+          });
+          console.error('Erro ao atualizar funcionário:', error);
+        });
       } catch (error) {
         Swal.fire({
           icon: 'error',
-          title: 'Erro ao atualizar funcionário!',
-          text: error.message,
+          title: 'Erro ao processar formulário!',
+          text: error.message || 'Ocorreu um erro ao processar o formulário.',
           showConfirmButton: false,
           timer: 3500,
-        })
-        console.error('Erro ao atualizar funcionário:', error);
+        });
+        console.error('Erro ao processar formulário:', error);
       }
     },
   },
@@ -359,7 +363,12 @@ select {
   border-radius: 6px;
   font-size: 1rem;
   box-sizing: border-box;
-  color: rgb(68,68,68)
+  color: rgb(68, 68, 68)
+}
+
+input:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
 }
 
 .button-container {
@@ -394,12 +403,12 @@ select {
   color: #6F08AF;
 }
 
-.selector{
+.selector {
   display: none;
 }
 
-input[type="date"]:invalid{
-  color: rgb(153,153,153);
+input[type="date"]:invalid {
+  color: rgb(153, 153, 153);
 }
 
 </style>
