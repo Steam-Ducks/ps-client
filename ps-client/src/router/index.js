@@ -5,9 +5,14 @@ import CompanyPage from '@/views/company/CompanyIndex.vue';
 import EmployeePage from '@/views/employee/EmployeeIndex.vue';
 import timeRecordPage from '@/views/timeRecord/TimeRecordIndex.vue';
 import UserPage from '@/views/users/UserIndex.vue';
+<<<<<<< Updated upstream
 import Test from '@/components/Test.vue';
 import LoginPage from '@/views/auth/AuthIndex.vue';
 import admintLayout from "@/layout/AdmintLayout.vue";
+=======
+import PositionPage from '@/views/position/PositionIndex.vue';
+import Test from '@/components/Test.vue'; 
+>>>>>>> Stashed changes
 
 const routes = [
   {
@@ -72,7 +77,22 @@ const routes = [
     ],
   },
   {
+<<<<<<< Updated upstream
     path: '/Test',
+=======
+    path: '/position',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        component: PositionPage
+      }
+    ]
+  },
+
+  {
+    path: '/Test', 
+>>>>>>> Stashed changes
     name: 'Test',
     component: Test,
     meta: { requiresAuth: true },
