@@ -89,9 +89,10 @@
       />
     </div>
 
-    <!-- Botão de Atualizar  -->
-    <div class="button-container">
-      <CreateButton> Atualizar </CreateButton>
+    <!-- Botões de Atualizar e Desativar -->
+    <div class="buttons-container">
+      <button type="button" @click="deactivateEmployee" class="deactivate-button">Desativar</button>
+      <CreateButton class="update-button">Atualizar</CreateButton>
     </div>
 
   </form>
@@ -262,6 +263,57 @@ export default {
       }
     },
 
+    deactivateEmployee() {
+      // Confirmar com o usuário antes de desativar
+      Swal.fire({
+        title: 'Desativar funcionário?',
+        text: 'Isso removerá a associação deste funcionário com a empresa atual. Deseja continuar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#6F08AF',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim, desativar',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Preparar os dados para envio com company_id como null
+          const employeeToSubmit = {
+            id: this.employee.id,
+            name: this.employee.name,
+            cpf: this.employee.cpf,
+            companyId: null, // Definindo a empresa como null
+            positionId: this.employee.position_id,
+            salary: parseFloat(this.employee.salary),
+            photo: this.employee.photo,
+            startDate: this.employee.start_date,
+          };
+
+          // Executar a atualização
+          EmployeeService.updateEmployee(employeeToSubmit)
+              .then(() => {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Funcionário desativado com sucesso!',
+                  showConfirmButton: false,
+                  timer: 1500,
+                }).then(() => {
+                  this.$emit('employee-updated');
+                });
+              })
+              .catch(error => {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Erro ao desativar funcionário!',
+                  text: error.message || 'Ocorreu um erro ao tentar desativar o funcionário.',
+                  showConfirmButton: false,
+                  timer: 3500,
+                });
+                console.error('Erro ao desativar funcionário:', error);
+              });
+        }
+      });
+    },
+
     submitForm() {
       try {
         let photoUrl = this.employee.photo;
@@ -371,9 +423,48 @@ input:disabled {
   cursor: not-allowed;
 }
 
-.button-container {
-  text-align: center;
+/* Novo container para os botões */
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
+  margin-top: 20px;
+}
+
+/* Estilo para o botão de desativar */
+.deactivate-button {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
+  background-color: #e2e8f0;
+  color: #1f2937;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  height: 40px;
+}
+
+.deactivate-button:hover {
+  background-color: #cbd5e1;
+}
+
+/* Estilo para o botão de atualizar */
+:deep(.update-button) {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
+  background-color: #6F08AF;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  height: 40px;
 }
 
 .profile-picture {
