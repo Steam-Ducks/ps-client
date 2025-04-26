@@ -93,8 +93,8 @@ const UserService = {
       });
       return response.data;
     } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      throw error;
+      const erroMassage = error.response ?.data ?.message || "Erro ao criar usuario"
+      throw new Error(erroMassage);
     }
   },
 };

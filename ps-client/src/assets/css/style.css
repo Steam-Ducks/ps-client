@@ -121,11 +121,16 @@ body{
 table.dataTable thead th {
   border-bottom: 2px solid #e2e8f0;
   padding: 12px 15px;
+  text-align: left;
 }
 
 table.dataTable tbody td {
   padding: 10px 15px;
   border-top: 1px solid #f1f5f9;
+}
+
+table.dataTable tbody td:last-child {
+  text-align: right;
 }
 
 table.dataTable tbody tr:nth-child(even) {
@@ -146,8 +151,8 @@ nav{
 
 .actions-container {
   display: flex;
-  justify-content: center; 
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
 }
 
 .actions-link {
