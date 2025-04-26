@@ -5,12 +5,21 @@ import CompanyPage from '@/views/company/CompanyIndex.vue';
 import EmployeePage from '@/views/employee/EmployeeIndex.vue';
 import timeRecordPage from '@/views/timeRecord/TimeRecordIndex.vue';
 import UserPage from '@/views/users/UserIndex.vue';
-import Test from '@/components/Test.vue'; 
+import Test from '@/components/Test.vue';
+import LoginPage from '@/views/auth/AuthIndex.vue';
+import admintLayout from "@/layout/AdmintLayout.vue";
 
 const routes = [
   {
     path: '/',
-    component: AdminLayout,
+    name: 'Login',
+    component: LoginPage,
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    meta: { requiresAuth: true },
+    component: admintLayout,
     children: [
       {
         path: '',
@@ -21,55 +30,67 @@ const routes = [
   {
     path: '/user',
     component: AdminLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
-        component: UserPage
-      }
-    ]
+        component: UserPage,
+      },
+    ],
   },
   {
     path: '/company',
     component: AdminLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
-        component: CompanyPage
-      }
-    ]
+        component: CompanyPage,
+      },
+    ],
   },
   {
     path: '/employee',
     component: AdminLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
-        component: EmployeePage
-      }
-    ]
+        component: EmployeePage,
+      },
+    ],
   },
   {
     path: '/ponto',
     component: AdminLayout,
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
-        component: timeRecordPage
-      }
-    ]
+        component: timeRecordPage,
+      },
+    ],
   },
-
   {
-    path: '/Test', 
+    path: '/Test',
     name: 'Test',
-    component: Test, 
+    component: Test,
+    meta: { requiresAuth: true },
   },
-
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = !!localStorage.getItem('token');
+  console.log('Navigating to:', to.fullPath, 'Authenticated:', isAuthenticated);
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    next({ name: 'Login', query: { redirect: to.fullPath } });
+  } else {
+    next();
+  }
+});
 export default router;

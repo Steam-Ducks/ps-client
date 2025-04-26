@@ -18,6 +18,7 @@
 <script>
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
+import languagePTBR from '@/assets/dataTable/language/pt-BR.json';
 
 
 export default {
@@ -41,11 +42,9 @@ export default {
       tableOptions: {
         responsive: true,
         lengthMenu: [10],
-        dom: 'frtip',
-        
-        language: {
-          url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
-        },
+        dom: 'Bfrtip',
+
+        language: languagePTBR
       },
     };
   },

@@ -2,15 +2,17 @@
   <div class="side-bar">
 
     <div>
-      <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+      <router-link to="/home">
+        <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
+      </router-link>
     </div>
 
     <div class="nav-section">
-      
+
       <ul class="nav-bar" >
 
         <li class="nav-item">
-          <router-link to="/" class="nav-link">
+          <router-link to="/home" class="nav-link">
             <HomeIcon class="icon" />
             <p>Home</p>
           </router-link>
@@ -37,7 +39,7 @@
           </router-link>
         </li>
 
-        <li v-if="isAdmin"  class="nav-item">
+        <li v-if="isAdmin" class="nav-item">
           <router-link to="/user" class="nav-link">
             <UserIcon class="icon"/>
             <p> Usuário </p>
@@ -60,6 +62,7 @@ import { BuildingOffice2Icon } from '@heroicons/vue/24/solid'
 import { IdentificationIcon } from '@heroicons/vue/24/solid'
 import { CalendarDateRangeIcon } from '@heroicons/vue/24/solid'
 import { UserIcon } from '@heroicons/vue/24/solid'
+import UserService from "@/services/UserService";
 
 export default {
   name: 'SideBar',
@@ -71,12 +74,16 @@ export default {
     CalendarDateRangeIcon,
     UserIcon,
   },
+
   data() {
     return {
-      isAdmin: true,
+      isAdmin: false,
     };
   },
-  
+
+  created() {
+    this.isAdmin = UserService.getIsAdmin();
+  },
 };
 </script>
 
@@ -87,8 +94,8 @@ export default {
     background-color: #fff;
     width: 261px;
     height: 100%;
-    position: fixed; 
-    top: 0; 
+    position: fixed;
+    top: 0;
     left: 0;
     border: 1px solid #ccc;
     z-index:2;
@@ -134,7 +141,7 @@ export default {
   }
 
   .icon {
-    width: 28px; 
+    width: 28px;
     height: 28px;
     margin-right: 10px;
   }
