@@ -1,10 +1,24 @@
 import axios from 'axios';
+import UserService from './UserService';
+
+const API_URL = 'http://localhost:8080/api/timerecords';
 
 const TimeRecordService = {
 
-     async getTimeRecords() {
+     async getTimeRecords(employeeId, startDate, endDate) {
         try {
-          const response = await axios.get(`https://run.mocky.io/v3/735ce962-3331-42fe-aa91-17a3449256b8`);
+          const url = `${API_URL}/employee/${employeeId}`;
+
+          const params = {
+            startDate: startDate, 
+            endDate: endDate,     
+          };
+          
+          const response = await axios.get(url, {
+            params: params,
+            headers: UserService.getAuthHeaders(),
+          });
+
           return response.data;
         }
 

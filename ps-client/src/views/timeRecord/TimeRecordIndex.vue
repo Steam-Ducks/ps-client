@@ -150,6 +150,7 @@ import ReportButton from '@/components/ui/ReportButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
+import TimeRecordService from '@/services/TimeRecordService';
 import Swal from 'sweetalert2';
 import $ from 'jquery';
 import 'select2';
@@ -169,7 +170,6 @@ export default {
       selectedEmployee: null,
       startDate: '', 
       endDate: '',  
-      timeRecords: [],
       processedTimeRecords: [],
       marcacaoCount: 0,
     };
@@ -247,71 +247,20 @@ export default {
 
         // Reseta o estado antes de buscar novos dados
         this.selectedEmployee = null;
-        this.timeRecords = [];
         this.processedTimeRecords = [];
 
         try {
-
+            
+            // Busca o funcionário
             this.selectedEmployee = await EmployeeService.getEmployeeById(this.selectedEmployeeId);
 
-            // Busca todos os pontos
-                const responseData = [
-                    { "id": 1, "dateTime": "2025-01-10T08:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 2, "dateTime": "2025-01-10T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 2, "dateTime": "2025-01-10T18:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 2, "dateTime": "2025-01-10T19:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 3, "dateTime": "2025-01-11T08:15:00", "isEdited": true, "employeeId": 87 },
-                    { "id": 4, "dateTime": "2025-01-11T17:10:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 5, "dateTime": "2025-01-12T08:05:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 6, "dateTime": "2025-01-12T16:55:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 7, "dateTime": "2025-01-13T08:10:00", "isEdited": true, "employeeId": 87 },
-                    { "id": 8, "dateTime": "2025-01-13T17:05:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 9, "dateTime": "2025-01-14T08:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 10, "dateTime": "2025-01-14T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 11, "dateTime": "2025-01-15T08:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 12, "dateTime": "2025-01-15T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 13, "dateTime": "2025-01-16T08:10:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 14, "dateTime": "2025-01-16T17:10:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 15, "dateTime": "2025-01-17T08:20:00", "isEdited": true, "employeeId": 87 },
-                    { "id": 16, "dateTime": "2025-01-17T17:15:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 17, "dateTime": "2025-01-18T08:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 18, "dateTime": "2025-01-18T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 19, "dateTime": "2025-01-19T08:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 20, "dateTime": "2025-01-19T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 21, "dateTime": "2025-01-20T08:05:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 22, "dateTime": "2025-01-20T16:55:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 23, "dateTime": "2025-01-21T08:10:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 24, "dateTime": "2025-01-21T17:05:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 25, "dateTime": "2025-01-22T08:00:00", "isEdited": true, "employeeId": 87 },
-                    { "id": 26, "dateTime": "2025-01-22T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 27, "dateTime": "2025-01-23T08:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 28, "dateTime": "2025-01-23T17:00:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 29, "dateTime": "2025-01-24T08:10:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 30, "dateTime": "2025-01-24T17:10:00", "isEdited": false, "employeeId": 87 },
-                    { "id": 31, "dateTime": "2025-01-25T08:20:00", "isEdited": true, "employeeId": 87 },
-                    { "id": 32, "dateTime": "2025-01-25T17:15:00", "isEdited": false, "employeeId": 87 }
-                ];
-
-                this.timeRecords = responseData;
-
-            // Filtra os pontos que foram obtidos
-                this.timeRecords = responseData.filter(record => {
-                    
-                    const matchesEmployee = record.employeeId == 87; //Depois trocar para o selectedEmployeeId 
-
-                    // Pega os primeiros 10 caracteres de dateTime yyyy-mm-dd
-                    const recordDateStr = record.dateTime.substring(0, 10);
-
-                    // Filtra as datas entre maior ou igual a startDate e menor ou igual a endDate
-                    const matchesStartDate = !this.startDate || recordDateStr >= this.startDate;
-                    const matchesEndDate = !this.endDate || recordDateStr <= this.endDate;
-
-                    return matchesEmployee && matchesStartDate && matchesEndDate;
-                });
-
-            // Variável com os dados filtrados
-            this.processedTimeRecords = this.processRecordsForTable(this.timeRecords);
-
+            // Busca os pontos dos funcionários já passando os parâmetros desejados
+            const filteredRecordsFromBackend = await TimeRecordService.getTimeRecords(
+                this.selectedEmployeeId,
+                this.startDate,
+                this.endDate
+            );
+            this.processedTimeRecords = this.processRecordsForTable(filteredRecordsFromBackend);
 
         } catch (error) {
             Swal.fire({
@@ -323,7 +272,6 @@ export default {
             });
             console.error("Erro em searchTimeRecords:", error);
             this.selectedEmployee = null;
-            this.timeRecords = [];
             this.processedTimeRecords = [];
         }
     },
