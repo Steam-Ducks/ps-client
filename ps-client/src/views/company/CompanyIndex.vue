@@ -45,7 +45,6 @@
 import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
-//import { BriefcaseIcon } from '@heroicons/vue/24/solid';
 import CompanyCreate from './CompanyCreate.vue';  
 import PositionCreate from '@/views/position/PositionCreate.vue';  
 import CompanyList from '@/components/company/CompanyList.vue';
@@ -56,7 +55,6 @@ export default {
   components: {
     ReportButton,
     DocumentArrowDownIcon,
-    //BriefcaseIcon,
     CreateButton,
     CompanyCreate,
     PositionCreate,
