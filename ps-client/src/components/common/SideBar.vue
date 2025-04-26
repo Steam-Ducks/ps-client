@@ -26,6 +26,12 @@
         </li>
 
         <li class="nav-item">
+          <router-link to="/position" class="nav-link">
+            <BriefcaseIcon class="icon"/> 
+            <p> Cargos </p>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link to="/employee" class="nav-link">
             <IdentificationIcon class="icon"/>
             <p> Funcionário </p>
@@ -57,22 +63,21 @@
 </template>
 
 <script>
-import { HomeIcon } from '@heroicons/vue/24/solid'
-import { BuildingOffice2Icon } from '@heroicons/vue/24/solid'
-import { IdentificationIcon } from '@heroicons/vue/24/solid'
-import { CalendarDateRangeIcon } from '@heroicons/vue/24/solid'
-import { UserIcon } from '@heroicons/vue/24/solid'
+import { HomeIcon, BuildingOffice2Icon, IdentificationIcon, CalendarDateRangeIcon, UserIcon } from '@heroicons/vue/24/solid'
+import { BriefcaseIcon } from '@heroicons/vue/24/solid'
 import UserService from "@/services/UserService";
 
 export default {
   name: 'SideBar',
 
   components: {
+
     HomeIcon,
     BuildingOffice2Icon,
     IdentificationIcon,
     CalendarDateRangeIcon,
     UserIcon,
+    BriefcaseIcon,
   },
 
   data() {
@@ -88,7 +93,6 @@ export default {
 </script>
 
 <style >
-
   .side-bar {
     text-align: center;
     background-color: #fff;
@@ -102,26 +106,24 @@ export default {
     padding: 10px;
     color: #6F08AF;
     font-family: Nunito;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* img{
-    width: 200px;
-  } */
-
   .logo-top {
-  width: 70%;
-  /**margin-bottom: 20px;*/
-}
+    width: 70%;
+    margin-bottom: 20px;
+  }
 
-.logo-bottom {
-  width: 80px;
-  padding-bottom: 17px;
-}
+  .logo-bottom {
+    width: 80px;
+
+  }
 
   .nav-bar{
     list-style-type: none;
     padding: 0;
-    margin-top: 20px;
+
     width: 100%;
   }
 
@@ -133,31 +135,33 @@ export default {
     border-radius: 10px;
     color: #6F08AF;
     font-family: Nunito;
-    padding: 0 10px 0 10px;
+    padding: 10px; 
+    margin-bottom: 5px; 
   }
 
   .nav-link:hover {
     background-color: #f0f0f0;
   }
 
+
+  .router-link-exact-active {
+    background-color: #e8d4f5; 
+    font-weight: bold;
+  }
+
   .icon {
-    width: 28px;
-    height: 28px;
+    width: 24px; 
+    height: 24px;
     margin-right: 10px;
   }
 
   .nav-footer{
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    height:43%;
+    margin-top: auto; 
+    padding-bottom: 17px; 
   }
 
-  /* .nav-header{
-    height:14%;
-  } */
-
   .nav-section{
-    height:43%;
+
+    overflow-y: auto;
   }
 </style>
