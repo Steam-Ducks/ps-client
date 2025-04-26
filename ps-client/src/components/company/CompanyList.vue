@@ -19,6 +19,7 @@
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
 import OptionsButton from '@/components/ui/OptionsButton.vue';
+import languagePTBR from '@/assets/dataTable/language/pt-BR.json';
 
 export default {
   name: 'CompanyList',
@@ -60,9 +61,7 @@ export default {
       ],
       tableOptions: {
         responsive: true,
-        language: {
-          url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
-        },
+        language: languagePTBR,
         dom: '<"top"f>rt<"bottom"lip><"clear">',
       },
     };

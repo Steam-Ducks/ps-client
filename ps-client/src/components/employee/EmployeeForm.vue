@@ -3,7 +3,7 @@
 
     <div class="image-preview-container">
       <!-- foto -->
-      <img :src="previewImage || employee.photo || defaultProfilePicture" class="profile-picture" alt="Profile Picture"/>
+      <img :src="previewImage || defaultProfilePicture" class="profile-picture" alt="Profile Picture"/>
       <input type="file" id="photo" accept="image/png, image/jpeg" @change="onFileChange" class="selector"/>
       <label for="photo" class="upload-button">
         Selecionar Foto
@@ -88,9 +88,9 @@
       />
     </div>
 
-    <!-- Botão de Atualizar  -->
+    <!-- Botão de Cadastrar  -->
     <div class="button-container">
-      <CreateButton> Atualizar </CreateButton>
+      <CreateButton> Cadastrar </CreateButton>
     </div>
 
   </form>
@@ -110,7 +110,7 @@ import 'select2/dist/css/select2.css';
 
 
 export default {
-  name: 'EmployeeEditForm',
+  name: 'EmployeeForm',
 
   components: {
     CreateButton,
@@ -120,19 +120,11 @@ export default {
     mask: IMaskDirective,
   },
 
-  props: {
-    employeeId: {
-      type: String,
-      required: true
-    }
-  },
-
-  emits: ['employee-updated'],
+  emits: ['employee-created'],
 
   data() {
     return {
       employee: {
-        id: null,
         name: '',
         cpf: '',
         company_id: null,
@@ -155,28 +147,16 @@ export default {
         scale: 2,
       },
       selectedFile: null,
-      photoChanged: false,
     };
   },
 
   async created() {
     try {
-      // Carregar empresas e cargos
       this.companies = await CompanyService.getAllCompanies();
       this.positions = await PositionService.getAllPositions();
-
-      // Carregar dados do funcionário
-      await this.fetchEmployeeData();
     } catch (error) {
-      console.error('Error fetching data:', error);
-      this.errorMessage = 'Erro ao carregar dados.';
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Erro ao carregar dados',
-        text: 'Não foi possível carregar os dados do funcionário.',
-        showConfirmButton: true,
-      });
+      console.error('Error fetching companies or positions:', error);
+      this.errorMessage = 'Erro ao carregar empresas ou cargos.';
     }
   },
 
@@ -197,61 +177,15 @@ export default {
       this.employee.position_id = $(this.$refs.positionSelect).val();
     });
   },
-
-  updated() {
-    // Atualizar os valores do select2 quando os dados do funcionário forem carregados
-    if (this.employee.company_id) {
-      $(this.$refs.companySelect).val(this.employee.company_id).trigger('change');
-    }
-
-    if (this.employee.position_id) {
-      $(this.$refs.positionSelect).val(this.employee.position_id).trigger('change');
-    }
-  },
-
   beforeUnmount(){
     $(this.$refs.companySelect).select2('destroy');
     $(this.$refs.positionSelect).select2('destroy');
   },
 
   methods: {
-    async fetchEmployeeData() {
-      try {
-        const employeeData = await EmployeeService.getEmployeeById(this.employeeId);
-
-        // Formatar os dados recebidos para o formato esperado pelo formulário
-        this.employee = {
-          id: employeeData.id,
-          name: employeeData.name,
-          cpf: employeeData.cpf,
-          company_id: parseInt(employeeData.companyId),
-          position_id: parseInt(employeeData.positionId),
-          salary: employeeData.salary.toString(),
-          photo: employeeData.photo,
-          start_date: employeeData.startDate,
-        };
-
-        // Atualizar os selects
-        this.$nextTick(() => {
-          if (this.employee.company_id) {
-            $(this.$refs.companySelect).val(this.employee.company_id).trigger('change');
-          }
-
-          if (this.employee.position_id) {
-            $(this.$refs.positionSelect).val(this.employee.position_id).trigger('change');
-          }
-        });
-
-      } catch (error) {
-        console.error('Error fetching employee data:', error);
-        throw error;
-      }
-    },
-
     onFileChange(event) {
       const file = event.target.files[0];
       this.selectedFile = file;
-      this.photoChanged = true;
 
       if (file) {
         this.previewImage = URL.createObjectURL(file);
@@ -263,7 +197,10 @@ export default {
     async submitForm() {
       let errorMessage = '';
 
-      // Validar CPF
+      if (!this.selectedFile) {
+        errorMessage = 'Por favor, anexe uma foto!';
+      }
+      console.log(this.employee.cpf)
       if (!validateCpf(this.employee.cpf)) {
         errorMessage = 'CPF Inválido';
       }
@@ -271,7 +208,7 @@ export default {
       if (errorMessage) {
         Swal.fire({
           icon: 'warning',
-          title: 'Informação inválida',
+          title: 'Faltam informações',
           text: errorMessage,
           showConfirmButton: false,
           timer: 2500,
@@ -280,15 +217,9 @@ export default {
       }
 
       try {
-        let photoUrl = this.employee.photo;
-
-        // Só faz upload da foto se uma nova foi selecionada
-        if (this.photoChanged && this.selectedFile) {
-          photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
-        }
+        const photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
 
         const employeeToSubmit = {
-          id: this.employee.id,
           name: this.employee.name,
           cpf: this.employee.cpf,
           companyId: this.employee.company_id,
@@ -298,27 +229,39 @@ export default {
           startDate: this.employee.start_date,
         };
 
-        // Atualiza os dados do funcionário
-        await EmployeeService.updateEmployee(employeeToSubmit);
+        // Envia os dados do funcionário
+        await EmployeeService.createEmployee(employeeToSubmit);
 
         Swal.fire({
           icon: 'success',
-          title: 'Funcionário atualizado com sucesso!',
+          title: 'Funcionário cadastrado com sucesso!',
           showConfirmButton: false,
           timer: 1500,
         })
             .then(() => {
-              this.$emit('employee-updated');
+              this.$emit('employee-created');
+              this.employee = {
+                name: '',
+                cpf: '',
+                company_id: null,
+                position_id: null,
+                salary: '',
+                photo: null,
+                start_date: null,
+              };
+              this.previewImage = null;
+              this.selectedFile = null;
             });
       } catch (error) {
+
         Swal.fire({
           icon: 'error',
-          title: 'Erro ao atualizar funcionário!',
+          title: 'Erro ao cadastrar funcionário!',
           text: error.message,
           showConfirmButton: false,
           timer: 3500,
         })
-        console.error('Erro ao atualizar funcionário:', error);
+        console.error('Erro ao cadastrar funcionário:', error);
       }
     },
   },

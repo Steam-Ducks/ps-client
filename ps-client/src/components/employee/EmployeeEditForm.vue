@@ -105,7 +105,6 @@ import PositionService from '@/services/PositionService';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
 import { IMaskDirective } from 'vue-imask';
-// Removendo a importação não utilizada
 // import { validate as validateCpf } from 'gerador-validador-cpf';
 import $ from 'jquery';
 import 'select2';
@@ -227,11 +226,11 @@ export default {
           id: employeeData.id,
           name: employeeData.name,
           cpf: employeeData.cpf,
-          company_id: parseInt(employeeData.companyId),
-          position_id: parseInt(employeeData.positionId),
+          company_id: parseInt(employeeData.company.id),
+          position_id: parseInt(employeeData.position.id),
           salary: employeeData.salary.toString(),
           photo: employeeData.photo,
-          start_date: employeeData.startDate,
+          start_date: employeeData.startDate ? employeeData.startDate : null,
         };
 
         // Atualizar os selects
@@ -264,7 +263,6 @@ export default {
     },
 
     deactivateEmployee() {
-      // Confirmar com o usuário antes de desativar
       Swal.fire({
         title: 'Desativar funcionário?',
         text: 'Isso removerá a associação deste funcionário com a empresa atual. Deseja continuar?',
@@ -274,42 +272,29 @@ export default {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Sim, desativar',
         cancelButtonText: 'Cancelar'
-      }).then((result) => {
+      }).then(async (result) => {
         if (result.isConfirmed) {
-          // Preparar os dados para envio com company_id como null
-          const employeeToSubmit = {
-            id: this.employee.id,
-            name: this.employee.name,
-            cpf: this.employee.cpf,
-            companyId: null, // Definindo a empresa como null
-            positionId: this.employee.position_id,
-            salary: parseFloat(this.employee.salary),
-            photo: this.employee.photo,
-            startDate: this.employee.start_date,
-          };
+          try {
+            await EmployeeService.terminateEmployee(this.employee.id);
 
-          // Executar a atualização
-          EmployeeService.updateEmployee(employeeToSubmit)
-              .then(() => {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Funcionário desativado com sucesso!',
-                  showConfirmButton: false,
-                  timer: 1500,
-                }).then(() => {
-                  this.$emit('employee-updated');
-                });
-              })
-              .catch(error => {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Erro ao desativar funcionário!',
-                  text: error.message || 'Ocorreu um erro ao tentar desativar o funcionário.',
-                  showConfirmButton: false,
-                  timer: 3500,
-                });
-                console.error('Erro ao desativar funcionário:', error);
-              });
+            Swal.fire({
+              icon: 'success',
+              title: 'Funcionário desativado com sucesso!',
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              this.$emit('employee-updated');
+            });
+          } catch (error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro ao desativar funcionário!',
+              text: error.message || 'Ocorreu um erro ao tentar desativar o funcionário.',
+              showConfirmButton: false,
+              timer: 3500,
+            });
+            console.error('Erro ao desativar funcionário:', error);
+          }
         }
       });
     },
@@ -323,7 +308,7 @@ export default {
           // Só faz upload da foto se uma nova foi selecionada
           if (this.photoChanged && this.selectedFile) {
             try {
-              photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
+              photoUrl = await EmployeeService.updateEmployeePhoto(this.employee.photo, this.selectedFile);
             } catch (error) {
               console.error('Error uploading photo:', error);
               throw error;
@@ -331,7 +316,6 @@ export default {
           }
 
           const employeeToSubmit = {
-            id: this.employee.id,
             name: this.employee.name,
             cpf: this.employee.cpf,
             companyId: this.employee.company_id,
@@ -346,7 +330,7 @@ export default {
 
         // Executar a atualização
         prepareData().then(employeeToSubmit => {
-          return EmployeeService.updateEmployee(employeeToSubmit);
+          return EmployeeService.updateEmployee(this.employee.id, employeeToSubmit);
         }).then(() => {
           Swal.fire({
             icon: 'success',

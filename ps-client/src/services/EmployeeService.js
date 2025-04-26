@@ -1,158 +1,117 @@
-import axios from 'axios';
+import axios from 'axios'; // Biblioteca para fazer requisições HTTP.
+import UserService from '@/services/UserService'; // Serviço para obter os cabeçalhos de autenticação.
 
-// Crie uma instância do axios com a URL base da sua API
-const api = axios.create({
-    baseURL: process.env.VUE_APP_API_URL || 'http://localhost:8080',
-    headers: {
-        'Content-Type': 'application/json'
+const API_URL = 'http://localhost:8080/api/employees'; // Aonde o bootstrap está disponibilizando os dados
+
+const EmployeeService = { // Aonde colocamos as funções para as requisições
+
+  async createEmployee(createEmployee) {
+    try {
+      const response = await axios.post(`${API_URL}`, createEmployee, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar funcionário";
+      throw new Error(errorMessage);
     }
-});
-// Adiciona o token automaticamente em todas as requisições
-api.interceptors.request.use(config => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+  },
+
+  async getAllEmployees() {
+    try {
+      const response = await axios.get(`${API_URL}`, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error('Erro ao listar empresas: ' + error.message);
     }
-    return config;
-});
+  },
 
-// Função auxiliar para formatar o ID corretamente
-const formatId = (id) => {
-    // Se o ID for null ou undefined, retornar uma string vazia
-    if (id == null) {
-        return '';
+  async getEmployeeById(id) {
+    try {
+      const response = await axios.get(`${API_URL}/${id}`, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error('Erro ao achar empresa: ' + error.message);
     }
-
-    // Converter para string primeiro
-    let idStr = String(id);
-
-    // Se o ID contiver ":", extrair apenas a parte numérica antes do ":"
-    if (idStr.includes(':')) {
-        idStr = idStr.split(':')[0];
+  },
+  async updateEmployee(id, updateEmployee) {
+    try {
+      const response = await axios.put(`${API_URL}/${id}`, updateEmployee, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar funcionário";
+      throw new Error(errorMessage);
     }
+  },
 
-    return idStr;
-};
+  async uploadEmployeePhoto(file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
 
-// Função para formatar o objeto de funcionário para o formato esperado pelo backend
-const formatEmployeeForUpdate = (employee) => {
-    // Garantir que o ID da empresa e da posição sejam números inteiros
-    const companyId = employee.companyId ? parseInt(employee.companyId) : null;
-    const positionId = employee.positionId ? parseInt(employee.positionId) : null;
-
-    // Garantir que o salário seja um número de ponto flutuante
-    const salary = employee.salary ? parseFloat(employee.salary) : 0;
-
-    // Criar o objeto no formato esperado pelo backend (UpdateEmployeeDto)
-    return {
-        name: employee.name || '',
-        cpf: employee.cpf || '',
-        status: employee.status !== undefined ? employee.status : true,
-        photo: employee.photo || '',
-        salary: salary,
-        companyId: companyId,
-        positionId: positionId
-    };
-};
-
-// Exportando diretamente os métodos como objeto
-export default {
-    getAllEmployees() {
-        return api.get('/api/employees')
-            .then(response => {
-                // Garantir que todos os IDs sejam strings
-                if (Array.isArray(response.data)) {
-                    response.data.forEach(employee => {
-                        if (employee.id !== undefined) {
-                            employee.id = String(employee.id);
-                        }
-                    });
-                }
-                return response.data;
-            })
-            .catch(error => {
-                console.error('Error fetching employees:', error);
-                throw error;
-            });
-    },
-
-    getEmployeeById(id) {
-        const formattedId = formatId(id);
-        return api.get(`/api/employees/${formattedId}`)
-            .then(response => {
-                // Garantir que o ID seja string
-                if (response.data && response.data.id !== undefined) {
-                    response.data.id = String(response.data.id);
-                }
-                return response.data;
-            })
-            .catch(error => {
-                console.error(`Error fetching employee with id ${formattedId}:`, error);
-                throw error;
-            });
-    },
-
-    createEmployee(employee) {
-        return api.post('/api/employees', employee)
-            .then(response => {
-                // Garantir que o ID retornado seja string
-                if (response.data && response.data.id !== undefined) {
-                    response.data.id = String(response.data.id);
-                }
-                return response.data;
-            })
-            .catch(error => {
-                console.error('Error creating employee:', error);
-                throw error;
-            });
-    },
-
-    updateEmployee(employee) {
-        // Formatar o ID para remover qualquer caractere ":" e texto após ele
-        const formattedId = formatId(employee.id);
-
-        // Formatar o objeto de funcionário para o formato esperado pelo backend
-        const formattedEmployee = formatEmployeeForUpdate(employee);
-
-        return api.put(`/api/employees/${formattedId}`, formattedEmployee)
-            .then(response => {
-                // Garantir que qualquer dado retornado tenha ID como string
-                if (response.data && response.data.id !== undefined) {
-                    response.data.id = String(response.data.id);
-                }
-                return response.data;
-            })
-            .catch(error => {
-                console.error(`Error updating employee with id ${formattedId}:`, error);
-                throw error;
-            });
-    },
-
-    deleteEmployee(id) {
-        const formattedId = formatId(id);
-        return api.delete(`/api/employees/${formattedId}`)
-            .then(response => {
-                return response.data;
-            })
-            .catch(error => {
-                console.error(`Error deleting employee with id ${formattedId}:`, error);
-                throw error;
-            });
-    },
-
-    uploadEmployeePhoto(file) {
-        const formData = new FormData();
-        formData.append('photo', file);
-
-        return api.post('/api/employees/uploadPhoto', formData, {
+      const response = await axios.post(
+          `${API_URL}/uploadPhoto`,
+          formData,
+          {
             headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-            .then(response => response.data.photoUrl)
-            .catch(error => {
-                console.error('Error uploading employee photo:', error);
-                throw error;
-            });
+              ...UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+      );
+
+      return response.data.photoUrl;
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Erro no upload da imagem';
+      throw new Error(msg);
     }
-}
+  },
+
+  async updateEmployeePhoto(photoURL, file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('photoURL', photoURL);
+
+      const response = await axios.put(
+          `${API_URL}/updatePhoto`,
+          formData,
+          {
+            headers: {
+              ...UserService.getAuthHeaders(),
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+      );
+
+      return response.data.photoUrl;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Erro ao atualizar a foto do funcionário';
+      throw new Error(errorMessage);
+    }
+  },
+
+  async terminateEmployee(employeeId) {
+    try {
+      await axios.put(
+          `${API_URL}/${employeeId}/terminate`,
+          null,
+          {
+            headers: UserService.getAuthHeaders()
+          }
+      );
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Erro ao desativar o funcionário';
+      throw new Error(errorMessage);
+    }
+  }
+
+};
+
+export default EmployeeService;

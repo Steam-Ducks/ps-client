@@ -26,7 +26,7 @@
 
   <div v-if="isEditingEmployee" class="modal">
     <div class="modal-content">
-      <EmployeeEdit :id="selectedEmployeeId" @go-back="hideEditEmployee" @employee-updated="fetchEmployee"/>
+      <EmployeeEdit :id="String(selectedEmployeeId)" @go-back="hideEditEmployee" @employee-updated="fetchEmployee"/>
     </div>
   </div>
 
