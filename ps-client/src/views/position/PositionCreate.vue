@@ -42,6 +42,7 @@ width: 100%;
 display: flex;
 justify-content: flex-end;
 align-items: center;
+
 }
 .contents {
 padding: 0 24px 8px;

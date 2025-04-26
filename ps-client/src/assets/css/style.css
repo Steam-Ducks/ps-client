@@ -154,6 +154,10 @@ nav{
   text-decoration: none; 
   color: inherit;
 }
+
+.actions{
+  text-align: right;
+}
   
 button:hover {
   background-color: #f0f0f0;

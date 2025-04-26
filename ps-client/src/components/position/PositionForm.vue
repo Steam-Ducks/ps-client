@@ -104,10 +104,8 @@
   }
   
   .button-container {
-    margin-top: 20px; /* Add some space above the button */
+    margin-top: 20px;
   }
 
-
- 
   </style>
   
