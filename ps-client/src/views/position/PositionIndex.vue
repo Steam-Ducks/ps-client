@@ -25,7 +25,7 @@
     </div>
   </div>
 
-  <PositionList :position="positions"/>
+<!--<PositionList :position="positions"/>-->
 
   
   </template>
@@ -35,6 +35,8 @@ import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import PositionCreate from '@/views/position/PositionCreate.vue';  
+//import PositionList from '@/components/position/PositionList.vue';
+import PositionService from '@/services/PositionService';
 
 export default {
   name: 'PositionIndex',
@@ -43,12 +45,14 @@ export default {
     DocumentArrowDownIcon,
     CreateButton,
     PositionCreate,
+    //PositionList,
   },
   data() {
     return {
       isCreatingPosition: false,
-      companies: [],
+      positions: [],
     };
+    
   },
  
   methods: {
@@ -59,8 +63,26 @@ export default {
     },
     hideCreatePosition() {
       this.isCreatingPosition = false;
+    },
+    
+    async getAllPositions() {
+      this.positions = await PositionService.getAllPositions();
+      this.errorLoading = null;
+      this.positions = [];
+
+      try{
+        const response = await PositionService.getAllPositions();
+        this.positions = response.data;
+      }catch (error){
+        console.error("Erro ao buscar cargos:",error);
+        this.errorLoading = "Erro ao buscar cargos. Tente novamente mais tarde.";
+      }
     }
+
+    
   },
+
+  
 };
 </script>
 

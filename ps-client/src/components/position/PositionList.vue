@@ -1,17 +1,17 @@
 <template>
-  <div v-if="users.length > 0" class="user-list">
+  <div v-if="positions.length > 0" class="position-list">
     <DataTable
       :key="tableKey"
       ref="dataTable"
-      :data="formattedUsers"
+      :data="formattedPositions"
       :columns="columns"
       :options="tableOptions"
       class="display nowrap my-custom-table"
       style="width:100%"
     />
   </div>
-  <div v-else class="no-users-message">
-    <p>Nenhum usuário encontrado. Tente buscar novamente.</p>
+  <div v-else class="no-positions-message">
+    <p>Nenhum cargo encontrado. Tente buscar novamente.</p>
   </div>
 </template>
 
@@ -20,13 +20,14 @@ import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
 
 
+
 export default {
-  name: 'UserList',
+  name: 'PositionList',
   components: {
     DataTable,
   },
   props: {
-    users: {
+    positions: {
       type: Array,
       required: true,
     },
@@ -35,8 +36,7 @@ export default {
     return {
       tableKey: 0,
       columns: [
-        { title: 'Nome', data: 'username' },
-        { title: 'Email', data: 'email' },
+        { title: 'Nome', data: 'name' },
       ],
       tableOptions: {
         responsive: true,
@@ -50,10 +50,9 @@ export default {
     };
   },
   computed: {
-    formattedUsers() {
-      return this.users.map((user) => ({
-        username: user.username,
-        email: user.email,
+    formattedPositions() {
+      return this.positions.map((position) => ({
+        name: position.name
       }));
     },
   },
@@ -61,7 +60,7 @@ export default {
     DataTable.use(DataTablesCore);
   },
   watch: {
-    users() {
+    positions() {
       this.tableKey += 1;
     },
   },
@@ -74,11 +73,11 @@ export default {
 </script>
 
 <style scoped>
-  .user-list {
+  .position-list {
     margin-top: 25px;
   }
 
-  .no-users-message {
+  .no-positions-message {
     text-align: center;
     color: #64748b;
     font-size: 1.2rem;
