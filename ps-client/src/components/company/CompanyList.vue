@@ -36,9 +36,8 @@
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
 import OptionsButton from '@/components/ui/OptionsButton.vue';
-
 import CompanyEditForm from '@/components/company/CompanyEditForm.vue';
-
+import languagePTBR from '@/assets/dataTable/language/pt-BR.json';
 
 export default {
   name: 'CompanyList',
@@ -104,6 +103,7 @@ export default {
     hideEditCompany() {
       this.isEditingCompany = false;
       this.selectedCompanyId = null;
+      this.$emit('company-updated');
     },
     companyUpdated() {
       this.hideEditCompany();

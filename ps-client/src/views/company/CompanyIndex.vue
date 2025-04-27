@@ -28,14 +28,16 @@
     </div>
   </div>
 
+  
+
   <div v-else-if="isCreatingPosition" class="modal">
     <div class="modal-content modal-content-position">
       <PositionCreate @go-back="hideCreatePosition" />
     </div>
   </div>
 
-  <CompanyList :companies="companies"/>
-    
+  <CompanyList :companies="companies" @company-updated="fetchCompanies"/>
+  
   
 
   
@@ -77,8 +79,9 @@ export default {
     showCreateCompany() {
       this.isCreatingCompany = true;
     },
-    hideCreateCompany() {
+    async hideCreateCompany() {
       this.isCreatingCompany = false;
+      await this.fetchCompanies();
     },
     async fetchCompanies() {
       try {
