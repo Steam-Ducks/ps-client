@@ -24,7 +24,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       });
       return response.data;
     } catch (error) {
-      throw new Error('Erro ao listar empresas: ' + error.message);
+      throw new Error('Erro ao listar colaboradores: ' + error.message);
     }
   },
 
