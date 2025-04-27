@@ -1,62 +1,112 @@
 <template>
-  <div class="user-form">
-    <h2 class="form-title">Cadastrar Novo Usuário</h2>
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm" class="user-form">
       <div class="form-group">
-        <label for="username">Nome:</label>
-        <input type="text" id="username" v-model="user.username" required />
-      </div>
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="user.email" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Senha:</label>
-        <input type="password" id="password" v-model="user.password" required />
-      </div>
-      <FormButton type="primary" class="submit-button">Cadastrar</FormButton>
+
+        <!-- nome -->
+        <div class="form-group">
+          Nome:
+          <input type="text" id="username" v-model="user.username" required />
+        </div>
+
+        <!-- email -->
+        <div class="form-group">
+          Email:
+          <input type="email" id="email" v-model="user.email" required />
+        </div>
+
+        <!-- senha -->
+        <div class="form-group">
+          Senha:
+          <input type="password" id="password" v-model="user.password" maxlength="15" minlength="8" required />
+        </div>
+
+        <!--tipo usuario-->
+        <div class="form-group">
+          Tipo do Usuário
+          <select v-model="user.isAdmin" id="isAdmin" required>
+            <option :value="true">Administrador</option>
+            <option :value="false">Padrão</option>
+          </select>
+        </div>
+
+        <div class="button-container">
+        <CreateButton> Cadastrar </CreateButton>
+        </div>
+      
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
-    </form>
-  </div>
+
+    </div>
+  </form>
 </template>
 
 <script>
 import UserService from '@/services/UserService';
-import FormButton from '@/components/ui/FormButton.vue';
+import CreateButton from '@/components/ui/CreateButton.vue';
+import Swal from 'sweetalert2';
 
 export default {
   name: 'UserForm',
   components: {
-    FormButton, 
+    CreateButton, 
   },
+  
   emits: ['user-created'],
+
   data() {
     return {
       user: {
         username: '',
         email: '',
         password: '',
+        isAdmin: null,
       },
       errorMessage: '',
     };
   },
+
   methods: {
     async submitForm() {
+
       this.errorMessage = ''; 
+
       try {
         await UserService.createUser(this.user);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Usuário cadastrada com sucesso!',
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
         this.user = {
           username: '',
           email: '',
           password: '',
+          isAdmin: null,
         };
+      });
+
         this.$emit('user-created');
       } catch (error) {
-        this.errorMessage = 'Erro ao cadastrar usuário. Tente novamente.';
-        console.error('Erro ao cadastrar usuário:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao cadastar Empresa',
+          text: error.message,
+          showConfirmButton: false,
+          timer: 3500,
+        });
       }
+    },
+    showErrorAlert(errorMessage) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltam informações',
+        text: errorMessage,
+        showConfirmButton: false,
+        timer: 2500,
+      });
     },
   },
 };
@@ -64,43 +114,53 @@ export default {
 
 <style scoped>
 .user-form {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 30px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+    margin: 0 auto;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.form-title {
-  text-align: center;
-  color: #1e293b;
-  margin-bottom: 30px;
-}
+  .form-title {
+    text-align: center;
+    color: #1e293b;
+    margin-bottom: 30px;
+  }
 
-.form-group {
-  margin-bottom: 20px;
-}
+  .form-group {
+    padding: 10px 0 25px;
+    margin-bottom: 0px;
+    width: 100%;
+    font-size: 18px;
+    font-weight: 300;
+  }
 
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #334155;
-}
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: #334155;
+  }
 
-input[type='text'],
-input[type='email'],
-input[type='password'] {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
+  select, 
+  input[type='text'],
+  input[type='email'], 
+    input[type='password'] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
 
-.error-message {
-  color: #dc2626;
-  margin-top: 15px;
+  .error-message {
+    color: #dc2626;
+    margin-top: 15px;
+  }
+
+  .button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 </style>
