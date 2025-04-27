@@ -42,7 +42,7 @@ export default {
       tableOptions: {
         responsive: true,
         lengthMenu: [10],
-        dom: 'Bfrtip',
+        dom: 'frtip',
         language: languagePTBR
       },
     };
