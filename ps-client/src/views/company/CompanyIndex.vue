@@ -10,12 +10,7 @@
 
       <ReportButton>
         <DocumentArrowDownIcon/>
-      </ReportButton> 
-
-      <CreateButton @click="showCreatePosition">
-        + Novo Cargo
-      </CreateButton> 
-      
+      </ReportButton>       
       <CreateButton @click="showCreateCompany">
         + Nova Empresa
       </CreateButton>
@@ -45,9 +40,7 @@
 import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
 import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
-//import { BriefcaseIcon } from '@heroicons/vue/24/solid';
 import CompanyCreate from './CompanyCreate.vue';  
-import PositionCreate from '@/views/position/PositionCreate.vue';  
 import CompanyList from '@/components/company/CompanyList.vue';
 import CompanyService from '@/services/CompanyService';
 
@@ -56,10 +49,8 @@ export default {
   components: {
     ReportButton,
     DocumentArrowDownIcon,
-    //BriefcaseIcon,
     CreateButton,
     CompanyCreate,
-    PositionCreate,
     CompanyList,
   },
   data() {
@@ -89,15 +80,6 @@ export default {
       }
     },
 
-    // ::::::::::::: Position :::::::::::::
-
-    showCreatePosition() {
-      this.isCreatingPosition = true;
-    },
-    hideCreatePosition() {
-      this.isCreatingPosition = false;
-    }
-    
   },
 };
 </script>
@@ -106,7 +88,7 @@ export default {
   .head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items:first baseline;
   }
   
   .buttons {

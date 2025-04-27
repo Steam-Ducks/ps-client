@@ -8,6 +8,8 @@ import UserPage from '@/views/users/UserIndex.vue';
 import Test from '@/components/Test.vue';
 import LoginPage from '@/views/auth/AuthIndex.vue';
 import admintLayout from "@/layout/AdmintLayout.vue";
+import PositionPage from '@/views/position/PositionIndex.vue';
+
 
 const routes = [
   {
@@ -72,7 +74,18 @@ const routes = [
     ],
   },
   {
-    path: '/Test',
+    path: '/position',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        component: PositionPage
+      }
+    ]
+  },
+
+  {
+    path: '/Test', 
     name: 'Test',
     component: Test,
     meta: { requiresAuth: true },

@@ -43,7 +43,6 @@ export default {
         responsive: true,
         lengthMenu: [10],
         dom: 'Bfrtip',
-
         language: languagePTBR
       },
     };

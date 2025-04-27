@@ -27,7 +27,31 @@ const PositionService = {
             const errorMessage = error.response?.data?.message || "Erro desconhecido ao listar cargos.";
             throw new Error(errorMessage);
         }
-    }
+    },
+
+    async getPositionById(id) {
+        try {
+            const response = await axios.get(`${API_URL}/${id}`, {
+                headers: UserService.getAuthHeaders(),
+            });
+            return response.data;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Erro desconhecido ao buscar cargo.";
+            throw new Error(errorMessage);
+        }
+    },
+    
+    async updatePosition(id, positionData) {
+        try {
+          const response = await axios.put(`${API_URL}/${id}`, positionData, {
+            headers: UserService.getAuthHeaders(),
+          });
+          return response.data;
+        } catch (error) {
+          const errorMessage = error.response?.data?.message || "Erro desconhecido ao editar cargo.";
+          throw new Error(errorMessage);
+        }
+      }
 };
 
 export default PositionService;
