@@ -331,76 +331,80 @@ export default {
 
     // Trata os pontos para aparecerem na tabela
     processRecordsForTable(records) {
-        try {
-            // Junta os pontos que foram feitos no mesmo dia
-            const groupedByDate = records.reduce((acc, record) => {
 
-                // Verifica se é uma string com o dia, se não for ignora
+        try {
+            const groupedByDate = records.reduce((acc, record) => {
                 if (!record || typeof record.dateTime !== 'string' || record.dateTime.length < 10) {
                     return acc;
                 }
-
-                // Armazena a parte da data do datetime yyyy-mm-dd
                 const dateStr = record.dateTime.substring(0, 10);
                 if (!acc[dateStr]) {
                     acc[dateStr] = [];
                 }
-
-                // Retorna o acumulador atualizado para a próxima iteração.
                 acc[dateStr].push(record);
                 return acc;
-            },{});
+            }, {});
 
-            // Separa as horas das marcações
-            const tableRows = Object.keys(groupedByDate)
-                // Para cada registro em um mesmo dia, deixa em ordem crescente
-                .map(dateStr => {
-                    const dailyRecords = groupedByDate[dateStr].sort((a, b) =>
-                        new Date(a.dateTime) - new Date(b.dateTime) 
-                    );
+            const allDatesInRange = [];
+            let currentDate = new Date(this.startDate + 'T00:00:00');
+            const finalDate = new Date(this.endDate + 'T00:00:00');
 
-                    // Cria a linha para a tabela
-                    const row = {
-                        originalDate: dateStr,
-                        date: this.formatDate(dateStr),
-                        entrada1: dailyRecords[0] ? this.formatTime(dailyRecords[0].dateTime) : null,
-                        id1: dailyRecords[0] ? dailyRecords[0].id : null,
-                        saida1:   dailyRecords[1] ? this.formatTime(dailyRecords[1].dateTime) : null,
-                        id2: dailyRecords[1] ? dailyRecords[1].id : null,
-                        entrada2: dailyRecords[2] ? this.formatTime(dailyRecords[2].dateTime) : null,
-                        id3: dailyRecords[2] ? dailyRecords[2].id : null,
-                        saida2:   dailyRecords[3] ? this.formatTime(dailyRecords[3].dateTime) : null,
-                        id4: dailyRecords[3] ? dailyRecords[3].id : null,
-                        entrada3: dailyRecords[4] ? this.formatTime(dailyRecords[4].dateTime) : null,
-                        id5: dailyRecords[4] ? dailyRecords[4].id : null,
-                        saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
-                        id6: dailyRecords[5] ? dailyRecords[5].id : null,
-                        totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
-                        totalSalaryDay: this.calculateDaySalary(dailyRecords),
-                    };
-                    return row;
-                })
-                // Função para ordenar datas
-                .sort((a, b) => {
-                    try {
-                        // separa as datas em variaveis diferentes pra comparação
-                        const datePartsA = a.date.split('/');
-                        const datePartsB = b.date.split('/');
+            if (isNaN(currentDate.getTime()) || isNaN(finalDate.getTime())) {
+                 console.error("Datas de início ou fim inválidas:", this.startDate, this.endDate);
+                 this.processedTimeRecords = []; 
+                 return [];
+            }
 
-                         // Cria objetos Date no formato YYYY-MM-DD
-                        const dateA = new Date(`${datePartsA[2]}-${datePartsA[1]}-${datePartsA[0]}`);
-                        const dateB = new Date(`${datePartsB[2]}-${datePartsB[1]}-${datePartsB[0]}`);
+            while (currentDate <= finalDate) {
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const day = String(currentDate.getDate()).padStart(2, '0');
+                allDatesInRange.push(`${year}-${month}-${day}`);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
 
-                         // Compara as datas. Retorna negativo se A < B, positivo se A > B, 0 se A == B.
-                        return dateA - dateB;
-                        
-                    } catch (sortError) {
-                            return 0;
-                    }
-                });
+            const tableRows = allDatesInRange.map(dateStr => {
+                const dailyRecords = groupedByDate[dateStr] || []; 
+
+                // Ordena os registros do dia
+                if (dailyRecords.length > 0) {
+                    dailyRecords.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+                }
+
+                // Cria a linha para a tabela
+                const row = {
+                    originalDate: dateStr, 
+                    date: this.formatDate(dateStr),
+                    entrada1: dailyRecords[0] ? this.formatTime(dailyRecords[0].dateTime) : null,
+                    id1: dailyRecords[0] ? dailyRecords[0].id : null,
+                    saida1:   dailyRecords[1] ? this.formatTime(dailyRecords[1].dateTime) : null,
+                    id2: dailyRecords[1] ? dailyRecords[1].id : null,
+                    entrada2: dailyRecords[2] ? this.formatTime(dailyRecords[2].dateTime) : null,
+                    id3: dailyRecords[2] ? dailyRecords[2].id : null,
+                    saida2:   dailyRecords[3] ? this.formatTime(dailyRecords[3].dateTime) : null,
+                    id4: dailyRecords[3] ? dailyRecords[3].id : null,
+                    entrada3: dailyRecords[4] ? this.formatTime(dailyRecords[4].dateTime) : null,
+                    id5: dailyRecords[4] ? dailyRecords[4].id : null,
+                    saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
+                    id6: dailyRecords[5] ? dailyRecords[5].id : null,
+                    // Calcula totais (funções devem tratar array vazio)
+                    totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
+                    totalSalaryDay: this.calculateDaySalary(dailyRecords),
+                };
+                return row;
+            });
+
             return tableRows;
 
         } catch (error) {
+            console.error("Erro ao processar registros para a tabela:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao processar dados',
+                text: 'Ocorreu um erro ao preparar os dados para exibição.',
+                showConfirmButton: true,
+            });
+            this.processedTimeRecords = [];
             return [];
         }
     },
