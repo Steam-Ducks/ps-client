@@ -30,53 +30,54 @@
 
     </div>
 
-    <div v-if="selectedEmployee">
 
-        <div class="info">
+        <div v-if="selectedEmployee">
 
-            <div class="Employee"> 
-                <img 
-                    :src="selectedEmployee.photo" 
-                    :alt="'Foto de ' + selectedEmployee.name" 
-                    class="employee-photo"
-                >
-                <div class="employee-details">
-                <p class="employee-name">{{ selectedEmployee.name }}</p>
-                <p>{{ selectedEmployee.position.name }}</p>
+            <div class="info">
+
+                <div class="Employee"> 
+                    <img 
+                        :src="selectedEmployee.photo" 
+                        :alt="'Foto de ' + selectedEmployee.name" 
+                        class="employee-photo"
+                    >
+                    <div class="employee-details">
+                    <p class="employee-name">{{ selectedEmployee.name }}</p>
+                    <p>{{ selectedEmployee.position.name }}</p>
+                    </div>
+                </div>
+                
+                <div class="total">
+                    <div class="total-column">
+                        <p class="val">{{ totalWorkedPeriod }}</p>
+                        <p class="label">Total trabalhado no período</p>
+                    </div>
+                    <div class="total-column">
+                        <p class="val">{{ totalSalaryPeriod }}</p> 
+                        <p class="label">Total a receber no período</p>
+                    </div>
+                    <div class="total-column"> 
+                        <p class="val"> {{formatCurrency( selectedEmployee.salary )}} </p>
+                        <p class="label">Salario/hora</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="margin: 10px">
+                        <ReportButton>
+                            <DocumentArrowDownIcon/>
+                        </ReportButton>
+                    </div>
+                    <div style="display: flex; gap: 3%; margin-left: 5px;">
+                        <div class="button-coluna" @click="removeColuna">
+                            -
+                        </div>
+                        <div class="button-coluna" @click="adicionaColuna">
+                            +
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="total">
-                <div class="total-column">
-                    <p class="val">{{ totalWorkedPeriod }}</p>
-                    <p class="label">Total trabalhado no período</p>
-                </div>
-                <div class="total-column">
-                    <p class="val">{{ totalSalaryPeriod }}</p> 
-                    <p class="label">Total a receber no período</p>
-                </div>
-                <div class="total-column"> 
-                    <p class="val"> {{formatCurrency( selectedEmployee.salary )}} </p>
-                    <p class="label">Salario/hora</p>
-                </div>
-            </div>
-
-            <div>
-                <div style="margin: 10px">
-                    <ReportButton>
-                        <DocumentArrowDownIcon/>
-                    </ReportButton>
-                </div>
-                <div style="display: flex; gap: 3%; margin-left: 5px;">
-                    <button @click="removeColuna">
-                        -
-                    </button>
-                    <button @click="adicionaColuna">
-                        +
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <div class="apontamento">
             <table>
@@ -98,26 +99,50 @@
                         <td :colspan="3 + (hasAnyEntrada2 ? 2 : 0) + (hasAnyEntrada3 ? 2 : 0) + 2" style="text-align: center;">Nenhum registro encontrado para o período selecionado.</td>
                     </tr>
                     <tr v-for="(record, index) in processedTimeRecords" :key="index">
-                        <td class="data">
+                        <td class="data" nome="date" :value="record.date">
                             {{ record.date }}
                         </td>
                         <td class="marcacao">
-                            <input class="ponto" :value="record.entrada1 ?? '--:--'"/>
+                            <input class="ponto" 
+                                :value="record.entrada1 ?? '--:--'" 
+                                :id="record.id1"
+                                @keyup.enter="handleTimeUpdate($event, record.id1, record.originalDate)"
+                            />
                         </td>
                         <td class="marcacao">
-                            <input class="ponto" :value="record.saida1 ?? '--:--'"/>
+                            <input class="ponto" 
+                                :value="record.saida1 ?? '--:--'" 
+                                :id="record.id2"
+                                @keyup.enter="handleTimeUpdate($event, record.id2, record.originalDate)"
+                            />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
-                            <input class="ponto" :value="record.entrada2 ?? '--:--'"/>
+                            <input class="ponto" 
+                                :value="record.entrada2 ?? '--:--'" 
+                                :id="record.id3"
+                                @keyup.enter="handleTimeUpdate($event, record.id3, record.originalDate)"
+                            />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
-                            <input class="ponto" :value="record.saida2 ?? '--:--'"/>
+                            <input class="ponto" 
+                                :value="record.saida2 ?? '--:--'" 
+                                :id="record.id4"
+                                @keyup.enter="handleTimeUpdate($event, record.id4, record.originalDate)"
+                            />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
-                            <input class="ponto" :value="record.entrada3 ?? '--:--'"/>
+                            <input class="ponto" 
+                                :value="record.entrada3 ?? '--:--'" 
+                                :id="record.id5"
+                                @keyup.enter="handleTimeUpdate($event, record.id5, record.originalDate)"
+                            />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
-                            <input class="ponto" :value="record.saida3 ?? '--:--'"/>
+                            <input class="ponto" 
+                                :value="record.saida3 ?? '--:--'" 
+                                :id="record.id6"
+                                @keyup.enter="handleTimeUpdate($event, record.id6, record.originalDate)"
+                            />
                         </td>
                         <td class="total-trabalhado">
                             {{ record.totalTrabalhadoDia }}
@@ -129,19 +154,13 @@
                 </tbody>
             </table>
         </div>
-        <div class="footer">
-            <button class="save">
-                salvar
-            </button>
-        </div>
     </div>
-   
+
     <div class="default" v-else>
         Selecione um funcionário para visualizar os apontamentos
     </div>
-    
 
-</div>
+ </div>
 </template>
 
 <script>
@@ -308,13 +327,20 @@ export default {
 
                     // Cria a linha para a tabela
                     const row = {
+                        originalDate: dateStr,
                         date: this.formatDate(dateStr),
                         entrada1: dailyRecords[0] ? this.formatTime(dailyRecords[0].dateTime) : null,
+                        id1: dailyRecords[0] ? dailyRecords[0].id : null,
                         saida1:   dailyRecords[1] ? this.formatTime(dailyRecords[1].dateTime) : null,
+                        id2: dailyRecords[1] ? dailyRecords[1].id : null,
                         entrada2: dailyRecords[2] ? this.formatTime(dailyRecords[2].dateTime) : null,
+                        id3: dailyRecords[2] ? dailyRecords[2].id : null,
                         saida2:   dailyRecords[3] ? this.formatTime(dailyRecords[3].dateTime) : null,
+                        id4: dailyRecords[3] ? dailyRecords[3].id : null,
                         entrada3: dailyRecords[4] ? this.formatTime(dailyRecords[4].dateTime) : null,
+                        id5: dailyRecords[4] ? dailyRecords[4].id : null,
                         saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
+                        id6: dailyRecords[5] ? dailyRecords[5].id : null,
                         totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                         totalSalaryDay: this.calculateDaySalary(dailyRecords),
                     };
@@ -354,6 +380,61 @@ export default {
     removeColuna(){
         if (this.marcacaoCount > 0) {
             this.marcacaoCount--;
+        }
+    },
+
+    async handleTimeUpdate(event, recordId, recordDate) {
+        if (!recordId) {
+            console.warn("Tentativa de atualizar um registro sem ID.");
+            return;
+        }
+
+        const newTimeValue = event.target.value.trim();
+
+        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        if (!timeRegex.test(newTimeValue)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Formato inválido',
+                text: 'Por favor, insira a hora no formato HH:MM (ex: 08:30).',
+                timer: 2500,
+                showConfirmButton: false
+            });
+
+            return;
+        }
+
+        const newDateTime = `${recordDate}T${newTimeValue}:00`;
+
+        Swal.fire({
+            title: 'Atualizando...',
+            text: 'Aguarde enquanto o registro é atualizado.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try{
+            await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Ponto atualizado!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            await this.searchTimeRecords();
+
+        }catch(error){
+            console.error("Erro ao atualizar o registro de ponto:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao atualizar',
+                text: error?.response?.data?.message || 'Não foi possível atualizar o registro.',
+                showConfirmButton: true 
+            });
         }
     },
 
@@ -594,19 +675,6 @@ export default {
         box-shadow: none;
     }
 
-    .save{
-        border: 5px;
-        padding: 0.7%;
-        border-radius: 10%;
-        background-color:#5b007d;
-        color: white;
-    }
-
-    .footer{
-        padding-left: 3%;
-        padding-top: 10px;
-    }
-
     input[type="date"]{
         height: 25px;
         border-radius: 5px;
@@ -614,5 +682,17 @@ export default {
         font-family: inherit;
         color: inherit;
         box-shadow: none;
+        border: solid 1px;
     }
+
+    .button-coluna{
+        width: 25px;
+        height: 25px;
+        background-color: #5b007d;
+        border-radius: 20%;
+        color: white;
+        cursor: pointer;
+        text-align: center
+    }
+
 </style>
