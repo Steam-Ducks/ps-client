@@ -1,4 +1,4 @@
-<template>  
+<template>
   <div class="employee-create-view">
 
     <div class="button-container">
@@ -9,7 +9,7 @@
 
     <h2> Novo Funcionário </h2>
     <p> Preencha os campos abaixo para cadastrar o Funcionário </p>
-  
+
     <EmployeeForm @employee-created="goBack" />
   </div>
 
@@ -44,10 +44,10 @@
   .button-container {
     display: flex;
     justify-content: flex-end;
-    position: absolute;  
-    top: 0;  
-    right: 0;  
-    z-index: 10; 
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
   }
 
   .transparent-button {
