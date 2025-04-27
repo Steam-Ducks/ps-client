@@ -1,9 +1,9 @@
 <template>
   <div v-if="companies.length > 0" class="company-list">
     <DataTable
-      :data="formattedCompanies"
-      :columns="columns"
-      :options="tableOptions"
+        :data="formattedCompanies"
+        :columns="columns"
+        :options="tableOptions"
     >
       <template v-slot:actions="{ rowData }">
         <OptionsButton @click="handleAction(rowData)" />
@@ -13,18 +13,37 @@
   <div v-else class="no-companies-message">
     <p>Nenhuma empresa encontrada. Tente buscar novamente.</p>
   </div>
+
+  <!-- Modal de Edição de Empresa -->
+  <div v-if="isEditingCompany" class="modal">
+    <div class="modal-content">
+      <div class="close-button-container">
+        <button @click="hideEditCompany" class="transparent-button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="close-icon">
+            <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+      <CompanyEditForm
+          :company-id="selectedCompanyId"
+          @company-updated="companyUpdated"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
 import OptionsButton from '@/components/ui/OptionsButton.vue';
+import CompanyEditForm from '@/components/company/CompanyEditForm.vue';
 
 export default {
   name: 'CompanyList',
   components: {
     DataTable,
     OptionsButton,
+    CompanyEditForm,
   },
   props: {
     companies: {
@@ -32,10 +51,12 @@ export default {
       required: true,
     },
   },
-  emits: ['delete-company'], 
+  emits: ['company-updated'],
   data() {
     return {
       tableKey: 0,
+      isEditingCompany: false,
+      selectedCompanyId: null,
       columns: [
         { title: 'Nome', data: 'name', class: 'name' },
         { title: 'CNPJ/CPF', data: 'cnpj', class: 'cnpj' },
@@ -49,12 +70,7 @@ export default {
           render: (data, type, row) => {
             return `<button class="edit-btn" data-id="${row.id}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
               <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-12.15 12.15a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32L19.513 8.2Z" />
-</svg>
-</button>
-                    <button class="delet-btn" data-id="${row.id}"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-  <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
-</svg>
-</button>`;
+            </svg></button>`;
           }
         }
       ],
@@ -64,6 +80,9 @@ export default {
           url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
         },
         dom: '<"top"f>rt<"bottom"lip><"clear">',
+        drawCallback: () => {
+          this.attachEventListeners();
+        }
       },
     };
   },
@@ -78,37 +97,144 @@ export default {
     },
   },
   methods: {
+    showEditCompany(companyId) {
+      this.selectedCompanyId = companyId;
+      this.isEditingCompany = true;
+    },
+    hideEditCompany() {
+      this.isEditingCompany = false;
+      this.selectedCompanyId = null;
+    },
+    companyUpdated() {
+      this.hideEditCompany();
+      this.$emit('company-updated');
+    },
     handleAction(company) {
-      console.log("Ação para empresa:", company);
+      // Usar o método showEditCompany para abrir o modal de edição
+      this.showEditCompany(company.id);
     },
     attachEventListeners() {
       this.$nextTick(() => {
-        document.querySelectorAll('.action-btn').forEach((btn) => {
-          btn.addEventListener('click', (event) => {
-            const companyId = event.target.getAttribute('data-id');
-            const selectedCompany = this.companies.find(c => c.id == companyId);
-            if (selectedCompany) {
-              this.handleAction(selectedCompany);
-            }
+        const editButtons = document.querySelectorAll('.edit-btn');
+        if (editButtons.length > 0) {
+          editButtons.forEach((btn) => {
+            // Remover event listeners anteriores para evitar duplicação
+            btn.removeEventListener('click', this.handleEditButtonClick);
+            // Adicionar novo event listener
+            btn.addEventListener('click', this.handleEditButtonClick);
           });
-        });
+        }
       });
+    },
+    handleEditButtonClick(event) {
+      // Encontrar o elemento pai mais próximo com data-id
+      let target = event.target;
+      while (target && !target.getAttribute('data-id')) {
+        target = target.parentElement;
+      }
+
+      if (target) {
+        const companyId = target.getAttribute('data-id');
+        if (companyId) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.showEditCompany(companyId);
+        }
+      }
     }
   },
   mounted() {
     DataTable.use(DataTablesCore);
     this.attachEventListeners();
   },
+  updated() {
+    this.attachEventListeners();
+  },
   watch: {
     companies() {
       this.tableKey += 1;
-      this.attachEventListeners();
+      this.$nextTick(() => {
+        this.attachEventListeners();
+      });
     },
   },
   beforeUnmount() {
+    // Remover todos os event listeners para evitar memory leaks
+    document.querySelectorAll('.edit-btn').forEach((btn) => {
+      btn.removeEventListener('click', this.handleEditButtonClick);
+    });
+
     if (this.$refs.dataTable?.dt) {
       this.$refs.dataTable.dt.destroy(true);
     }
   },
 };
 </script>
+
+<style scoped>
+.company-list {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.no-companies-message {
+  text-align: center;
+  margin-top: 20px;
+  color: #6b7280;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  position: relative;
+}
+
+.close-button-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.transparent-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.close-icon {
+  width: 24px;
+  height: 24px;
+  color: #6F08AF;
+}
+
+:deep(.edit-btn) {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6F08AF;
+}
+
+:deep(.edit-btn:hover) {
+  color: #5a0690;
+}
+</style>
