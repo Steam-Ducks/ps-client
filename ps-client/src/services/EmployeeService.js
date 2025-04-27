@@ -38,6 +38,17 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       throw new Error('Erro ao achar empresa: ' + error.message);
     }
   },
+  async updateEmployee(id, updateEmployee) {
+    try {
+      const response = await axios.put(`${API_URL}/${id}`, updateEmployee, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Erro desconhecido ao criar funcionário";
+      throw new Error(errorMessage);
+    }
+  },
 
   async uploadEmployeePhoto(file) {
     try {
@@ -61,6 +72,45 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       throw new Error(msg);
     }
   },
+
+  async updateEmployeePhoto(photoURL, file) {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('photoURL', photoURL);
+
+      const response = await axios.put(
+          `${API_URL}/updatePhoto`,
+          formData,
+          {
+            headers: {
+              ...UserService.getAuthHeaders(),
+              'Content-Type': 'multipart/form-data',
+            },
+          }
+      );
+
+      return response.data.photoUrl;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Erro ao atualizar a foto do funcionário';
+      throw new Error(errorMessage);
+    }
+  },
+
+  async terminateEmployee(employeeId) {
+    try {
+      await axios.put(
+          `${API_URL}/${employeeId}/terminate`,
+          null,
+          {
+            headers: UserService.getAuthHeaders()
+          }
+      );
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Erro ao desativar o funcionário';
+      throw new Error(errorMessage);
+    }
+  }
 
 };
 
