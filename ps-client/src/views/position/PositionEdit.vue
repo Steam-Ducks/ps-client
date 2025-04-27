@@ -58,7 +58,8 @@ export default {
     async savePosition(positionData) {
       try {
         await PositionService.updatePosition(positionData.id, positionData);
-        this.goBack(); // Volta para a tela anterior após salvar
+        this.$emit('position-edited', positionData);
+        this.goBack();
       } catch (error) {
         console.error('Erro ao salvar cargo:', error);
       }

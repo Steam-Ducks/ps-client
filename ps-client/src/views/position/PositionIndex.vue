@@ -6,10 +6,6 @@
     </div>
 
     <div class="buttons">
-      <ReportButton>
-        <DocumentArrowDownIcon />
-      </ReportButton>
-
       <CreateButton @click="showCreatePosition">
         + Novo Cargo
       </CreateButton>
@@ -18,7 +14,7 @@
 
   <div v-if="isCreatingPosition" class="modal">
     <div class="modal-content modal-content-position">
-      <PositionCreate @go-back="hideCreatePosition" @position-created="fetchPositions" />
+      <PositionCreate @go-back="hideCreatePosition" />
     </div>
   </div>
 
@@ -36,9 +32,7 @@
 </template>
 
 <script>
-import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import PositionCreate from '@/views/position/PositionCreate.vue';
 import PositionList from '@/components/position/PositionList.vue';
 import PositionService from '@/services/PositionService';
@@ -47,8 +41,6 @@ import PositionEdit from './PositionEdit.vue';
 export default {
   name: 'PositionIndex',
   components: {
-    ReportButton,
-    DocumentArrowDownIcon,
     CreateButton,
     PositionCreate,
     PositionList,
@@ -69,15 +61,17 @@ export default {
     showCreatePosition() {
       this.isCreatingPosition = true;
     },
-    hideCreatePosition() {
+    async hideCreatePosition() {
       this.isCreatingPosition = false;
+      await this.fetchPositions();
     },
     handleEditPosition(positionId) {
       this.selectedPositionId = positionId;  // Atualiza o ID do cargo selecionado
       this.isEditingPosition = true;  // Exibe o modal para editar
     },
-    hideEditPosition() {
-      this.isEditingPosition = false;  // Fecha o modal de edição
+    async hideEditPosition() {
+      this.isEditingPosition = false; 
+      await this.fetchPositions(); // Fecha o modal de edição
     },
     async fetchPositions() {
       try {
