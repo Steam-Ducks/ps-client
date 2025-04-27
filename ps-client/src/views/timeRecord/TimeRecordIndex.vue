@@ -107,6 +107,8 @@
                                 :value="record.entrada1 ?? '--:--'" 
                                 :id="record.id1"
                                 @keyup.enter="handleTimeUpdate($event, record.id1, record.originalDate)"
+                                v-imask="timeMask"
+                                
                             />
                         </td>
                         <td class="marcacao">
@@ -114,6 +116,7 @@
                                 :value="record.saida1 ?? '--:--'" 
                                 :id="record.id2"
                                 @keyup.enter="handleTimeUpdate($event, record.id2, record.originalDate)"
+                                v-imask="timeMask"
                             />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
@@ -121,6 +124,7 @@
                                 :value="record.entrada2 ?? '--:--'" 
                                 :id="record.id3"
                                 @keyup.enter="handleTimeUpdate($event, record.id3, record.originalDate)"
+                                v-imask="timeMask"
                             />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
@@ -128,6 +132,7 @@
                                 :value="record.saida2 ?? '--:--'" 
                                 :id="record.id4"
                                 @keyup.enter="handleTimeUpdate($event, record.id4, record.originalDate)"
+                                v-imask="timeMask"
                             />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
@@ -135,6 +140,7 @@
                                 :value="record.entrada3 ?? '--:--'" 
                                 :id="record.id5"
                                 @keyup.enter="handleTimeUpdate($event, record.id5, record.originalDate)"
+                                v-imask="timeMask"
                             />
                         </td>
                         <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
@@ -142,6 +148,7 @@
                                 :value="record.saida3 ?? '--:--'" 
                                 :id="record.id6"
                                 @keyup.enter="handleTimeUpdate($event, record.id6, record.originalDate)"
+                                v-imask="timeMask"
                             />
                         </td>
                         <td class="total-trabalhado">
@@ -170,6 +177,8 @@ import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
 import TimeRecordService from '@/services/TimeRecordService';
+import { IMaskDirective } from 'vue-imask';
+import IMask from 'imask';
 import Swal from 'sweetalert2';
 import $ from 'jquery';
 import 'select2';
@@ -177,6 +186,9 @@ import 'select2/dist/css/select2.css';
 
 export default {
   name: 'TimeRecordIndex',
+  directives: {
+    imask: IMaskDirective
+  },
   components: {
     ReportButton,
     DocumentArrowDownIcon,
@@ -191,6 +203,28 @@ export default {
       endDate: '',  
       processedTimeRecords: [],
       marcacaoCount: 0,
+      timeMask: {
+        mask: 'HH:MM',
+        lazy: false, 
+        blocks: {
+          HH: {
+            mask: IMask.MaskedRange, 
+            from: 0,
+            to: 23,
+            maxLength: 2,
+            autofix: true, 
+            placeholderChar: '_', 
+          },
+          MM: {
+            mask: IMask.MaskedRange,
+            from: 0,
+            to: 59,
+            maxLength: 2,
+            autofix: true,
+            placeholderChar: '_',
+          },
+        },
+      },
     };
   },
   computed: {
