@@ -6,7 +6,7 @@
       </div>
 
       <div>
-        <CreateButton> Cadastrar </CreateButton>
+        <CreateButton > Cadastrar </CreateButton>
       </div>
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -70,7 +70,6 @@
     flex-direction: column;
     align-items: center;
   }
-  
   
   .form-group {
     padding: 10px 0 25px;

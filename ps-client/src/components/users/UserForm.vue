@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="submitForm" class="user-form">
       <div class="form-group">
 
         <!-- nome -->
@@ -29,7 +29,9 @@
           </select>
         </div>
 
-      <FormButton type="primary" class="submit-button">Cadastrar</FormButton>
+        <div class="button-container">
+        <CreateButton> Cadastrar </CreateButton>
+        </div>
       
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -41,13 +43,13 @@
 
 <script>
 import UserService from '@/services/UserService';
-import FormButton from '@/components/ui/FormButton.vue';
+import CreateButton from '@/components/ui/CreateButton.vue';
 import Swal from 'sweetalert2';
 
 export default {
   name: 'UserForm',
   components: {
-    FormButton, 
+    CreateButton, 
   },
   
   emits: ['user-created'],
@@ -111,10 +113,8 @@ export default {
 </script>
 
 <style scoped>
-  .company-form {
-    max-width: 500px;
+.user-form {
     margin: 0 auto;
-    padding: 30px;
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -128,8 +128,11 @@ export default {
   }
 
   .form-group {
-    margin-bottom: 20px;
+    padding: 10px 0 25px;
+    margin-bottom: 0px;
     width: 100%;
+    font-size: 18px;
+    font-weight: 300;
   }
 
   label {
@@ -156,6 +159,8 @@ export default {
   }
 
   .button-container {
-    margin-top: 20px;
-  }
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
 </style>
