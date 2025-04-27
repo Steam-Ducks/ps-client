@@ -213,7 +213,7 @@ export default {
             to: 23,
             maxLength: 2,
             autofix: true, 
-            placeholderChar: '_', 
+            placeholderChar: '-', 
           },
           MM: {
             mask: IMask.MaskedRange,
@@ -221,7 +221,7 @@ export default {
             to: 59,
             maxLength: 2,
             autofix: true,
-            placeholderChar: '_',
+            placeholderChar: '-',
           },
         },
       },
@@ -418,10 +418,6 @@ export default {
     },
 
     async handleTimeUpdate(event, recordId, recordDate) {
-        if (!recordId) {
-            console.warn("Tentativa de atualizar um registro sem ID.");
-            return;
-        }
 
         const newTimeValue = event.target.value.trim();
 
@@ -450,6 +446,8 @@ export default {
         });
 
         try{
+          if (recordId) {
+
             await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
 
             Swal.fire({
@@ -458,6 +456,22 @@ export default {
                 showConfirmButton: false,
                 timer: 1500
             });
+
+            }else {
+
+                const newRecordData = {
+                    employeeId: this.selectedEmployeeId, 
+                    dateTime: newDateTime
+                };
+                await TimeRecordService.createTimeRecord(newRecordData);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Ponto registrado!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+
+            }
 
             await this.searchTimeRecords();
 

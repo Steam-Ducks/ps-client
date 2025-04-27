@@ -82,6 +82,27 @@ const TimeRecordService = {
         console.error(`Erro ao atualizar o ponto com ID ${id}:`, error);
         throw error;    
       }
+    },
+
+    async createTimeRecord(recordData){
+
+      try {
+        const payload = {
+          employeeId: recordData.employeeId,
+          dateTime: recordData.dateTime
+        };
+
+        const response = await axios.post(API_URL, payload, {
+          headers: UserService.getAuthHeaders(),
+        });
+
+        return response.data;
+
+      } catch (error) {
+        console.error('Erro ao criar registro de ponto:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Erro desconhecido ao criar o registro de ponto.';
+        throw new Error(errorMessage);
+      }
     }
 
 }
