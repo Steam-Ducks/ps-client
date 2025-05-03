@@ -14,7 +14,7 @@
         <form @submit.prevent="handleLogin" class="login-form">
           <!-- Email -->
           <div class="form-group">
-            <input type="email" id="email" v-model="credentials.email" required placeholder="email@altave.com.br" />
+            <input type="email" id="email" v-model="credentials.email" required placeholder="email@email.com.br" />
           </div>
 
           <!-- Password -->
