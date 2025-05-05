@@ -25,8 +25,6 @@
                 v-model="credentials.password"
                 required
                 placeholder="********"
-                maxlength="15"
-                minlength="8"
             />
             <span class="toggle-password" @click="togglePasswordVisibility">
               <EyeIcon v-if="!showPassword" class="icon" />
