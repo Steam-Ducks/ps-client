@@ -88,7 +88,7 @@ body{
   border: 1.5px solid #6F08AF;
   border-radius: 8px;
   height: 30px;
-  width: 270px;
+  width: 300px;
   background-color: transparent;
 }
 
@@ -121,16 +121,11 @@ body{
 table.dataTable thead th {
   border-bottom: 2px solid #e2e8f0;
   padding: 12px 15px;
-  text-align: left;
 }
 
 table.dataTable tbody td {
   padding: 10px 15px;
   border-top: 1px solid #f1f5f9;
-}
-
-table.dataTable tbody td:last-child {
-  text-align: right;
 }
 
 table.dataTable tbody tr:nth-child(even) {
@@ -151,17 +146,13 @@ nav{
 
 .actions-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; 
+  align-items: center; 
 }
 
 .actions-link {
   text-decoration: none; 
   color: inherit;
-}
-
-.actions{
-  text-align: right;
 }
   
 button:hover {

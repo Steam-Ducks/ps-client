@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: ' SearchBar',
+  name: 'SearchBar',
   props: {
     searchQuery: {
       type: String,
