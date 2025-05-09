@@ -109,10 +109,10 @@ body{
   width: 60px;
   background-color: #f1d4fc;
 }
-
-.dt-paging-button:hover,
-.dt-paging-button:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+.dataTables_wrapper .dataTables_paginate a.paginate_button.current,
+.dataTables_wrapper .dataTables_paginate a.paginate_button.current:focus,
+.dataTables_wrapper .dataTables_paginate a.paginate_button.current:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   background: #6F08AF !important;
   color: #f0f0f0;
   transition: 0.2s;
