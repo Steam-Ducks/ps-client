@@ -18,6 +18,7 @@
 <script>
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
+import languagePTBR from '@/assets/dataTable/language/pt-BR.json';
 
 export default {
   name: 'PositionList',
@@ -53,6 +54,7 @@ export default {
       tableOptions: {
         responsive: true,
         lengthMenu: [10],
+        language: languagePTBR,
         dom: 'frtip',
       },
     };
