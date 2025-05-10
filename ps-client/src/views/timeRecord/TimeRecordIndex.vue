@@ -92,6 +92,7 @@
                         <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Saída 3</th>
                         <th>Total trabalhado</th>
                         <th>Total a receber</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -157,6 +158,11 @@
                         <td class="total-trabalhado">
                             {{ record.totalSalaryDay }}
                         </td>
+                        <td class="registro-edicao" v-if="record.isEdited">
+                            <div class="edited-indicator">
+                                <span class="tooltip-text">Este registro foi editado.</span>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -196,6 +202,7 @@ export default {
   },
   data() {
     return {
+      isCheckingHistory: false,
       employees: [],
       selectedEmployeeId: "",
       selectedEmployee: null,
@@ -390,6 +397,10 @@ export default {
                     // Calcula totais (funções devem tratar array vazio)
                     totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                     totalSalaryDay: this.calculateDaySalary(dailyRecords),
+
+                    // Verifica se algum dos registros do dia foi editado
+                    isEdited: dailyRecords.some(record => record.isEdit === true),
+
                 };
                 return row;
             });
@@ -689,7 +700,7 @@ export default {
     }
 
     th{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
         border-bottom: 1px solid #71009a;
     }
@@ -700,23 +711,68 @@ export default {
     }
 
     .data{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
     }
 
     .Previsto{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
     }
 
     .marcacao{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
     }
 
     .total-trabalhado{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
+    }
+
+    .registro-edicao {
+        width: 4%;
+        text-align: center;
+        vertical-align: middle; 
+    }
+
+    .registro-edicao div {
+        width: 15px;
+        height: 15px;
+        background-color: #fff269;
+        display: inline-block;
+        vertical-align: middle;
+        border-radius: 100%;
+    }
+
+    .edited-indicator {
+        position: relative;
+        display: inline-block;
+        cursor: pointer; 
+    }
+
+    .tooltip-text {
+        visibility: hidden; 
+        width: 150px; 
+        background-color: rgba(0, 0, 0, 0.7);    
+        font-size: small;
+        color: white;   
+        text-align: center;     
+        border-radius: 5px;     
+        padding: 10px 15px;   
+        position: absolute;     
+        z-index: 1;     
+        bottom: 125%;   
+        left: 50%;  
+        transform: translateX(-50%);        
+        opacity: 0; 
+        transition: opacity 0.3s ease; 
+    }
+
+    .edited-indicator:hover .tooltip-text {
+        visibility: visible; 
+        opacity: 1;
+        
     }
 
     .ponto {
