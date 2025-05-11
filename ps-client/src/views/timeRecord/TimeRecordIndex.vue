@@ -159,7 +159,7 @@
                             {{ record.totalSalaryDay }}
                         </td>
                         <td class="registro-edicao" v-if="record.isEdited">
-                            <div class="edited-indicator">
+                            <div class="edited-indicator" @click="showCreateEmployee">
                                 <span class="tooltip-text">Este registro foi editado.</span>
                             </div>
                         </td>
@@ -174,6 +174,12 @@
     </div>
 
  </div>
+
+ <div v-if="isCheckingHistory" class="modal">
+    <div class="modal-content">
+      <EmployeeEdit :id="String(selectedEmployeeId)" @go-back="hideEditEmployee"/>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -183,6 +189,7 @@ import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
 import TimeRecordService from '@/services/TimeRecordService';
+import EmployeeEdit from './TimeRecordHistory.vue';
 import { IMaskDirective } from 'vue-imask';
 import IMask from 'imask';
 import Swal from 'sweetalert2';
@@ -199,6 +206,7 @@ export default {
     ReportButton,
     DocumentArrowDownIcon,
     MagnifyingGlassIcon,
+    EmployeeEdit,
   },
   data() {
     return {
@@ -291,6 +299,12 @@ export default {
   },
   
   methods: {
+    showCreateEmployee() {
+      this.isCheckingHistory = true;
+    },
+    hideEditEmployee() {
+      this.isCheckingHistory = false;
+    },
 
     // Seleciona o funcionáro e busca os pontos
     async searchTimeRecords() {
@@ -802,5 +816,33 @@ export default {
         cursor: pointer;
         text-align: center
     }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(3px);
+    }
+
+    .modal-content {
+        width: 30%;
+        max-width: 600px;
+        min-height: 300px;
+        top: 81px;
+        left: 633px;
+        border-radius: 20px;
+        background-color: #FFFFFF;
+        padding: 30px 50px;
+        max-height: 90vh;
+        overflow-y: auto;
+        }
 
 </style>
