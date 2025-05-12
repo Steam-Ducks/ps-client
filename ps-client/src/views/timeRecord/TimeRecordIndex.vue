@@ -159,7 +159,7 @@
                             {{ record.totalSalaryDay }}
                         </td>
                         <td class="registro-edicao" v-if="record.isEdited">
-                            <div class="edited-indicator" @click="showCreateEmployee">
+                            <div class="edited-indicator" @click="showEditedEmployee(record)">
                                 <span class="tooltip-text">Este registro foi editado.</span>
                             </div>
                         </td>
@@ -177,7 +177,13 @@
 
  <div v-if="isCheckingHistory" class="modal">
     <div class="modal-content">
-      <EmployeeEdit :id="String(selectedEmployeeId)" @go-back="hideEditEmployee"/>
+      <EmployeeEdit 
+        :recordDateInfo="showRecordInfo.date"
+        :id="String(selectedEmployeeId)" 
+        :name="String(selectedEmployee.name)" 
+        :historyData="showRecordInfo"
+        @go-back="hideEditEmployee"
+      />
     </div>
   </div>
 </template>
@@ -213,6 +219,7 @@ export default {
       isCheckingHistory: false,
       employees: [],
       selectedEmployeeId: "",
+      showRecordInfo: '',
       selectedEmployee: null,
       startDate: '', 
       endDate: '',  
@@ -299,8 +306,9 @@ export default {
   },
   
   methods: {
-    showCreateEmployee() {
+    showEditedEmployee(recordRow) {
       this.isCheckingHistory = true;
+      this.showRecordInfo = recordRow;     
     },
     hideEditEmployee() {
       this.isCheckingHistory = false;
@@ -408,6 +416,15 @@ export default {
                     id5: dailyRecords[4] ? dailyRecords[4].id : null,
                     saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
                     id6: dailyRecords[5] ? dailyRecords[5].id : null,
+
+                    // Campos de atualização (valores brutos de updatedAt)
+                    entrada1Update: dailyRecords[0] && dailyRecords[0].updatedAt ? dailyRecords[0].updatedAt : null,
+                    saida1Update:   dailyRecords[1] && dailyRecords[1].updatedAt ? dailyRecords[1].updatedAt : null,
+                    entrada2Update: dailyRecords[2] && dailyRecords[2].updatedAt ? dailyRecords[2].updatedAt : null,
+                    saida2Update:   dailyRecords[3] && dailyRecords[3].updatedAt ? dailyRecords[3].updatedAt : null,
+                    entrada3Update: dailyRecords[4] && dailyRecords[4].updatedAt ? dailyRecords[4].updatedAt : null,
+                    saida3Update:   dailyRecords[5] && dailyRecords[5].updatedAt ? dailyRecords[5].updatedAt : null,
+
                     // Calcula totais (funções devem tratar array vazio)
                     totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                     totalSalaryDay: this.calculateDaySalary(dailyRecords),
