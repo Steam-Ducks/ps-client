@@ -100,7 +100,7 @@ body{
   border: 1.5px solid #6F08AF;
   border-radius: 8px;
   height: 30px;
-  width: 155px;
+  width: 270px;
   background-color: transparent;
 }
 
@@ -170,6 +170,10 @@ nav{
 .actions-link {
   text-decoration: none; 
   color: inherit;
+}
+
+.actions{
+  text-align: right;
 }
   
 button:hover {

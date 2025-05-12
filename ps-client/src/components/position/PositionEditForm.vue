@@ -2,11 +2,11 @@
     <form @submit.prevent="submitForm" class="position-form">
       <div class="form-group">
         Cargo
-        <input type="text" id="name" v-model="position.name" required placeholder="ex: Desenvolvedor de Software"/>
+        <input type="text" id="name" v-model="formPosition.name" required placeholder="ex: Desenvolvedor de Software"/>
       </div>
-
+  
       <div>
-        <CreateButton > Cadastrar </CreateButton>
+        <CreateButton> Editar </CreateButton>
       </div>
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
@@ -20,19 +20,29 @@
   import Swal from 'sweetalert2';
   
   export default {
-    name: 'PositionForm',
+    name: 'PositionEditForm',
     components: {
       CreateButton,
     },
-    emits: ['position-created'],
-  
+    emits: ['position-edited'],
+    props: {
+      position: {
+        type: Object,
+        required: true,
+      },
+    },
     data() {
       return {
-        position: {
-          name: '',
-        },
+        formPosition: { ...this.position },
         errorMessage: '',
       };
+    },
+  
+    watch: {
+      // Caso a prop position mude, vamos garantir que a cópia seja atualizada.
+      position(newPosition) {
+        this.formPosition = { ...newPosition };  // Atualiza a cópia sempre que a prop mudar
+      },
     },
   
     methods: {
@@ -40,22 +50,20 @@
         this.errorMessage = '';
   
         try {
-          await PositionService.createPosition(this.position);
+          await PositionService.updatePosition(this.formPosition.id, this.formPosition);
   
           Swal.fire({
             icon: 'success',
-            title: 'Cargo criado com sucesso!',
+            title: 'Cargo editado com sucesso!',
             showConfirmButton: false,
             timer: 1500,
           }).then(() => {
-            this.$emit('position-created');
-            this.position = {
-              name: '',
-            };
+            this.$emit('position-edited', this.formPosition);  // Emite evento para o componente pai.
+            this.formPosition = { name: '' };  // Limpa o formulário após salvar.
           });
         } catch (error) {
-          this.errorMessage = 'Erro ao cadastrar cargo. Tente novamente.';
-          console.error('Erro ao cadastrar cargo:', error);
+          this.errorMessage = 'Erro ao editar cargo. Tente novamente.';
+          console.error('Erro ao editar cargo:', error);
         }
       },
     },
@@ -93,9 +101,7 @@
     border-radius: 6px;
     font-size: 1rem;
     box-sizing: border-box;
-
   }
-
   
   .error-message {
     color: #dc2626;
@@ -105,6 +111,5 @@
   .button-container {
     margin-top: 20px;
   }
-
   </style>
   
