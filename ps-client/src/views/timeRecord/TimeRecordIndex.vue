@@ -7,166 +7,171 @@
     <p> Acompanhe abaixo os registros de ponto dos funcionários. Para visualizar os registros de um colaborador específico, selecione-o na barra abaixo. </p>
   </div>
 
-  <div class="tools">
-    <select class="search" ref="employeeSelect" v-model="selectedEmployeeId">
-        <option 
-            v-for="employee in employeeslist" 
-            :key="employee.id" 
-            :value="employee.id"
-        >
-             {{ employee.name }}
-        </option>
-    </select>
+  <div class="loading-overlay" v-if="isLoading">
+    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
+  </div>
+  <div v-else>
 
-    <label for="start-date">Início</label>
-    <input type="date" id="start-date" v-model="startDate"/>
+    <div class="tools">
+      <select class="search" ref="employeeSelect" v-model="selectedEmployeeId">
+          <option
+              v-for="employee in employeeslist"
+              :key="employee.id"
+              :value="employee.id"
+          >
+               {{ employee.name }}
+          </option>
+      </select>
 
-    <label for="end-date">Fim</label>
-    <input type="date" id="end-date" v-model="endDate"/>
+      <label for="start-date">Início</label>
+      <input type="date" id="start-date" v-model="startDate"/>
 
-    <ReportButton @click="searchTimeRecords">
-        <MagnifyingGlassIcon/>
-    </ReportButton>
+      <label for="end-date">Fim</label>
+      <input type="date" id="end-date" v-model="endDate"/>
 
-    </div>
+      <ReportButton @click="searchTimeRecords">
+          <MagnifyingGlassIcon/>
+      </ReportButton>
+
+      </div>
 
 
-        <div v-if="selectedEmployee">
+          <div v-if="selectedEmployee">
 
-            <div class="info">
+              <div class="info">
 
-                <div class="Employee"> 
-                    <img 
-                        :src="selectedEmployee.photo" 
-                        :alt="'Foto de ' + selectedEmployee.name" 
-                        class="employee-photo"
-                    >
-                    <div class="employee-details">
-                    <p class="employee-name">{{ selectedEmployee.name }}</p>
-                    <p>{{ selectedEmployee.position.name }}</p>
-                    </div>
-                </div>
-                
-                <div class="total">
-                    <div class="total-column">
-                        <p class="val">{{ totalWorkedPeriod }}</p>
-                        <p class="label">Total trabalhado no período</p>
-                    </div>
-                    <div class="total-column">
-                        <p class="val">{{ totalSalaryPeriod }}</p> 
-                        <p class="label">Total a receber no período</p>
-                    </div>
-                    <div class="total-column"> 
-                        <p class="val"> {{formatCurrency( selectedEmployee.salary )}} </p>
-                        <p class="label">Salario/hora</p>
-                    </div>
-                </div>
+                  <div class="Employee">
+                      <img
+                          :src="selectedEmployee.photo"
+                          :alt="'Foto de ' + selectedEmployee.name"
+                          class="employee-photo"
+                      >
+                      <div class="employee-details">
+                      <p class="employee-name">{{ selectedEmployee.name }}</p>
+                      <p>{{ selectedEmployee.position.name }}</p>
+                      </div>
+                  </div>
 
-                <div>
-                    <div style="margin: 10px">
-                        <ReportButton>
-                            <DocumentArrowDownIcon/>
-                        </ReportButton>
-                    </div>
-                    <div style="display: flex; gap: 3%; margin-left: 5px;">
-                        <div class="button-coluna" @click="removeColuna">
-                            -
-                        </div>
-                        <div class="button-coluna" @click="adicionaColuna">
-                            +
-                        </div>
-                    </div>
-                </div>
-            </div>
+                  <div class="total">
+                      <div class="total-column">
+                          <p class="val">{{ totalWorkedPeriod }}</p>
+                          <p class="label">Total trabalhado no período</p>
+                      </div>
+                      <div class="total-column">
+                          <p class="val">{{ totalSalaryPeriod }}</p>
+                          <p class="label">Total a receber no período</p>
+                      </div>
+                      <div class="total-column">
+                          <p class="val"> {{formatCurrency( selectedEmployee.salary )}} </p>
+                          <p class="label">Salario/hora</p>
+                      </div>
+                  </div>
 
-        <div class="apontamento">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Entrada 1</th>
-                        <th>Saída 1</th>
-                        <th v-if="hasAnyEntrada2 || marcacaoCount > 0">Entrada 2</th>
-                        <th v-if="hasAnyEntrada2 || marcacaoCount > 0">Saída 2</th>
-                        <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Entrada 3</th>
-                        <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Saída 3</th>
-                        <th>Total trabalhado</th>
-                        <th>Total a receber</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="processedTimeRecords.length === 0">
-                        <td :colspan="3 + (hasAnyEntrada2 ? 2 : 0) + (hasAnyEntrada3 ? 2 : 0) + 2" style="text-align: center;">Nenhum registro encontrado para o período selecionado.</td>
-                    </tr>
-                    <tr v-for="(record, index) in processedTimeRecords" :key="index">
-                        <td class="data" nome="date" :value="record.date">
-                            {{ record.date }}
-                        </td>
-                        <td class="marcacao">
-                            <input class="ponto" 
-                                :value="record.entrada1 ?? '--:--'" 
-                                :id="record.id1"
-                                @keyup.enter="handleTimeUpdate($event, record.id1, record.originalDate)"
-                                v-imask="timeMask"
-                                
-                            />
-                        </td>
-                        <td class="marcacao">
-                            <input class="ponto" 
-                                :value="record.saida1 ?? '--:--'" 
-                                :id="record.id2"
-                                @keyup.enter="handleTimeUpdate($event, record.id2, record.originalDate)"
-                                v-imask="timeMask"
-                            />
-                        </td>
-                        <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
-                            <input class="ponto" 
-                                :value="record.entrada2 ?? '--:--'" 
-                                :id="record.id3"
-                                @keyup.enter="handleTimeUpdate($event, record.id3, record.originalDate)"
-                                v-imask="timeMask"
-                            />
-                        </td>
-                        <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
-                            <input class="ponto" 
-                                :value="record.saida2 ?? '--:--'" 
-                                :id="record.id4"
-                                @keyup.enter="handleTimeUpdate($event, record.id4, record.originalDate)"
-                                v-imask="timeMask"
-                            />
-                        </td>
-                        <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
-                            <input class="ponto" 
-                                :value="record.entrada3 ?? '--:--'" 
-                                :id="record.id5"
-                                @keyup.enter="handleTimeUpdate($event, record.id5, record.originalDate)"
-                                v-imask="timeMask"
-                            />
-                        </td>
-                        <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
-                            <input class="ponto" 
-                                :value="record.saida3 ?? '--:--'" 
-                                :id="record.id6"
-                                @keyup.enter="handleTimeUpdate($event, record.id6, record.originalDate)"
-                                v-imask="timeMask"
-                            />
-                        </td>
-                        <td class="total-trabalhado">
-                            {{ record.totalTrabalhadoDia }}
-                        </td>
-                        <td class="total-trabalhado">
-                            {{ record.totalSalaryDay }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                  <div>
+                      <div style="margin: 10px">
+                          <ReportButton>
+                              <DocumentArrowDownIcon/>
+                          </ReportButton>
+                      </div>
+                      <div style="display: flex; gap: 3%; margin-left: 5px;">
+                          <div class="button-coluna" @click="removeColuna">
+                              -
+                          </div>
+                          <div class="button-coluna" @click="adicionaColuna">
+                              +
+                          </div>
+                      </div>
+                  </div>
+              </div>
 
-    <div class="default" v-else>
-        Selecione um funcionário para visualizar os apontamentos
-    </div>
+          <div class="apontamento">
+              <table>
+                  <thead>
+                      <tr>
+                          <th>Data</th>
+                          <th>Entrada 1</th>
+                          <th>Saída 1</th>
+                          <th v-if="hasAnyEntrada2 || marcacaoCount > 0">Entrada 2</th>
+                          <th v-if="hasAnyEntrada2 || marcacaoCount > 0">Saída 2</th>
+                          <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Entrada 3</th>
+                          <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Saída 3</th>
+                          <th>Total trabalhado</th>
+                          <th>Total a receber</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr v-if="processedTimeRecords.length === 0">
+                          <td :colspan="3 + (hasAnyEntrada2 ? 2 : 0) + (hasAnyEntrada3 ? 2 : 0) + 2" style="text-align: center;">Nenhum registro encontrado para o período selecionado.</td>
+                      </tr>
+                      <tr v-for="(record, index) in processedTimeRecords" :key="index">
+                          <td class="data" nome="date" :value="record.date">
+                              {{ record.date }}
+                          </td>
+                          <td class="marcacao">
+                              <input class="ponto"
+                                  :value="record.entrada1 ?? '--:--'"
+                                  :id="record.id1"
+                                  @keyup.enter="handleTimeUpdate($event, record.id1, record.originalDate)"
+                                  v-imask="timeMask"
 
+                              />
+                          </td>
+                          <td class="marcacao">
+                              <input class="ponto"
+                                  :value="record.saida1 ?? '--:--'"
+                                  :id="record.id2"
+                                  @keyup.enter="handleTimeUpdate($event, record.id2, record.originalDate)"
+                                  v-imask="timeMask"
+                              />
+                          </td>
+                          <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
+                              <input class="ponto"
+                                  :value="record.entrada2 ?? '--:--'"
+                                  :id="record.id3"
+                                  @keyup.enter="handleTimeUpdate($event, record.id3, record.originalDate)"
+                                  v-imask="timeMask"
+                              />
+                          </td>
+                          <td class="marcacao"  v-if="hasAnyEntrada2 || marcacaoCount > 0">
+                              <input class="ponto"
+                                  :value="record.saida2 ?? '--:--'"
+                                  :id="record.id4"
+                                  @keyup.enter="handleTimeUpdate($event, record.id4, record.originalDate)"
+                                  v-imask="timeMask"
+                              />
+                          </td>
+                          <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
+                              <input class="ponto"
+                                  :value="record.entrada3 ?? '--:--'"
+                                  :id="record.id5"
+                                  @keyup.enter="handleTimeUpdate($event, record.id5, record.originalDate)"
+                                  v-imask="timeMask"
+                              />
+                          </td>
+                          <td class="marcacao"  v-if="hasAnyEntrada3 || marcacaoCount > 1">
+                              <input class="ponto"
+                                  :value="record.saida3 ?? '--:--'"
+                                  :id="record.id6"
+                                  @keyup.enter="handleTimeUpdate($event, record.id6, record.originalDate)"
+                                  v-imask="timeMask"
+                              />
+                          </td>
+                          <td class="total-trabalhado">
+                              {{ record.totalTrabalhadoDia }}
+                          </td>
+                          <td class="total-trabalhado">
+                              {{ record.totalSalaryDay }}
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+
+      <div class="default" v-else>
+          Selecione um funcionário para visualizar os apontamentos
+      </div>
+  </div>
  </div>
 </template>
 
@@ -196,6 +201,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       employees: [],
       selectedEmployeeId: "",
       selectedEmployee: null,
@@ -285,6 +291,9 @@ export default {
   
   methods: {
 
+    isLoaded() {
+      this.isLoading = false;
+    },
     // Seleciona o funcionáro e busca os pontos
     async searchTimeRecords() {
 
@@ -560,6 +569,7 @@ export default {
   async mounted() {
     // Busca todos os funcionários
     this.employees = await EmployeeService.getAllEmployees();
+    this.isLoaded()
 
     // Transforma o select em select2
     this.$nextTick(() => {
