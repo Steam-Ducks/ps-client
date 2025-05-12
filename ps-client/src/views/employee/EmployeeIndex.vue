@@ -30,7 +30,11 @@
     </div>
   </div>
 
-  <EmployeeList :employees="employees" @edit-employee="showEditEmployee"/>
+  <div class="loading-overlay" v-if="isLoading">
+    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
+  </div>
+
+  <EmployeeList v-else :employees="employees" @edit-employee="showEditEmployee"/>
 
 
 </template>
@@ -56,6 +60,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       isCreatingEmployee: false,
       isEditingEmployee: false,
       selectedEmployeeId: null,
@@ -66,6 +71,9 @@ export default {
     this.fetchEmployee();
   },
   methods: {
+    isLoaded() {
+      this.isLoading = false;
+    },
     showCreateEmployee() {
       this.isCreatingEmployee = true;
     },
@@ -84,6 +92,7 @@ export default {
       try {
         const data = await EmployeeService.getAllEmployees();
         this.employees = data;
+        this.isLoaded();
       } catch (error) {
         console.error('Erro ao buscar empresas:', error);
       }
