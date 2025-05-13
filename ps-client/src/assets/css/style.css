@@ -110,11 +110,10 @@ body{
   background-color: #f1d4fc;
 }
 
-.dt-paging-button:hover,
-.dt-paging-button:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+.dt-paging-button.current{
   background: #6F08AF !important;
-  color: #f0f0f0;
+  color: #ffff;
+  border: 1px solid #6f08af !important;
   transition: 0.2s;
 }
 
