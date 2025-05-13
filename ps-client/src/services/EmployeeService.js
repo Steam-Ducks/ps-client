@@ -41,7 +41,7 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
   async updateEmployee(id, updateEmployee) {
     try {
       const response = await axios.put(`${API_URL}/${id}`, updateEmployee, {
-        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+        headers: UserService.getAuthHeaders(), 
       });
       return response.data;
     } catch (error) {
