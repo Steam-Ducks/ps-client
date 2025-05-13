@@ -92,6 +92,7 @@
                         <th v-if="hasAnyEntrada3 || marcacaoCount > 1">Saída 3</th>
                         <th>Total trabalhado</th>
                         <th>Total a receber</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -157,6 +158,11 @@
                         <td class="total-trabalhado">
                             {{ record.totalSalaryDay }}
                         </td>
+                        <td class="registro-edicao" v-if="record.isEdited">
+                            <div class="edited-indicator" @click="showEditedEmployee(record)">
+                                <span class="tooltip-text">Este registro foi editado.</span>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -168,6 +174,18 @@
     </div>
 
  </div>
+
+ <div v-if="isCheckingHistory" class="modal">
+    <div class="modal-content">
+      <EmployeeEdit 
+        :recordDateInfo="showRecordInfo.date"
+        :id="String(selectedEmployeeId)" 
+        :name="String(selectedEmployee.name)" 
+        :historyData="showRecordInfo"
+        @go-back="hideEditEmployee"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -177,6 +195,7 @@ import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
 import TimeRecordService from '@/services/TimeRecordService';
+import EmployeeEdit from './TimeRecordHistory.vue';
 import { IMaskDirective } from 'vue-imask';
 import IMask from 'imask';
 import Swal from 'sweetalert2';
@@ -193,11 +212,14 @@ export default {
     ReportButton,
     DocumentArrowDownIcon,
     MagnifyingGlassIcon,
+    EmployeeEdit,
   },
   data() {
     return {
+      isCheckingHistory: false,
       employees: [],
       selectedEmployeeId: "",
+      showRecordInfo: '',
       selectedEmployee: null,
       startDate: '', 
       endDate: '',  
@@ -284,6 +306,13 @@ export default {
   },
   
   methods: {
+    showEditedEmployee(recordRow) {
+      this.isCheckingHistory = true;
+      this.showRecordInfo = recordRow;     
+    },
+    hideEditEmployee() {
+      this.isCheckingHistory = false;
+    },
 
     // Seleciona o funcionáro e busca os pontos
     async searchTimeRecords() {
@@ -387,9 +416,22 @@ export default {
                     id5: dailyRecords[4] ? dailyRecords[4].id : null,
                     saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
                     id6: dailyRecords[5] ? dailyRecords[5].id : null,
+
+                    // Campos de atualização (valores brutos de updatedAt)
+                    entrada1Update: dailyRecords[0] && dailyRecords[0].updatedAt ? dailyRecords[0].updatedAt : null,
+                    saida1Update:   dailyRecords[1] && dailyRecords[1].updatedAt ? dailyRecords[1].updatedAt : null,
+                    entrada2Update: dailyRecords[2] && dailyRecords[2].updatedAt ? dailyRecords[2].updatedAt : null,
+                    saida2Update:   dailyRecords[3] && dailyRecords[3].updatedAt ? dailyRecords[3].updatedAt : null,
+                    entrada3Update: dailyRecords[4] && dailyRecords[4].updatedAt ? dailyRecords[4].updatedAt : null,
+                    saida3Update:   dailyRecords[5] && dailyRecords[5].updatedAt ? dailyRecords[5].updatedAt : null,
+
                     // Calcula totais (funções devem tratar array vazio)
                     totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                     totalSalaryDay: this.calculateDaySalary(dailyRecords),
+
+                    // Verifica se algum dos registros do dia foi editado
+                    isEdited: dailyRecords.some(record => record.isEdit === true),
+
                 };
                 return row;
             });
@@ -689,7 +731,7 @@ export default {
     }
 
     th{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
         border-bottom: 1px solid #71009a;
     }
@@ -700,23 +742,68 @@ export default {
     }
 
     .data{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
     }
 
     .Previsto{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
     }
 
     .marcacao{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
     }
 
     .total-trabalhado{
-        width:12.5%;
+        width:10.6%;
         text-align: center;
+    }
+
+    .registro-edicao {
+        width: 4%;
+        text-align: center;
+        vertical-align: middle; 
+    }
+
+    .registro-edicao div {
+        width: 15px;
+        height: 15px;
+        background-color: #fff269;
+        display: inline-block;
+        vertical-align: middle;
+        border-radius: 100%;
+    }
+
+    .edited-indicator {
+        position: relative;
+        display: inline-block;
+        cursor: pointer; 
+    }
+
+    .tooltip-text {
+        visibility: hidden; 
+        width: 150px; 
+        background-color: rgba(0, 0, 0, 0.7);    
+        font-size: small;
+        color: white;   
+        text-align: center;     
+        border-radius: 5px;     
+        padding: 10px 15px;   
+        position: absolute;     
+        z-index: 1;     
+        bottom: 125%;   
+        left: 50%;  
+        transform: translateX(-50%);        
+        opacity: 0; 
+        transition: opacity 0.3s ease; 
+    }
+
+    .edited-indicator:hover .tooltip-text {
+        visibility: visible; 
+        opacity: 1;
+        
     }
 
     .ponto {
@@ -746,5 +833,33 @@ export default {
         cursor: pointer;
         text-align: center
     }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(3px);
+    }
+
+    .modal-content {
+        width: 30%;
+        max-width: 600px;
+        min-height: 300px;
+        top: 81px;
+        left: 633px;
+        border-radius: 20px;
+        background-color: #FFFFFF;
+        padding: 30px 50px;
+        max-height: 90vh;
+        overflow-y: auto;
+        }
 
 </style>
