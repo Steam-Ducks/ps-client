@@ -110,7 +110,6 @@ export default {
       this.$emit('company-updated');
     },
     handleAction(company) {
-      // Usar o método showEditCompany para abrir o modal de edição
       this.showEditCompany(company.id);
     },
     attachEventListeners() {
@@ -118,16 +117,13 @@ export default {
         const editButtons = document.querySelectorAll('.edit-btn');
         if (editButtons.length > 0) {
           editButtons.forEach((btn) => {
-            // Remover event listeners anteriores para evitar duplicação
             btn.removeEventListener('click', this.handleEditButtonClick);
-            // Adicionar novo event listener
             btn.addEventListener('click', this.handleEditButtonClick);
           });
         }
       });
     },
     handleEditButtonClick(event) {
-      // Encontrar o elemento pai mais próximo com data-id
       let target = event.target;
       while (target && !target.getAttribute('data-id')) {
         target = target.parentElement;
@@ -159,7 +155,6 @@ export default {
     },
   },
   beforeUnmount() {
-    // Remover todos os event listeners para evitar memory leaks
     document.querySelectorAll('.edit-btn').forEach((btn) => {
       btn.removeEventListener('click', this.handleEditButtonClick);
     });
