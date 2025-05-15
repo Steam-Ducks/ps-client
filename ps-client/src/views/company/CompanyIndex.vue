@@ -27,12 +27,6 @@
       </div>
     </div>
 
-    <div v-else-if="isCreatingPosition" class="modal">
-      <div class="modal-content modal-content-position">
-        <PositionCreate @go-back="hideCreatePosition" />
-      </div>
-    </div>
-
     <CompanyList :companies="companies"/>
   </div>
 

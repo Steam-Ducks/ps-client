@@ -66,8 +66,8 @@
 
     <div class="charts-container">
       <div class="chart-box">
-        <h2>Salário por empresa</h2>
-        <canvas id="salaryChart"></canvas>
+        <h2>Horas Trabalhadas</h2>
+        <canvas id="workedHoursChart"></canvas>
       </div>
 
       <div class="chart-box">
@@ -113,7 +113,7 @@ export default {
         totalSalaryLastPeriod: 0
       },
       tempChart: null,
-      salaryChartInstance: null,
+      workedHoursChartInstance: null,
       startDate: firstDay.toISOString().slice(0, 10),
       endDate: lastDay.toISOString().slice(0, 10),
     };
@@ -177,12 +177,12 @@ export default {
       };
 
       this.$nextTick(() => {
-        this.renderSalaryChart();
+        this.renderWorkedHoursChart();
       });
     }, 500),
 
-    renderSalaryChart() {
-      const canvas = document.getElementById('salaryChart');
+    renderWorkedHoursChart() {
+      const canvas = document.getElementById('workedHoursChart');
       if (!canvas) {
         return;
       }
@@ -191,15 +191,15 @@ export default {
         return;
       }
 
-      if (this.salaryChartInstance) {
-        this.salaryChartInstance.destroy();
-        this.salaryChartInstance = null;
+      if (this.workedHoursChartInstance) {
+        this.workedHoursChartInstance.destroy();
+        this.workedHoursChartInstance = null;
       }
 
       const selectedIds = this.selectedCompanies.map(c => c.id);
       const filteredData = this.dashboardAll
           .filter(entry => selectedIds.includes(entry.companyId))
-          .sort((a, b) => b.totalSalary - a.totalSalary);
+          .sort((a, b) => b.totalWorkedHours - a.totalWorkedHours);
 
       canvas.height = filteredData.length * 18;
 
@@ -207,15 +207,16 @@ export default {
         const company = this.companyOptions.find(opt => opt.id === entry.companyId);
         return company ? company.name : 'Unknown';
       });
-      const data = filteredData.map(entry => entry.totalSalary);
 
-      this.salaryChartInstance = new Chart(ctx, {
+      const rawData = filteredData.map(entry => entry.totalWorkedHours);
+
+      this.workedHoursChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels,
           datasets: [{
-            label: 'Total Salary',
-            data,
+            label: 'Horas trabalhadas',
+            data: rawData,
             backgroundColor: '#6F08AF',
             borderRadius: 4
           }]
@@ -224,10 +225,21 @@ export default {
           responsive: true,
           indexAxis: 'y',
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  const value = context.raw;
+                  const totalMinutes = Math.round(value * 60);
+                  const hours = Math.floor(totalMinutes / 60);
+                  const minutes = totalMinutes % 60;
+                  return `${hours}h ${minutes}m`;
+                }
+              }
+            }
           },
           scales: {
-            x: { beginAtZero: true, title: { display: true, text: 'Salário total (R$)' } },
+            x: { beginAtZero: true, title: { display: true, text: 'Horas trabalhadas (h)' } },
             y: { title: { display: false } }
           },
           animation: {
@@ -235,7 +247,6 @@ export default {
           }
         }
       });
-
     }
     ,
     selectAllCompanies() {
