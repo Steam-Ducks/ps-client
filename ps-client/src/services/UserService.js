@@ -97,6 +97,18 @@ const UserService = {
       throw new Error(erroMassage);
     }
   },
+
+  async updateUser(id, updateUser) {
+    try {
+      const response = await axios.put(`${USERS_URL}/${id}`, updateUser, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      const erroMassage = error.response ?.data ?.message || "Erro ao editar usuário"
+      throw new Error(erroMassage);
+    }
+  },
 };
 
 export default UserService;
