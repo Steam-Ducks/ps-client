@@ -82,7 +82,7 @@
           type="text"
           id="salary"
           v-model="employee.salary"
-          v-mask="currencyMask"
+          v-money="moneyConfig"
           placeholder="R$"
           required
       />
@@ -107,6 +107,7 @@ import { validate as validateCpf } from 'gerador-validador-cpf';
 import $ from 'jquery';
 import 'select2';
 import 'select2/dist/css/select2.css';
+import { VMoney } from 'v-money';
 
 
 export default {
@@ -118,6 +119,7 @@ export default {
 
   directives: {
     mask: IMaskDirective,
+    money: VMoney, 
   },
 
   emits: ['employee-created'],
@@ -129,7 +131,7 @@ export default {
         cpf: '',
         company_id: null,
         position_id: null,
-        salary: '',
+        salary: '0,00',
         photo: null,
         start_date: null,
       },
@@ -142,9 +144,12 @@ export default {
       cpfMask: {
         mask: '000.000.000-00',
       },
-      currencyMask: {
-        mask: Number,
-        scale: 2,
+      moneyConfig: {
+        decimal: ',',
+        thousands: '.',
+        prefix: 'R$ ',
+        precision: 2,
+        masked: false
       },
       selectedFile: null,
     };
@@ -217,6 +222,8 @@ export default {
       }
 
       try {
+        const numericValue = this.employee.salary.replace(/[^\d,]/g, '').replace(',', '.')     
+
         const photoUrl = await EmployeeService.uploadEmployeePhoto(this.selectedFile);
 
         const employeeToSubmit = {
@@ -224,7 +231,7 @@ export default {
           cpf: this.employee.cpf,
           companyId: this.employee.company_id,
           positionId: this.employee.position_id,
-          salary: parseFloat(this.employee.salary),
+          salary: parseFloat(numericValue),
           photo: photoUrl,
           startDate: this.employee.start_date,
         };
@@ -345,4 +352,7 @@ input[type="date"]:invalid{
   color: rgb(153,153,153);
 }
 
+.form-group input {
+  font-family: Nunito;
+}
 </style>

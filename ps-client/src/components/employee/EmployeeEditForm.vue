@@ -83,7 +83,7 @@
           type="text"
           id="salary"
           v-model="employee.salary"
-          v-mask="currencyMask"
+          v-money="moneyConfig"
           placeholder="R$"
           required
       />
@@ -109,6 +109,7 @@ import { IMaskDirective } from 'vue-imask';
 import $ from 'jquery';
 import 'select2';
 import 'select2/dist/css/select2.css';
+import { VMoney } from 'v-money';
 
 
 export default {
@@ -120,6 +121,7 @@ export default {
 
   directives: {
     mask: IMaskDirective,
+    money: VMoney, 
   },
 
   props: {
@@ -139,7 +141,7 @@ export default {
         cpf: '',
         company_id: null,
         position_id: null,
-        salary: '',
+        salary: '0,00',
         photo: null,
         start_date: null,
       },
@@ -152,9 +154,12 @@ export default {
       cpfMask: {
         mask: '000.000.000-00',
       },
-      currencyMask: {
-        mask: Number,
-        scale: 2,
+      moneyConfig: {
+        decimal: ',',
+        thousands: '.',
+        prefix: 'R$ ',
+        precision: 2,
+        masked: false
       },
       selectedFile: null,
       photoChanged: false,
@@ -228,7 +233,7 @@ export default {
           cpf: employeeData.cpf,
           company_id: parseInt(employeeData.company.id),
           position_id: parseInt(employeeData.position.id),
-          salary: employeeData.salary.toString(),
+          salary: (employeeData.salary * 100).toString(),
           photo: employeeData.photo,
           start_date: employeeData.startDate ? employeeData.startDate : null,
         };
@@ -303,6 +308,8 @@ export default {
       try {
         let photoUrl = this.employee.photo;
 
+        const numericValue = this.employee.salary.replace(/[^\d,]/g, '').replace(',', '.')
+
         // Preparar os dados para envio
         const prepareData = async () => {
           // Só faz upload da foto se uma nova foi selecionada
@@ -320,7 +327,7 @@ export default {
             cpf: this.employee.cpf,
             companyId: this.employee.company_id,
             positionId: this.employee.position_id,
-            salary: parseFloat(this.employee.salary),
+            salary: parseFloat(numericValue),
             photo: photoUrl,
             startDate: this.employee.start_date,
           };
@@ -484,6 +491,10 @@ input:disabled {
 
 input[type="date"]:invalid {
   color: rgb(153, 153, 153);
+}
+
+.form-group input {
+  font-family: Nunito;
 }
 
 </style>
