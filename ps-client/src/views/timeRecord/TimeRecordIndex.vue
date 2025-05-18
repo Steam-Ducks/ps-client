@@ -226,7 +226,7 @@ export default {
       processedTimeRecords: [],
       marcacaoCount: 0,
       timeMask: {
-        mask: 'HH:MM',
+        mask: 'HH:MM' || '--:--',
         lazy: false, 
         blocks: {
           HH: {
@@ -467,68 +467,134 @@ export default {
 
         const newTimeValue = event.target.value.trim();
 
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (!timeRegex.test(newTimeValue)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Formato inválido',
-                text: 'Por favor, insira a hora no formato HH:MM (ex: 08:30).',
-                timer: 2500,
-                showConfirmButton: false
-            });
+        const isTimeValueEffectivelyEmpty = newTimeValue === '--:--' || newTimeValue === '';
 
-            return;
-        }
-
-        const newDateTime = `${recordDate}T${newTimeValue}:00`;
-
-        Swal.fire({
-            title: 'Atualizando...',
-            text: 'Aguarde enquanto o registro é atualizado.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        try{
-          if (recordId) {
-
-            await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Ponto atualizado!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-
-            }else {
-
-                const newRecordData = {
-                    employeeId: this.selectedEmployeeId, 
-                    dateTime: newDateTime
-                };
-                await TimeRecordService.createTimeRecord(newRecordData);
+        if (!isTimeValueEffectivelyEmpty) {
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            if (!timeRegex.test(newTimeValue)) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Ponto registrado!',
-                    showConfirmButton: false,
-                    timer: 1500
+                    icon: 'error',
+                    title: 'Formato inválido',
+                    text: 'Por favor, insira a hora no formato HH:MM (ex: 08:30).',
+                    timer: 2500,
+                    showConfirmButton: false
                 });
+                return;
+            }
+        }
+        let operationCompleted = false;
+        
 
+        try {
+            if (recordId) {
+                if (isTimeValueEffectivelyEmpty) {
+                    const result = await Swal.fire({
+                        title: "Quer realmente apagar este ponto?",
+                        text: "Você não poderá reverter essa alteração!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sim, deletar!",
+                        cancelButtonText: "Cancelar"
+                    });
+
+                    if (result.isConfirmed) {
+                         Swal.fire({ 
+                            title: 'Removendo...',
+                            text: 'Aguarde enquanto o registro é removido.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        await TimeRecordService.deleteTimeRecordById(recordId);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Ponto removido!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        operationCompleted = true;
+                    } else {
+                        operationCompleted = true; 
+                    }
+                } else {
+                    Swal.fire({ 
+                        title: 'Atualizando...',
+                        text: 'Aguarde enquanto o registro é atualizado.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    const newDateTime = `${recordDate}T${newTimeValue}:00`;
+                    await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
+                   
+        
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Ponto atualizado!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                 operationCompleted = true;
+               }
+            } else {
+                
+                if (!isTimeValueEffectivelyEmpty) {
+                     Swal.fire({ 
+                        title: 'Registrando...',
+                        text: 'Aguarde enquanto o novo ponto é registrado.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    const newDateTime = `${recordDate}T${newTimeValue}:00`;
+                    const newRecordData = {
+                        employeeId: this.selectedEmployeeId,
+                        dateTime: newDateTime
+                    };
+                    await TimeRecordService.createTimeRecord(newRecordData);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Ponto registrado!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    operationCompleted = true;
+                }
             }
 
-            await this.searchTimeRecords();
+            if (operationCompleted) {
+                await this.searchTimeRecords();
+            }
 
-        }catch(error){
-            console.error("Erro ao atualizar o registro de ponto:", error);
+        } catch (error) {
+            console.error("Erro ao processar o registro de ponto:", error);
+            let errorMessage = 'Não foi possível concluir a operação.';
+            let errorTitle = 'Erro ao processar';
+
+            if (error.response) {
+                if (error.response.status === 403) {
+                    errorMessage = 'Você não tem permissão para realizar esta ação. Verifique suas credenciais ou contate o administrador.';
+                    errorTitle = 'Acesso Negado';
+                } else if (error.response.status === 404) {
+                    errorMessage = 'O registro de ponto não foi encontrado. Pode ter sido removido ou a URL da API está incorreta.';
+                    errorTitle = 'Não Encontrado';
+                } else if (error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+            }
             Swal.fire({
                 icon: 'error',
-                title: 'Erro ao atualizar',
-                text: error?.response?.data?.message || 'Não foi possível atualizar o registro.',
-                showConfirmButton: true 
-            });
+                 title: errorTitle,
+                text: errorMessage,
+                showConfirmButton: true
+           });
         }
     },
 
