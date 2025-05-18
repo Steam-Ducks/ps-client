@@ -45,6 +45,7 @@ export default {
   background-color: #fff;
   border-bottom: 1px solid #ccc;
   position: fixed;
+  z-index: 1;
 }
 
 .icon {

@@ -30,7 +30,13 @@
     </div>
   </div>
 
-  <UserList :users="users"/>
+  <div v-if="isEditingUser" class="modal">
+    <div class="modal-content">
+      <UserEdit :id="String(selectedUserId)" @go-back="hideEditUser" @user-updated="fetchUser"/>
+    </div>
+  </div>
+
+  <UserList :users="users" @edit-user="showEditUser"/>
     
   
 </template>
@@ -42,6 +48,7 @@ import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import UserCreate from './UserCreate.vue';  
 import UserList from '@/components/users/UserList.vue';
 import UserService from '@/services/UserService';
+import UserEdit from './UserEdit.vue';
 
 export default {
   name: 'UserIndex',
@@ -51,12 +58,15 @@ export default {
     CreateButton,
     UserCreate,
     UserList,
+    UserEdit,
   },
   data() {
     return {
       isLoading: true,
       isCeatingUser: false,
       users: [], 
+      isEditingUser: false,
+      selectedUserId: null,
     };
   },
   mounted() {
@@ -71,6 +81,14 @@ export default {
     },
     hideCreateUser() {
       this.isCeatingUser = false;
+    },
+    showEditUser(userId) {
+      this.selectedUserId = userId;
+      this.isEditingUser = true;
+    },
+    hideEditUser() {
+      this.isEditingUser = false;
+      this.selectedUserId = null;
     },
     async fetchUser() {
       try {
