@@ -71,14 +71,23 @@
       </div>
 
       <div class="chart-box">
-        <h2>exemplo 2</h2>
-        <canvas id="tempchar"></canvas>
+        <h2>Novos Funcionários por empresa</h2>
+        <canvas id="newEmployeesChart"></canvas>
       </div>
+      <!-- removed for now
+      <div class="chart-box">
+        <h2>Registros de ponto alterados</h2>
+        <canvas id="editedTimeRecords"></canvas>
+      </div>
+    -->
+
     </div>
   </div>
 </template>
 <script>
 import { Chart } from 'chart.js/auto';
+import 'chartjs-adapter-date-fns';
+import { ptBR } from 'date-fns/locale';
 import Card from '@/components/common/Card.vue';
 import UserService from '@/services/UserService';
 import Multiselect from 'vue-multiselect';
@@ -128,9 +137,6 @@ export default {
     selectedCompanies: 'updateDashboard'
   },
   methods: {
-    loading() {
-      this.isLoading = true;
-    },
     loaded() {
       this.isLoading = false;
     },
@@ -166,8 +172,10 @@ export default {
       const totalEmployees = filteredData.reduce((sum, entry) => sum + (entry.totalEmployees || 0), 0);
       const totalSalary = filteredData.reduce((sum, entry) => sum + (entry.totalSalary || 0), 0);
       const totalSalaryLastPeriod = filteredData.reduce((sum, entry) => sum + (entry.totalSalaryLastPeriod || 0), 0);
-      const newEmployees = filteredData.reduce((sum, entry) => sum + (entry.newEmployees || 0), 0);
-
+      const newEmployees = filteredData.reduce((sum, entry) => {
+        const employeeCounts = Object.values(entry.newEmployees || {});
+        return sum + employeeCounts.reduce((subSum, count) => subSum + count, 0);
+      }, 0);
       this.cardData = {
         selectedCompanies: selectedIds.length,
         totalEmployees,
@@ -178,6 +186,10 @@ export default {
 
       this.$nextTick(() => {
         this.renderWorkedHoursChart();
+        /* removed for now
+        this.renderEditedTimeRecordsChart();
+         */
+        this.renderNewEmployeesChart();
       });
     }, 500),
 
@@ -201,7 +213,7 @@ export default {
           .filter(entry => selectedIds.includes(entry.companyId))
           .sort((a, b) => b.totalWorkedHours - a.totalWorkedHours);
 
-      canvas.height = filteredData.length * 18;
+      canvas.height = Math.max(filteredData.length * 18, 200);
 
       const labels = filteredData.map(entry => {
         const company = this.companyOptions.find(opt => opt.id === entry.companyId);
@@ -247,8 +259,237 @@ export default {
           }
         }
       });
-    }
-    ,
+    },
+    /* removed for now
+    renderEditedTimeRecordsChart() {
+      const canvas = document.getElementById('editedTimeRecords');
+      const hoursChartCanvas = document.getElementById('workedHoursChart');
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      if (this.editedTimeRecordsChartInstance) {
+        this.editedTimeRecordsChartInstance.destroy();
+      }
+
+      canvas.height = hoursChartCanvas ? hoursChartCanvas.height : 300;
+
+      const selectedIds = this.selectedCompanies.map(c => c.id);
+
+      const allDates = new Set();
+      this.dashboardAll.forEach(entry => {
+        if (!selectedIds.includes(entry.companyId)) return;
+        Object.keys(entry.manualChangesByDate || {}).forEach(d => allDates.add(d));
+      });
+
+      let newStartDate = new Date(this.startDate);
+      newStartDate.setDate(newStartDate.getDate() - 3);
+      allDates.add(newStartDate.toISOString().slice(0, 10));
+
+      let newEndDate = new Date(this.endDate);
+      newEndDate.setDate(newEndDate.getDate() + 3);
+      allDates.add(newEndDate.toISOString().slice(0, 10));
+
+      const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+      const dateInfo = {};
+      sortedDates.forEach(date => {
+        dateInfo[date] = { total: 0, details: [] };
+      });
+
+      this.dashboardAll.forEach(entry => {
+        if (!selectedIds.includes(entry.companyId)) return;
+        const name = this.companyOptions.find(c => c.id === entry.companyId)?.name || `ID ${entry.companyId}`;
+        Object.entries(entry.manualChangesByDate || {}).forEach(([date, count]) => {
+          if (!dateInfo[date]) return;
+          dateInfo[date].total += count;
+          dateInfo[date].details.push({ name, count });
+        });
+      });
+
+      const data = sortedDates.map(date => ({ x: date, y: dateInfo[date].total }));
+
+      this.editedTimeRecordsChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [{
+            label: 'Total de alterações',
+            data,
+            borderColor: '#6F08AF',
+            borderWidth: 3,
+            pointRadius: 2.8,
+            fill: false,
+            tension: 0.15
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'nearest',
+              callbacks: {
+                title: (items) => {
+                  const dateVal = items[0].parsed.x;
+                  const dateObj = new Date(dateVal);
+                  return dateObj.toLocaleDateString('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                  });
+                },
+                label: (ctx) => {
+                  const dateVal = ctx.parsed.x;
+                  const dateKey = new Date(dateVal).toISOString().slice(0, 10);
+                  const info = dateInfo[dateKey] || { total: 0 };
+                  return `Total: ${info.total}`;
+                },
+                afterBody: (ctxItems) => {
+                  const dateVal = ctxItems[0].parsed.x;
+                  const dateKey = new Date(dateVal).toISOString().slice(0, 10);
+                  const info = dateInfo[dateKey] || { details: [] };
+                  return info.details.map(d => `• ${d.name}: ${d.count}`);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                parser: 'yyyy-MM-dd',
+                unit: 'day',
+                displayFormats: { day: 'dd/MM' }
+              },
+              adapters: { date: { locale: ptBR } },
+              title: { display: true, text: 'Data' },
+              min: newStartDate.toISOString().slice(0, 10),
+              max: newEndDate.toISOString().slice(0, 10),
+            },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Número de alterações' }
+            }
+          }
+        }
+      });
+    },*/
+
+    renderNewEmployeesChart() {
+      const canvas = document.getElementById('newEmployeesChart');
+      const hoursChartCanvas = document.getElementById('workedHoursChart');
+      if (!canvas || !hoursChartCanvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      if (this.newEmployeesChartInstance) {
+        this.newEmployeesChartInstance.destroy();
+      }
+
+      canvas.height = hoursChartCanvas.height;
+
+      const selectedIds = this.selectedCompanies.map(c => c.id);
+
+      const allDates = new Set();
+      this.dashboardAll.forEach(entry => {
+        if (!selectedIds.includes(entry.companyId)) return;
+        Object.keys(entry.newEmployees || {}).forEach(d => allDates.add(d));
+      });
+
+      let newStartDate = new Date(this.startDate);
+      newStartDate.setDate(newStartDate.getDate() - 3);
+      allDates.add(newStartDate.toISOString().slice(0, 10));
+
+      let newEndDate = new Date(this.endDate);
+      newEndDate.setDate(newEndDate.getDate() + 3);
+      allDates.add(newEndDate.toISOString().slice(0, 10));
+
+      const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+      const dateInfo = {};
+      sortedDates.forEach(date => {
+        dateInfo[date] = { total: 0, details: [] };
+      });
+
+      this.dashboardAll.forEach(entry => {
+        if (!selectedIds.includes(entry.companyId)) return;
+        const name = this.companyOptions.find(c => c.id === entry.companyId)?.name || `ID ${entry.companyId}`;
+        Object.entries(entry.newEmployees || {}).forEach(([date, count]) => {
+          if (!dateInfo[date]) return;
+          dateInfo[date].total += count;
+          dateInfo[date].details.push({ name, count });
+        });
+      });
+
+      const data = sortedDates.map(date => ({ x: date, y: dateInfo[date].total }));
+
+      this.newEmployeesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [{
+            label: 'Novos Funcionários',
+            data,
+            borderColor: '#6F08AF',
+            borderWidth: 3,
+            pointRadius: 2.8,
+            fill: false,
+            tension: 0.15
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'nearest',
+              callbacks: {
+                title: (items) => {
+                  const dateVal = items[0].parsed.x;
+                  const dateObj = new Date(dateVal);
+                  return dateObj.toLocaleDateString('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                  });
+                },
+                label: (ctx) => {
+                  const dateVal = ctx.parsed.x;
+                  const dateKey = new Date(dateVal).toISOString().slice(0, 10);
+                  const info = dateInfo[dateKey] || { total: 0 };
+                  return `Total: ${info.total}`;
+                },
+                afterBody: (ctxItems) => {
+                  const dateVal = ctxItems[0].parsed.x;
+                  const dateKey = new Date(dateVal).toISOString().slice(0, 10);
+                  const info = dateInfo[dateKey] || { details: [] };
+                  return info.details.map(d => `• ${d.name}: ${d.count}`);
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              offset: true,
+              time: {
+                parser: 'yyyy-MM-dd',
+                unit: 'day',
+                displayFormats: { day: 'dd/MM' }
+              },
+              adapters: { date: { locale: ptBR } },
+              title: { display: true, text: 'Data' },
+              min: newStartDate.toISOString().slice(0, 10),
+              max: newEndDate.toISOString().slice(0, 10)
+            },
+            y: {
+              beginAtZero: true,
+              title: { display: true, text: 'Número de Novos Funcionários' },
+              ticks: {
+                stepSize: 1,
+              }
+            }
+          }
+        }
+      });
+    },
     selectAllCompanies() {
       this.selectedCompanies = [...this.companyOptions];
     },
@@ -325,20 +566,20 @@ export default {
 .filters .actions {
   margin-bottom: 0.5rem;
   display: flex;
-  gap: 6px;
+  gap: 1rem;
   justify-content: flex-end;
 }
 
 .cards-container {
   display: flex;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
 }
 
 .charts-container {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
@@ -353,6 +594,7 @@ export default {
 canvas {
   max-width: 100%;
   height: auto;
+  max-height: 500px;
 }
 
 .multiselect {
