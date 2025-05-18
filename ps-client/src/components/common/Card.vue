@@ -35,7 +35,7 @@ export default {
   flex: 1 1 20%;
   background-color: #fff;
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.9rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -43,7 +43,7 @@ export default {
   color: #9b00ff;
   font-weight: 600;
   font-size: 0.9rem;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.2rem;
 }
 
 .card-value {
