@@ -32,7 +32,8 @@
 
         
         <div class="button-container">
-        <CreateButton> Editar </CreateButton>
+          <CreateButton type="button" @click="deactivateUser" class="deactivate-button">Desativar</CreateButton>
+          <CreateButton> Editar </CreateButton>
         </div>
       
       <div v-if="errorMessage" class="error-message">
@@ -91,6 +92,26 @@ export default {
   },
 
   methods: {
+
+    async deactivateUser() {
+      this.user.isActive = false;
+      try {
+        await UserService.updateUser(this.user.id, this.user);
+        Swal.fire({
+          icon: 'success',
+          title: 'Usuário desativado',
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao desativar usuário',
+          text: error.message || 'Ocorreu um erro ao tentar desativar o usuário.',
+          showConfirmButton: false,
+          timer: 3500,
+        });
+        console.error('Erro ao desativar usuário:', error);
+      }
+    },
 
     async fetchUserData() {
       try {
@@ -227,5 +248,18 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  gap: 10px;
 }
+
+.deactivate-button {
+  background-color: #e2e8f0;
+  color: black;
+}
+
+.deactivate-button:hover {
+  background-color: #eee8e8;
+  color: black;
+}
+
+
 </style>

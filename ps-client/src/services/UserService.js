@@ -109,6 +109,7 @@ const UserService = {
       throw new Error(erroMassage);
     }
   },
+
 };
 
 export default UserService;
