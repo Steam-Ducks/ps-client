@@ -33,7 +33,7 @@
         
         <div class="button-container">
           <CreateButton type="button" @click="deactivateUser" class="deactivate-button">Desativar</CreateButton>
-          <CreateButton> Editar </CreateButton>
+          <CreateButton class="update-button"> Editar </CreateButton>
         </div>
       
       <div v-if="errorMessage" class="error-message">
@@ -246,20 +246,46 @@ export default {
 
   .button-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Match EmployeeEditForm */
   margin-top: 20px;
-  gap: 10px;
+  width: 100%; /* Match EmployeeEditForm */
+  /* gap: 10px; Will use margin on buttons like EmployeeEditForm */
 }
 
-.deactivate-button {
+/* Style for Desativar button, matching EmployeeEditForm's .deactivate-button */
+:deep(.deactivate-button) {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
   background-color: #e2e8f0;
-  color: black;
+  color: #1f2937; /* Match EmployeeEditForm */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  height: 40px;
 }
 
-.deactivate-button:hover {
-  background-color: #eee8e8;
-  color: black;
+:deep(.deactivate-button):hover {
+  background-color: #cbd5e1; /* Match EmployeeEditForm */
 }
 
+/* Style for Editar (Update) button, matching EmployeeEditForm's :deep(.update-button) */
+:deep(.update-button) {
+  flex: 1;
+  margin-right: 10px; /* EmployeeEditForm's update button also has this */
+  padding: 10px;
+  background-color: #6F08AF;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  height: 40px;
+}
 
 </style>
