@@ -32,7 +32,8 @@
 
         
         <div class="button-container">
-        <CreateButton> Editar </CreateButton>
+          <CreateButton type="button" @click="deactivateUser" class="deactivate-button">Desativar</CreateButton>
+          <CreateButton class="update-button"> Editar </CreateButton>
         </div>
       
       <div v-if="errorMessage" class="error-message">
@@ -91,6 +92,26 @@ export default {
   },
 
   methods: {
+
+    async deactivateUser() {
+      this.user.isActive = false;
+      try {
+        await UserService.updateUser(this.user.id, this.user);
+        Swal.fire({
+          icon: 'success',
+          title: 'Usuário desativado',
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao desativar usuário',
+          text: error.message || 'Ocorreu um erro ao tentar desativar o usuário.',
+          showConfirmButton: false,
+          timer: 3500,
+        });
+        console.error('Erro ao desativar usuário:', error);
+      }
+    },
 
     async fetchUserData() {
       try {
@@ -225,7 +246,46 @@ export default {
 
   .button-container {
   display: flex;
-  justify-content: center;
+  justify-content: space-between; /* Match EmployeeEditForm */
   margin-top: 20px;
+  width: 100%; /* Match EmployeeEditForm */
+  /* gap: 10px; Will use margin on buttons like EmployeeEditForm */
 }
+
+/* Style for Desativar button, matching EmployeeEditForm's .deactivate-button */
+:deep(.deactivate-button) {
+  flex: 1;
+  margin-right: 10px;
+  padding: 10px;
+  background-color: #e2e8f0;
+  color: #1f2937; /* Match EmployeeEditForm */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  height: 40px;
+}
+
+:deep(.deactivate-button):hover {
+  background-color: #cbd5e1; /* Match EmployeeEditForm */
+}
+
+/* Style for Editar (Update) button, matching EmployeeEditForm's :deep(.update-button) */
+:deep(.update-button) {
+  flex: 1;
+  margin-right: 10px; /* EmployeeEditForm's update button also has this */
+  padding: 10px;
+  background-color: #6F08AF;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  height: 40px;
+}
+
 </style>
