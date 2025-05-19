@@ -18,10 +18,14 @@ const UserService = {
     const isAdmin = localStorage.getItem('isAdmin');
     return isAdmin === 'true';
   },
+  getUsername() {
+    return localStorage.getItem('username');
+  },
 
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('isAdmin');
+    localStorage.removeItem('username');
   },
 
   getAuthHeaders() {
@@ -32,7 +36,7 @@ const UserService = {
   async login(credentials) {
     try {
       const response = await axios.post(`${AUTH_URL}/login`, credentials);
-      const { accessToken, isAdmin } = response.data;
+      const { accessToken, isAdmin, username } = response.data;
 
       if (!accessToken) {
         throw new Error('No access token received from the backend');
@@ -40,6 +44,7 @@ const UserService = {
 
       localStorage.setItem('token', accessToken);
       localStorage.setItem('isAdmin', isAdmin);
+      localStorage.setItem('username', username);
 
       return response.data;
     } catch (error) {

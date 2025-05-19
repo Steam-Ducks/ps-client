@@ -18,10 +18,15 @@
       </CreateButton>
     </div>
   </div>
-  
-  <div v-if="isCeatingUser" class="modal">
-    <div class="modal-content">
-      <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
+  <div class="loading-overlay" v-if="isLoading">
+    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
+  </div>
+
+  <div v-else>
+    <div v-if="isCeatingUser" class="modal">
+      <div class="modal-content">
+        <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
+      </div>
     </div>
   </div>
 
@@ -57,6 +62,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       isCeatingUser: false,
       users: [], 
       isEditingUser: false,
@@ -67,6 +73,9 @@ export default {
     this.fetchUser(); 
   },
   methods: {
+    loaded() {
+      this.isLoading = false;
+    },
     showCreateUser() {
       this.isCeatingUser = true;
     },
@@ -84,7 +93,8 @@ export default {
     async fetchUser() {
       try {
         const data = await UserService.getAllUsers();
-        this.users = data; 
+        this.users = data;
+        this.loaded()
       } catch (error) {
         console.error('Erro ao buscar empresas:', error);
       }
