@@ -6,7 +6,6 @@
     <h1> Espelho de ponto </h1>
     <p> Acompanhe abaixo os registros de ponto dos funcionários. Para visualizar os registros de um colaborador específico, selecione-o na barra abaixo. </p>
   </div>
-updateTimeRecord
   <div class="tools">
     <select class="search" ref="employeeSelect" v-model="selectedEmployeeId">
         <option 
