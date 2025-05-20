@@ -74,6 +74,19 @@ const UserService = {
     }
   },
 
+  async deletedUsers(){
+    try{
+      const response = await axios.get(`${USERS_URL}/inactive`, {
+        headers: this.getAuthHeaders(),
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao buscar usuários inativos:', error);
+      const errorMessage = error.response?.data?.message || "Erro ao buscar usuários inativos.";
+      throw new Error(errorMessage);
+    }
+  },
+
   async getUserById(userId) {
     try {
       const response = await axios.get(`${USERS_URL}/${userId}`, {
@@ -93,8 +106,8 @@ const UserService = {
       });
       return response.data;
     } catch (error) {
-      const erroMassage = error.response ?.data ?.message || "Erro ao criar usuario"
-      throw new Error(erroMassage);
+      const errorMessage = error.response?.data?.message || "Erro ao criar usuário";
+      throw new Error(errorMessage);
     }
   },
 
@@ -105,8 +118,8 @@ const UserService = {
       });
       return response.data;
     } catch (error) {
-      const erroMassage = error.response ?.data ?.message || "Erro ao editar usuário"
-      throw new Error(erroMassage);
+      const errorMessage = error.response?.data?.message || "Erro ao editar usuário";
+      throw new Error(errorMessage);
     }
   },
 
