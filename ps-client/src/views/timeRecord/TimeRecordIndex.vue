@@ -6,7 +6,6 @@
     <h1> Espelho de ponto </h1>
     <p> Acompanhe abaixo os registros de ponto dos funcionários. Para visualizar os registros de um colaborador específico, selecione-o na barra abaixo. </p>
   </div>
-
   <div class="tools">
     <select class="search" ref="employeeSelect" v-model="selectedEmployeeId">
         <option 
@@ -226,7 +225,7 @@ export default {
       processedTimeRecords: [],
       marcacaoCount: 0,
       timeMask: {
-        mask: 'HH:MM',
+        mask: 'HH:MM' || '--:--',
         lazy: false, 
         blocks: {
           HH: {
@@ -467,68 +466,160 @@ export default {
 
         const newTimeValue = event.target.value.trim();
 
-        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
-        if (!timeRegex.test(newTimeValue)) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Formato inválido',
-                text: 'Por favor, insira a hora no formato HH:MM (ex: 08:30).',
-                timer: 2500,
-                showConfirmButton: false
-            });
+        const isTimeValueEffectivelyEmpty = newTimeValue === '--:--' || newTimeValue === '';
 
-            return;
-        }
-
-        const newDateTime = `${recordDate}T${newTimeValue}:00`;
-
-        Swal.fire({
-            title: 'Atualizando...',
-            text: 'Aguarde enquanto o registro é atualizado.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        try{
-          if (recordId) {
-
-            await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
-
-            Swal.fire({
-                icon: 'success',
-                title: 'Ponto atualizado!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-
-            }else {
-
-                const newRecordData = {
-                    employeeId: this.selectedEmployeeId, 
-                    dateTime: newDateTime
-                };
-                await TimeRecordService.createTimeRecord(newRecordData);
+        if (!isTimeValueEffectivelyEmpty) {
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+            if (!timeRegex.test(newTimeValue)) {
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Ponto registrado!',
-                    showConfirmButton: false,
-                    timer: 1500
+                    icon: 'error',
+                    title: 'Formato inválido',
+                    text: 'Por favor, insira a hora no formato HH:MM (ex: 08:30).',
+                    timer: 2500,
+                    showConfirmButton: false
                 });
+                return;
+            }
+        }
+        let operationCompleted = false;
+        
 
+        try {
+            if (recordId) {
+                if (isTimeValueEffectivelyEmpty) {
+                    const result = await Swal.fire({
+                        title: "Quer realmente apagar este ponto?",
+                        text: "Você não poderá reverter essa alteração!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#6F08AF",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sim, deletar!",
+                        cancelButtonText: "Cancelar"
+                    });
+
+                    if (result.isConfirmed) {
+                         Swal.fire({ 
+                            title: 'Removendo...',
+                            text: 'Aguarde enquanto o registro é removido.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        await TimeRecordService.deleteTimeRecordById(recordId);
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Ponto removido!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        operationCompleted = true;
+                    }
+                } else {
+                    const newDateTime = `${recordDate}T${newTimeValue}:00`;
+
+                    const confirmationResult = await Swal.fire({
+                        title: "Você tem certeza?",
+                        text: "Você não poderá reverter essa ação",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#6F08AF",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sim, editar!",
+                        cancelButtonText: "Cancelar"
+                    });
+
+                    if (confirmationResult.isConfirmed) {
+                        Swal.fire({
+                            title: 'Atualizando...',
+                            text: 'Aguarde enquanto o registro é atualizado.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
+
+                        Swal.fire({
+                            title: "Editado!",
+                            text: "Seu ponto foi editado!",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        operationCompleted = true;
+                    }
+               }
+            } else {
+                
+                if (!isTimeValueEffectivelyEmpty) { // Only proceed if there's a new time value
+                    const newDateTime = `${recordDate}T${newTimeValue}:00`;
+                    const newRecordData = {
+                        employeeId: this.selectedEmployeeId,
+                        dateTime: newDateTime
+                    };
+                    const confirmationResult = await Swal.fire({
+                        title: "Confirmar novo ponto?",
+                        text: `Deseja registrar o ponto às ${newTimeValue} para o dia ${this.formatDate(recordDate)}?`,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#6F08AF",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sim, registrar!",
+                        cancelButtonText: "Cancelar"
+                    });
+
+                    if (confirmationResult.isConfirmed) {
+                        Swal.fire({
+                            title: 'Registrando...',
+                            text: 'Aguarde enquanto o novo ponto é registrado.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        await TimeRecordService.createTimeRecord(newRecordData);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Ponto registrado!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        operationCompleted = true;
+                    }
+                }
             }
 
-            await this.searchTimeRecords();
+            if (operationCompleted) {
+                await this.searchTimeRecords();
+            }
 
-        }catch(error){
-            console.error("Erro ao atualizar o registro de ponto:", error);
+        } catch (error) {
+            console.error("Erro ao processar o registro de ponto:", error);
+            let errorMessage = 'Não foi possível concluir a operação.';
+            let errorTitle = 'Erro ao processar';
+
+            if (error.response) {
+                if (error.response.status === 403) {
+                    errorMessage = 'Você não tem permissão para realizar esta ação. Verifique suas credenciais ou contate o administrador.';
+                    errorTitle = 'Acesso Negado';
+                } else if (error.response.status === 404) {
+                    errorMessage = 'O registro de ponto não foi encontrado. Pode ter sido removido ou a URL da API está incorreta.';
+                    errorTitle = 'Não Encontrado';
+                } else if (error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+            }
             Swal.fire({
                 icon: 'error',
-                title: 'Erro ao atualizar',
-                text: error?.response?.data?.message || 'Não foi possível atualizar o registro.',
-                showConfirmButton: true 
-            });
+                 title: errorTitle,
+                text: errorMessage,
+                showConfirmButton: true
+           });
         }
     },
 

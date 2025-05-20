@@ -103,7 +103,21 @@ const TimeRecordService = {
         const errorMessage = error.response?.data?.message || error.message || 'Erro desconhecido ao criar o registro de ponto.';
         throw new Error(errorMessage);
       }
-    }
+    },
+
+    async deleteTimeRecordById(id) {
+      try {
+        const response = await axios.delete(`${API_URL}/${id}`, {
+          headers: UserService.getAuthHeaders(),
+        });
+        console.log('Registro de ponto deletado com sucesso:', response.data);
+        return response.data; 
+      } catch (error) {
+        console.error('Erro ao criar registro de ponto:', error);
+        const errorMessage = error.response?.data?.message || error.message || 'Erro desconhecido ao criar o registro de ponto.';
+        throw new Error(errorMessage);
+      }
+    },
 
 }
 
