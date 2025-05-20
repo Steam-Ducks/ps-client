@@ -16,24 +16,19 @@
       </CreateButton>
     </div>
   </div>
-  
-  <div v-if="isCreatingCompany" class="modal">
-    <div class="modal-content">
-      <CompanyCreate @go-back="hideCreateCompany" @company-created="fetchCompanies"/>
-    </div>
+
+  <div class="loading-overlay" v-if="isLoading">
+    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
   </div>
-
-  
-
-  <div v-else-if="isCreatingPosition" class="modal">
-    <div class="modal-content modal-content-position">
-      <PositionCreate @go-back="hideCreatePosition" />
+  <div v-else>
+<div v-if="isCreatingCompany" class="modal">
+      <div class="modal-content">
+        <CompanyCreate @go-back="hideCreateCompany" @company-created="fetchCompanies"/>
+      </div>
     </div>
-  </div>
 
-  <CompanyList :companies="companies" @company-updated="fetchCompanies"/>
-  
-  
+    <CompanyList :companies="companies"/>
+  </div>
 
   
   </template>
@@ -57,6 +52,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       isCreatingCompany: false,
       isCreatingPosition: false,
       companies: [],
@@ -66,6 +62,9 @@ export default {
     this.fetchCompanies(); 
   },
   methods: {
+    loaded() {
+      this.isLoading = false;
+    },
     // ::::::::::::: Company :::::::::::::
     showCreateCompany() {
       this.isCreatingCompany = true;
@@ -78,6 +77,7 @@ export default {
       try {
         const data = await CompanyService.getAllCompanies(); 
         this.companies = data;
+        this.loaded()
       } catch (error) {
         console.error('Erro ao buscar empresas:', error);
       }

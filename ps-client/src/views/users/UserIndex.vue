@@ -18,14 +18,25 @@
       </CreateButton>
     </div>
   </div>
-  
-  <div v-if="isCeatingUser" class="modal">
-    <div class="modal-content">
-      <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
+  <div class="loading-overlay" v-if="isLoading">
+    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
+  </div>
+
+  <div v-else>
+    <div v-if="isCeatingUser" class="modal">
+      <div class="modal-content">
+        <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
+      </div>
     </div>
   </div>
 
-  <UserList :users="users"/>
+  <div v-if="isEditingUser" class="modal">
+    <div class="modal-content">
+      <UserEdit :id="String(selectedUserId)" @go-back="hideEditUser" @user-updated="fetchUser"/>
+    </div>
+  </div>
+
+  <UserList :users="users" @edit-user="showEditUser"/>
     
   
 </template>
@@ -37,6 +48,7 @@ import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import UserCreate from './UserCreate.vue';  
 import UserList from '@/components/users/UserList.vue';
 import UserService from '@/services/UserService';
+import UserEdit from './UserEdit.vue';
 
 export default {
   name: 'UserIndex',
@@ -46,27 +58,43 @@ export default {
     CreateButton,
     UserCreate,
     UserList,
+    UserEdit,
   },
   data() {
     return {
+      isLoading: true,
       isCeatingUser: false,
       users: [], 
+      isEditingUser: false,
+      selectedUserId: null,
     };
   },
   mounted() {
     this.fetchUser(); 
   },
   methods: {
+    loaded() {
+      this.isLoading = false;
+    },
     showCreateUser() {
       this.isCeatingUser = true;
     },
     hideCreateUser() {
       this.isCeatingUser = false;
     },
+    showEditUser(userId) {
+      this.selectedUserId = userId;
+      this.isEditingUser = true;
+    },
+    hideEditUser() {
+      this.isEditingUser = false;
+      this.selectedUserId = null;
+    },
     async fetchUser() {
       try {
         const data = await UserService.getAllUsers();
-        this.users = data; 
+        this.users = data;
+        this.loaded()
       } catch (error) {
         console.error('Erro ao buscar empresas:', error);
       }
