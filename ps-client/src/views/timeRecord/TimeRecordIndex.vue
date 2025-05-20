@@ -6,7 +6,6 @@
     <h1> Espelho de ponto </h1>
     <p> Acompanhe abaixo os registros de ponto dos funcionários. Para visualizar os registros de um colaborador específico, selecione-o na barra abaixo. </p>
   </div>
-
   <div class="tools">
     <select class="search" ref="employeeSelect" v-model="selectedEmployeeId">
         <option 
@@ -493,7 +492,7 @@ export default {
                         text: "Você não poderá reverter essa alteração!",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
+                        confirmButtonColor: "#6F08AF",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Sim, deletar!",
                         cancelButtonText: "Cancelar"
@@ -516,56 +515,82 @@ export default {
                             timer: 1500
                         });
                         operationCompleted = true;
-                    } else {
-                        operationCompleted = true; 
                     }
                 } else {
-                    Swal.fire({ 
-                        title: 'Atualizando...',
-                        text: 'Aguarde enquanto o registro é atualizado.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-                    
                     const newDateTime = `${recordDate}T${newTimeValue}:00`;
-                    await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
-                   
-        
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Ponto atualizado!',
-                        showConfirmButton: false,
-                        timer: 1500
+
+                    const confirmationResult = await Swal.fire({
+                        title: "Você tem certeza?",
+                        text: "Você não poderá reverter essa ação",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#6F08AF",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sim, editar!",
+                        cancelButtonText: "Cancelar"
                     });
 
-                 operationCompleted = true;
+                    if (confirmationResult.isConfirmed) {
+                        Swal.fire({
+                            title: 'Atualizando...',
+                            text: 'Aguarde enquanto o registro é atualizado.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        await TimeRecordService.updateTimeRecord(recordId, { dateTime: newDateTime });
+
+                        Swal.fire({
+                            title: "Editado!",
+                            text: "Seu ponto foi editado!",
+                            icon: "success",
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        operationCompleted = true;
+                    }
                }
             } else {
                 
-                if (!isTimeValueEffectivelyEmpty) {
-                     Swal.fire({ 
-                        title: 'Registrando...',
-                        text: 'Aguarde enquanto o novo ponto é registrado.',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
+                if (!isTimeValueEffectivelyEmpty) { // Only proceed if there's a new time value
                     const newDateTime = `${recordDate}T${newTimeValue}:00`;
                     const newRecordData = {
                         employeeId: this.selectedEmployeeId,
                         dateTime: newDateTime
                     };
-                    await TimeRecordService.createTimeRecord(newRecordData);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Ponto registrado!',
-                        showConfirmButton: false,
-                        timer: 1500
+                    const confirmationResult = await Swal.fire({
+                        title: "Confirmar novo ponto?",
+                        text: `Deseja registrar o ponto às ${newTimeValue} para o dia ${this.formatDate(recordDate)}?`,
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: "#6F08AF",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Sim, registrar!",
+                        cancelButtonText: "Cancelar"
                     });
-                    operationCompleted = true;
+
+                    if (confirmationResult.isConfirmed) {
+                        Swal.fire({
+                            title: 'Registrando...',
+                            text: 'Aguarde enquanto o novo ponto é registrado.',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        await TimeRecordService.createTimeRecord(newRecordData);
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Ponto registrado!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        operationCompleted = true;
+                    }
                 }
             }
 

@@ -32,7 +32,7 @@
     "pdfmake": "^0.2.18",
     "Pontual": "file:",
     "select2": "^4.1.0-rc.0",
-    "sweetalert2": "^11.17.2",
+    "sweetalert2": "^11.21.2",
     "v-money": "^0.8.1",
     "vue": "^3.2.13",
     "vue-imask": "^7.6.1",
