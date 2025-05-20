@@ -493,7 +493,7 @@ export default {
                         text: "Você não poderá reverter essa alteração!",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
+                        confirmButtonColor: "#6F08AF",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Sim, deletar!",
                         cancelButtonText: "Cancelar"
@@ -525,7 +525,7 @@ export default {
                         text: "Você não poderá reverter essa ação",
                         icon: "warning",
                         showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
+                        confirmButtonColor: "#6F08AF",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Sim, editar!",
                         cancelButtonText: "Cancelar"
@@ -561,21 +561,18 @@ export default {
                         employeeId: this.selectedEmployeeId,
                         dateTime: newDateTime
                     };
-
-                    // 1. Show confirmation dialog first
                     const confirmationResult = await Swal.fire({
                         title: "Confirmar novo ponto?",
                         text: `Deseja registrar o ponto às ${newTimeValue} para o dia ${this.formatDate(recordDate)}?`,
                         icon: "question",
                         showCancelButton: true,
-                        confirmButtonColor: "#3085d6",
+                        confirmButtonColor: "#6F08AF",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Sim, registrar!",
                         cancelButtonText: "Cancelar"
                     });
 
                     if (confirmationResult.isConfirmed) {
-                        // 2. User confirmed, now show loading message
                         Swal.fire({
                             title: 'Registrando...',
                             text: 'Aguarde enquanto o novo ponto é registrado.',
@@ -585,10 +582,8 @@ export default {
                             }
                         });
 
-                        // 3. Perform the creation
                         await TimeRecordService.createTimeRecord(newRecordData);
 
-                        // 4. Show success message
                         Swal.fire({
                             icon: 'success',
                             title: 'Ponto registrado!',
@@ -597,8 +592,6 @@ export default {
                         });
                         operationCompleted = true;
                     }
-                    // If user cancels, operationCompleted remains false.
-                    // The input field will retain the new value until the next refresh or manual clearing.
                 }
             }
 
