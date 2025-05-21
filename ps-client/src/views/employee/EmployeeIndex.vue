@@ -60,6 +60,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       isCreatingEmployee: false,
       isEditingEmployee: false,
       selectedEmployeeId: null,
@@ -84,6 +85,9 @@ export default {
     }
   },
   methods: {
+    isLoaded() {
+      this.isLoading = false;
+    },
     showCreateEmployee() {
       this.isCreatingEmployee = true;
     },
@@ -130,7 +134,6 @@ export default {
     },
 
     async fetchAllEmployees() {
-      await this.fetchActiveEmployees();
       await this.fetchActiveEmployees();
       await this.fetchInactiveEmployees();
     }

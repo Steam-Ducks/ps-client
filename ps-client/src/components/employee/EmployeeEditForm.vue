@@ -127,6 +127,7 @@ import { IMaskDirective } from 'vue-imask';
 import $ from 'jquery';
 import 'select2';
 import 'select2/dist/css/select2.css';
+import { VMoney } from 'v-money';
 
 
 export default {
@@ -138,6 +139,7 @@ export default {
 
   directives: {
     mask: IMaskDirective,
+    money: VMoney, 
   },
 
   props: {
@@ -157,7 +159,7 @@ export default {
         cpf: '',
         company_id: null,
         position_id: null,
-        salary: '',
+        salary: '0,00',
         photo: null,
         start_date: null,
         isActive: true, // Novo campo para status
@@ -171,9 +173,12 @@ export default {
       cpfMask: {
         mask: '000.000.000-00',
       },
-      currencyMask: {
-        mask: Number,
-        scale: 2,
+      moneyConfig: {
+        decimal: ',',
+        thousands: '.',
+        prefix: 'R$ ',
+        precision: 2,
+        masked: false
       },
       selectedFile: null,
       photoChanged: false,
@@ -301,6 +306,8 @@ export default {
       try {
         let photoUrl = this.employee.photo;
 
+        const numericValue = this.employee.salary.replace(/[^\d,]/g, '').replace(',', '.')
+
         // Preparar os dados para envio
         const prepareData = async () => {
           // Só faz upload da foto se uma nova foi selecionada
@@ -318,7 +325,7 @@ export default {
             cpf: this.employee.cpf,
             companyId: this.employee.company_id,
             positionId: this.employee.position_id,
-            salary: parseFloat(this.employee.salary),
+            salary: parseFloat(numericValue),
             photo: photoUrl,
             startDate: this.employee.start_date,
             status: this.employee.isActive, // Enviar 'isActive' como 'status' para a API
@@ -484,19 +491,19 @@ input[type="date"]:invalid {
 .radio-group {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaçamento entre os botões de rádio */
-  margin-top: 5px; /* Pequena margem superior para alinhar com outros campos */
+  gap: 15px;
+  margin-top: 5px;
 }
 
 .radio-group label {
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin-bottom: 0; /* Remover margem inferior padrão do label */
-  font-weight: normal; /* Resetar peso da fonte se necessário */
+  margin-bottom: 0;
+  font-weight: normal;
 }
 
 .radio-group input[type="radio"] {
-  margin-right: 5px; /* Espaço entre o rádio e o texto */
+  margin-right: 5px;
 }
 </style>
