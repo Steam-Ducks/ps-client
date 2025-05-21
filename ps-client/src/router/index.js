@@ -9,6 +9,7 @@ import Test from '@/components/Test.vue';
 import LoginPage from '@/views/auth/AuthIndex.vue';
 import admintLayout from "@/layout/AdmintLayout.vue";
 import PositionPage from '@/views/position/PositionIndex.vue';
+import ExportReportPage from '@/views/report/ExportReportIndex.vue';
 
 
 const routes = [
@@ -83,9 +84,20 @@ const routes = [
       }
     ]
   },
-
   {
-    path: '/Test', 
+    path: '/export-report',
+    name: 'ExportReport',
+    component: AdminLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        component: ExportReportPage,
+      },
+    ],
+  },
+  {
+    path: '/Test',
     name: 'Test',
     component: Test,
     meta: { requiresAuth: true },

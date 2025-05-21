@@ -41,11 +41,13 @@
             <div class="date-inputs">
               <div class="date-input-container">
                 <input
-                    type="date"
+                    type="text"
                     v-model="startDate"
                     class="form-control date-input"
-
+                    readonly
+                    @click="openStartDatePicker"
                 />
+                <CalendarIcon class="calendar-icon" @click="openStartDatePicker" />
               </div>
               <span class="date-separator">até</span>
               <div class="date-input-container">
@@ -56,7 +58,7 @@
 
 
                 />
-
+                <CalendarIcon class="calendar-icon" @click="openEndDatePicker" />
               </div>
             </div>
           </div>
@@ -139,7 +141,7 @@
 
 <script>
 import { ref, computed, watch, onMounted } from 'vue';
-import { ArrowRightStartOnRectangleIcon, DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
+import { ArrowRightStartOnRectangleIcon, DocumentArrowDownIcon, CalendarIcon } from '@heroicons/vue/24/solid';
 import UserService from '@/services/UserService';
 import { useRouter } from 'vue-router';
 // Importação comentada para evitar erros de lint enquanto não for utilizada
@@ -151,6 +153,7 @@ export default {
   components: {
     ArrowRightStartOnRectangleIcon,
     DocumentArrowDownIcon,
+    CalendarIcon
   },
 
   setup() {
@@ -329,9 +332,9 @@ export default {
     const confirmDateSelection = () => {
       if (datePickerType.value === 'start') {
         startDate.value = tempDate.value;
-      } else
-
-
+      } else {
+        endDate.value = tempDate.value;
+      }
       closeDatePicker();
     };
 
