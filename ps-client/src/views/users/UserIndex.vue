@@ -129,10 +129,7 @@ export default {
       }
     },
     async fetchUser() {
-      // Sempre busca os usuários ativos
       await this.fetchActiveUsers();
-      // Sempre busca os usuários inativos também após uma criação/edição
-      // para garantir que ambas as listas estejam atualizadas.
       await this.fetchInactiveUsers();
     },
   },

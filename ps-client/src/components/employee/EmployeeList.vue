@@ -47,7 +47,8 @@ export default {
     employees: {
       type: Array,
       required: true,
-    },
+      // default: () => [] // Use default se 'employees' puder ser opcional
+    }
   },
   emits: ['edit-employee'],
   data() {
@@ -99,8 +100,8 @@ export default {
         foto: employee.photo,
         name: employee.name,
         cpf: employee.cpf,
-        position: employee.position.name,
-        company: employee.company.name,
+        position: employee.position ? employee.position.name : 'Não atribuído',
+        company: employee.company ? employee.company.name : 'Não atribuído'
       }));
     },
   },
