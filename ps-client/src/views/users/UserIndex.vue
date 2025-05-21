@@ -22,17 +22,17 @@
       </CreateButton>
     </div>
   </div>
-  <div class="loading-overlay" v-if="isLoading">
+  <!--<div class="loading-overlay" v-if="isLoading">
     <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
   </div>
 
-  <div v-else>
+  <div v-else>-->
     <div v-if="isCeatingUser" class="modal">
       <div class="modal-content">
         <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
       </div>
     </div>
-  </div>
+  <!--</div>-->
 
   <div v-if="isEditingUser" class="modal">
     <div class="modal-content">
