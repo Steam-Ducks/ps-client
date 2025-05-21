@@ -135,7 +135,6 @@ export default {
 
     async fetchAllEmployees() {
       await this.fetchActiveEmployees();
-      await this.fetchActiveEmployees();
       await this.fetchInactiveEmployees();
     }
   }
