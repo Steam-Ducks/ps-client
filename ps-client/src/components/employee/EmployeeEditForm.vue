@@ -491,8 +491,8 @@ input[type="date"]:invalid {
 .radio-group {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaçamento entre os botões de rádio */
-  margin-top: 5px; /* Pequena margem superior para alinhar com outros campos */
+  gap: 15px; 
+  margin-top: 5px; 
 }
 
 .radio-group label {
