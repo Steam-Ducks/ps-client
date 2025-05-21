@@ -22,10 +22,15 @@
       </CreateButton>
     </div>
   </div>
-  
-  <div v-if="isCeatingUser" class="modal">
-    <div class="modal-content">
-      <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
+  <div class="loading-overlay" v-if="isLoading">
+    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
+  </div>
+
+  <div v-else>
+    <div v-if="isCeatingUser" class="modal">
+      <div class="modal-content">
+        <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
+      </div>
     </div>
   </div>
 
@@ -61,6 +66,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       isCeatingUser: false,
       activeUsers: [],
       inactiveUsers: [],
@@ -88,6 +94,9 @@ export default {
     }
   },
   methods: {
+    loaded() {
+      this.isLoading = false;
+    },
     showCreateUser() {
       this.isCeatingUser = true;
     },
