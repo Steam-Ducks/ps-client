@@ -9,10 +9,6 @@
 
     <div class="buttons">
 
-      <ReportButton>
-        <DocumentArrowDownIcon/>
-      </ReportButton> 
-    
       <CreateButton @click="showCreateUser">
         + Novo Usuário
       </CreateButton>
@@ -42,10 +38,8 @@
 </template>
 
 <script>
-import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
-import UserCreate from './UserCreate.vue';  
+import UserCreate from './UserCreate.vue';
 import UserList from '@/components/users/UserList.vue';
 import UserService from '@/services/UserService';
 import UserEdit from './UserEdit.vue';
@@ -53,8 +47,6 @@ import UserEdit from './UserEdit.vue';
 export default {
   name: 'UserIndex',
   components: {
-    ReportButton,
-    DocumentArrowDownIcon,
     CreateButton,
     UserCreate,
     UserList,
