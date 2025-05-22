@@ -16,6 +16,7 @@
               <option value="company-hours">Horas trabalhadas</option>
             </select>
           </div>
+
           <div class="form-group" v-if="requiresPeriod">
             <label>Período</label>
             <div class="date-inputs">
@@ -45,6 +46,13 @@
               </option>
             </select>
           </div>
+          <div class="form-group">
+            <label for="fileFormat">Formato do Arquivo</label>
+            <select id="fileFormat" v-model="form.fileFormat" required>
+              <option value="excel">Excel</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
           <button type="submit" :disabled="!isFormValid">Exportar</button>
         </form>
       </div>
@@ -70,6 +78,7 @@ export default {
   setup(props, { emit }) {
     const form = ref({
       reportType: 'employee-list',
+      fileFormat: 'excel', // Default to Excel
       companyId: null,
       employeeId: null,
       startDate: '',
@@ -140,7 +149,7 @@ export default {
 
         const payload = {
           reportType: form.value.reportType,
-          fileFormat: 'excel',
+          fileFormat: form.value.fileFormat, // Use the selected file format
           companyId: form.value.companyId || null,
           companyName: companies.value.find(c => c.id === form.value.companyId)?.name || '',
           employeeId: form.value.employeeId || null,
@@ -179,7 +188,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .modal-overlay {
   position: fixed;
