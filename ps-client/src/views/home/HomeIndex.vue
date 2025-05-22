@@ -95,7 +95,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import CreateButton from "@/components/ui/CreateButton.vue";
 import CompanyService from "@/services/CompanyService";
 import { debounce } from 'lodash';
-import DashboardService from "@/services/dashboardService";
+import DashboardService from "@/services/DashboardService";
 
 export default {
   name: 'HomeIndex',
