@@ -19,17 +19,16 @@ const DashboardService = {
         }
     },
 
-    async  exportReport({
-                            reportType,
-                            fileFormat = 'pdf',
-                            companyId = null,
-                            companyName = '',
-                            employeeId = null,
-                            employeeName = '',
-                            startDate = '',
-                            endDate = '',
-                        })
-    {
+    async exportReport({
+                           reportType,
+                           fileFormat = 'pdf',
+                           companyId = null,
+                           companyName = '',
+                           employeeId = null,
+                           employeeName = '',
+                           startDate = '',
+                           endDate = '',
+                       }) {
         const reportRequestDto = {
             reportType,
             fileFormat,
@@ -52,17 +51,20 @@ const DashboardService = {
             const contentDisposition = response.headers['content-disposition'];
             const filename = contentDisposition
                 ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-                : 'report';
+                : 'report.xlsx';
 
             const blob = new Blob([response.data], { type: response.headers['content-type'] });
             const link = document.createElement('a');
+
+
             link.href = window.URL.createObjectURL(blob);
             link.download = filename;
             link.click();
         } catch (error) {
+            console.error('Erro ao exportar relatório:', error.message);
             throw new Error('Erro ao exportar relatório: ' + error.message);
         }
-    },
+    }
 };
 
 export default DashboardService;

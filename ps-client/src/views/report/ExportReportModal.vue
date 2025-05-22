@@ -56,6 +56,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import CompanyService from '@/services/CompanyService';
 import EmployeeService from '@/services/EmployeeService';
+import DashboardService from "@/services/DashboardService";
 
 export default {
   name: 'ExportReportModal',
@@ -79,7 +80,7 @@ export default {
     const isLoading = ref(false);
 
     const requiresPeriod = computed(() =>
-        ['employee-list', 'employee-timesheet'].includes(form.value.reportType)
+        ['employee-list', 'employee-timesheet', 'company-hours'].includes(form.value.reportType)
     );
     const requiresCompany = computed(() =>
         ['employee-list', 'employee-timesheet', 'company-hours'].includes(form.value.reportType)
@@ -136,7 +137,20 @@ export default {
     const submitForm = async () => {
       try {
         isLoading.value = true;
-        console.log('Form submitted:', form.value);
+
+        const payload = {
+          reportType: form.value.reportType,
+          fileFormat: 'excel',
+          companyId: form.value.companyId || null,
+          companyName: companies.value.find(c => c.id === form.value.companyId)?.name || '',
+          employeeId: form.value.employeeId || null,
+          employeeName: employees.value.find(e => e.id === form.value.employeeId)?.name || '',
+          startDate: form.value.startDate || '',
+          endDate: form.value.endDate || '',
+        };
+
+        await DashboardService.exportReport(payload);
+
         emit('export-success');
         closeModal();
       } catch (error) {
