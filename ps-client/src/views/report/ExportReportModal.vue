@@ -13,7 +13,7 @@
               <option value="employee-list">Listagem de funcionários</option>
               <option value="all-companies">Listagem de empresas</option>
               <option value="employee-timesheet">Pontos de funcionário</option>
-              <option value="company-hours">Horas trabalhadas</option>
+              <option value="company-hours">Horas trabalhadas por empresa</option>
             </select>
           </div>
 
@@ -89,7 +89,7 @@ export default {
     const isLoading = ref(false);
 
     const requiresPeriod = computed(() =>
-        ['employee-list', 'employee-timesheet', 'company-hours'].includes(form.value.reportType)
+        ['employee-timesheet', 'company-hours'].includes(form.value.reportType)
     );
     const requiresCompany = computed(() =>
         ['employee-list', 'employee-timesheet', 'company-hours'].includes(form.value.reportType)
