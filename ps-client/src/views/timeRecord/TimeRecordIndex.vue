@@ -442,29 +442,30 @@ export default {
                     });
                 }
 
-                // Cria linha da tabela
+                // Cria a linha para a tabela
                 const row = {
                     originalDate: dateStr, 
                     date: this.formatDate(dateStr),
                     entrada1: dailyRecords[0] ? this.formatTime(dailyRecords[0].dateTime) : null,
-                    id1: dailyRecords[0]?.id || null,
-                    saida1: dailyRecords[1] ? this.formatTime(dailyRecords[1].dateTime) : null,
-                    id2: dailyRecords[1]?.id || null,
+                    id1: dailyRecords[0] ? dailyRecords[0].id : null,
+                    saida1:   dailyRecords[1] ? this.formatTime(dailyRecords[1].dateTime) : null,
+                    id2: dailyRecords[1] ? dailyRecords[1].id : null,
                     entrada2: dailyRecords[2] ? this.formatTime(dailyRecords[2].dateTime) : null,
-                    id3: dailyRecords[2]?.id || null,
-                    saida2: dailyRecords[3] ? this.formatTime(dailyRecords[3].dateTime) : null,
-                    id4: dailyRecords[3]?.id || null,
+                    id3: dailyRecords[2] ? dailyRecords[2].id : null,
+                    saida2:   dailyRecords[3] ? this.formatTime(dailyRecords[3].dateTime) : null,
+                    id4: dailyRecords[3] ? dailyRecords[3].id : null,
                     entrada3: dailyRecords[4] ? this.formatTime(dailyRecords[4].dateTime) : null,
-                    id5: dailyRecords[4]?.id || null,
-                    saida3: dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
-                    id6: dailyRecords[5]?.id || null,
-
-                    entrada1Update: dailyRecords[0]?.updatedAt || null,
-                    saida1Update:   dailyRecords[1]?.updatedAt || null,
-                    entrada2Update: dailyRecords[2]?.updatedAt || null,
-                    saida2Update:   dailyRecords[3]?.updatedAt || null,
-                    entrada3Update: dailyRecords[4]?.updatedAt || null,
-                    saida3Update:   dailyRecords[5]?.updatedAt || null,
+                    id5: dailyRecords[4] ? dailyRecords[4].id : null,
+                    saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
+                    id6: dailyRecords[5] ? dailyRecords[5].id : null,
+                    
+                    // Campos de atualização (valores brutos de updatedAt)
+                    entrada1Update: dailyRecords[0] && dailyRecords[0].updatedAt ? dailyRecords[0].updatedAt : null,
+                    saida1Update:   dailyRecords[1] && dailyRecords[1].updatedAt ? dailyRecords[1].updatedAt : null,
+                    entrada2Update: dailyRecords[2] && dailyRecords[2].updatedAt ? dailyRecords[2].updatedAt : null,
+                    saida2Update:   dailyRecords[3] && dailyRecords[3].updatedAt ? dailyRecords[3].updatedAt : null,
+                    entrada3Update: dailyRecords[4] && dailyRecords[4].updatedAt ? dailyRecords[4].updatedAt : null,
+                    saida3Update:   dailyRecords[5] && dailyRecords[5].updatedAt ? dailyRecords[5].updatedAt : null,
 
                     totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                     totalSalaryDay: this.calculateDaySalary(dailyRecords),
