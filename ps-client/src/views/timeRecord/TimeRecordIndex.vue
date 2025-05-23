@@ -422,7 +422,7 @@ export default {
                     (dailyRecords.length % 2 !== 0) &&
                     diffHoras !== null &&
                     diffHoras > 0 &&
-                    diffHoras < 7;
+                    diffHoras <= 10;
 
                 if (precisaCorrigirJornadaNoturna) {
                     // Saída fictícia: 23:59:59.999 local
