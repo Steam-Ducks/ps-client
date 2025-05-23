@@ -8,9 +8,6 @@
 
     <div class="buttons">
 
-      <ReportButton>
-        <DocumentArrowDownIcon/>
-      </ReportButton>
 
       <button @click="toggleEmployeeView" class="toggle-view-button" :disabled="errorFetchingInactiveEmployees && !showActiveEmployees">
         {{ toggleButtonText }}
@@ -40,9 +37,7 @@
 </template>
 
 <script>
-import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import EmployeeCreate from './EmployeeCreate.vue';
 import EmployeeEdit from './EmployeeEdit.vue';
 import EmployeeList from '@/components/employee/EmployeeList.vue';
@@ -51,8 +46,6 @@ import EmployeeService from '@/services/EmployeeService';
 export default {
   name: 'EmployeeIndex',
   components: {
-    ReportButton,
-    DocumentArrowDownIcon,
     CreateButton,
     EmployeeCreate,
     EmployeeEdit,
