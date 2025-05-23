@@ -336,6 +336,9 @@ export default {
 
         // Executar a atualização
         prepareData().then(employeeToSubmit => {
+           if (!employeeToSubmit.status) {
+            return EmployeeService.terminateEmployee(this.employee.id);
+          }
           return EmployeeService.updateEmployee(this.employee.id, employeeToSubmit);
         }).then(() => {
           Swal.fire({

@@ -206,5 +206,4 @@ export default {
   .Title{
     width: 50%;
   }
- 
 </style>
