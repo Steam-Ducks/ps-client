@@ -496,17 +496,18 @@ input[type="date"]:invalid {
   align-items: center;
   gap: 15px; 
   margin-top: 5px; 
+
 }
 
 .radio-group label {
   display: flex;
   align-items: center;
   cursor: pointer;
-  margin-bottom: 0; /* Remover margem inferior padrão do label */
-  font-weight: normal; /* Resetar peso da fonte se necessário */
+  margin-bottom: 0;
+  font-weight: normal;
 }
 
 .radio-group input[type="radio"] {
-  margin-right: 5px; /* Espaço entre o rádio e o texto */
+  margin-right: 5px;
 }
 </style>

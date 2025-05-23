@@ -8,7 +8,6 @@
     
 
     <div class="buttons">
-
       <ReportButton>
         <DocumentArrowDownIcon/>
       </ReportButton> 
@@ -16,23 +15,23 @@
       <button @click="toggleUserView" class="deactivate-button" :disabled="errorFetchingInactive && !showActiveUsers">
         {{ toggleButtonText }}
       </button>
-    
+
       <CreateButton @click="showCreateUser">
         + Novo Usuário
       </CreateButton>
     </div>
   </div>
-  <div class="loading-overlay" v-if="isLoading">
+  <!--<div class="loading-overlay" v-if="isLoading">
     <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
   </div>
 
-  <div v-else>
+  <div v-else>-->
     <div v-if="isCeatingUser" class="modal">
       <div class="modal-content">
         <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
       </div>
     </div>
-  </div>
+  <!--</div>-->
 
   <div v-if="isEditingUser" class="modal">
     <div class="modal-content">
@@ -46,10 +45,8 @@
 </template>
 
 <script>
-import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
-import UserCreate from './UserCreate.vue';  
+import UserCreate from './UserCreate.vue';
 import UserList from '@/components/users/UserList.vue';
 import UserService from '@/services/UserService';
 import UserEdit from './UserEdit.vue';
@@ -57,8 +54,6 @@ import UserEdit from './UserEdit.vue';
 export default {
   name: 'UserIndex',
   components: {
-    ReportButton,
-    DocumentArrowDownIcon,
     CreateButton,
     UserCreate,
     UserList,
