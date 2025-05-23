@@ -82,10 +82,10 @@
       <div class="form-group">
         Remuneração por hora:
         <input
-            type="text"
+              type="text"
             id="salary"
             v-model="employee.salary"
-            v-mask="currencyMask"
+            v-money="moneyConfig"
             placeholder="R$"
             :disabled="!employee.isActive"
             :required="employee.isActive"
@@ -509,5 +509,9 @@ input[type="date"]:invalid {
 
 .radio-group input[type="radio"] {
   margin-right: 5px;
+}
+
+.form-group input {
+  font-family: Nunito;
 }
 </style>
