@@ -305,6 +305,7 @@ export default {
   },
   
   methods: {
+
     showEditedEmployee(recordRow) {
       this.isCheckingHistory = true;
       this.showRecordInfo = recordRow;     
@@ -391,12 +392,53 @@ export default {
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            const tableRows = allDatesInRange.map(dateStr => {
-                const dailyRecords = groupedByDate[dateStr] || []; 
+            const toLocalISOString = (date) => {
+                const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                return local.toISOString().slice(0, -1);
+            };
 
-                // Ordena os registros do dia
-                if (dailyRecords.length > 0) {
-                    dailyRecords.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+            const tableRows = allDatesInRange.map((dateStr, index) => {
+                const dailyRecords = groupedByDate[dateStr] || [];
+                const nextDateStr = allDatesInRange[index + 1] || null;
+                const dailyRecordsNextDay = nextDateStr ? (groupedByDate[nextDateStr] || []) : [];
+
+                // Ordena os registros
+                dailyRecords.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+                dailyRecordsNextDay.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+                // Último do dia atual e primeiro do dia seguinte
+                const ultimoRegistroHoje = dailyRecords[dailyRecords.length - 1];
+                const primeiroRegistroAmanha = dailyRecordsNextDay[0];
+
+                const ultimaData = ultimoRegistroHoje ? new Date(ultimoRegistroHoje.dateTime) : null;
+                const primeiraData = primeiroRegistroAmanha ? new Date(primeiroRegistroAmanha.dateTime) : null;
+
+                const diffHoras = (primeiraData && ultimaData)
+                    ? (primeiraData - ultimaData) / 3600000
+                    : null;
+
+                const precisaCorrigirJornadaNoturna = 
+                    (dailyRecords.length % 2 !== 0) &&
+                    diffHoras !== null &&
+                    diffHoras > 0 &&
+                    diffHoras <= 10;
+
+                if (precisaCorrigirJornadaNoturna) {
+                    // Saída fictícia: 23:59:59.999 local
+                    const saidaFicticia = new Date(ultimaData);
+                    saidaFicticia.setHours(23, 59, 59, 999);
+                    dailyRecords.push({ 
+                        dateTime: toLocalISOString(saidaFicticia), 
+                        isFicticio: true 
+                    });
+
+                    // Entrada fictícia: 00:00:00.000 local no próximo dia
+                    const entradaFicticia = new Date(primeiraData);
+                    entradaFicticia.setHours(0, 0, 0, 0);
+                    dailyRecordsNextDay.unshift({ 
+                        dateTime: toLocalISOString(entradaFicticia), 
+                        isFicticio: true 
+                    });
                 }
 
                 // Cria a linha para a tabela
@@ -415,7 +457,7 @@ export default {
                     id5: dailyRecords[4] ? dailyRecords[4].id : null,
                     saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
                     id6: dailyRecords[5] ? dailyRecords[5].id : null,
-
+                    
                     // Campos de atualização (valores brutos de updatedAt)
                     entrada1Update: dailyRecords[0] && dailyRecords[0].updatedAt ? dailyRecords[0].updatedAt : null,
                     saida1Update:   dailyRecords[1] && dailyRecords[1].updatedAt ? dailyRecords[1].updatedAt : null,
@@ -424,14 +466,11 @@ export default {
                     entrada3Update: dailyRecords[4] && dailyRecords[4].updatedAt ? dailyRecords[4].updatedAt : null,
                     saida3Update:   dailyRecords[5] && dailyRecords[5].updatedAt ? dailyRecords[5].updatedAt : null,
 
-                    // Calcula totais (funções devem tratar array vazio)
                     totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                     totalSalaryDay: this.calculateDaySalary(dailyRecords),
-
-                    // Verifica se algum dos registros do dia foi editado
                     isEdited: dailyRecords.some(record => record.isEdit === true),
-
                 };
+
                 return row;
             });
 
