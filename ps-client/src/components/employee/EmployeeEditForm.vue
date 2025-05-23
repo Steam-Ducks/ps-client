@@ -336,6 +336,9 @@ export default {
 
         // Executar a atualização
         prepareData().then(employeeToSubmit => {
+           if (!employeeToSubmit.status) {
+            return EmployeeService.terminateEmployee(this.employee.id);
+          }
           return EmployeeService.updateEmployee(this.employee.id, employeeToSubmit);
         }).then(() => {
           Swal.fire({
@@ -491,8 +494,9 @@ input[type="date"]:invalid {
 .radio-group {
   display: flex;
   align-items: center;
-  gap: 15px;
-  margin-top: 5px;
+  gap: 15px; 
+  margin-top: 5px; 
+
 }
 
 .radio-group label {
