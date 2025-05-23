@@ -40,7 +40,7 @@
     <!-- Empresa -->
     <div class="form-group">
       Empresa:
-      <select id="company_id" v-model="employee.company_id" ref="companySelect" required>
+      <select id="company_id" v-model="employee.company_id" ref="companySelect" :disabled="!employee.isActive" :required="employee.isActive">
         <option
             v-for="company in companies"
             :key="company.id"
@@ -54,7 +54,7 @@
     <!-- Cargo -->
     <div class="form-group">
       Cargo:
-      <select id="position_id" v-model="employee.position_id" ref="positionSelect" required>
+      <select id="position_id" v-model="employee.position_id" ref="positionSelect" :disabled="!employee.isActive" :required="employee.isActive">
         <option
             v-for="position in positions"
             :key="position.id"
@@ -65,34 +65,52 @@
       </select>
     </div>
 
-    <!-- Data de início -->
-    <div class="form-group">
-      Data de início:
-      <input
-          type="date"
-          id="start_date"
-          v-model="employee.start_date"
-          required
-      />
+    <!-- Linha para Data de Início e Remuneração -->
+    <div class="form-row">
+      <!-- Data de início -->
+      <div class="form-group">
+        Data de início:
+        <input
+            type="date"
+            id="start_date"
+            v-model="employee.start_date"
+            required
+        />
+      </div>
+
+      <!-- Remuneração -->
+      <div class="form-group">
+        Remuneração por hora:
+        <input
+            type="text"
+            id="salary"
+            v-model="employee.salary"
+            v-mask="currencyMask"
+            placeholder="R$"
+            :disabled="!employee.isActive"
+            :required="employee.isActive"
+        />
+      </div>
     </div>
 
-    <!-- Remuneração -->
+    <!-- Status do Funcionário -->
     <div class="form-group">
-      Remuneração por hora trabalhada:
-      <input
-          type="text"
-          id="salary"
-          v-model="employee.salary"
-          v-money="moneyConfig"
-          placeholder="R$"
-          required
-      />
+      Status:
+      <div class="radio-group">
+        <label for="statusActive">
+          <input type="radio" id="statusActive" :value="true" v-model="employee.isActive" name="employeeStatus" @change="handleStatusChange">
+          Ativo
+        </label>
+        <label for="statusInactive">
+          <input type="radio" id="statusInactive" :value="false" v-model="employee.isActive" name="employeeStatus" @change="handleStatusChange">
+          Inativo
+        </label>
+      </div>
     </div>
 
-    <!-- Botões de Atualizar e Desativar -->
+    <!-- Botão de Atualizar -->
     <div class="buttons-container">
-      <button type="button" @click="deactivateEmployee" class="deactivate-button">Desativar</button>
-      <CreateButton class="update-button">Atualizar</CreateButton>
+      <CreateButton class="update-button full-width-button">Atualizar</CreateButton>
     </div>
 
   </form>
@@ -144,6 +162,7 @@ export default {
         salary: '0,00',
         photo: null,
         start_date: null,
+        isActive: true, // Novo campo para status
       },
       errorMessage: '',
       companies: [],
@@ -231,11 +250,12 @@ export default {
           id: employeeData.id,
           name: employeeData.name,
           cpf: employeeData.cpf,
-          company_id: parseInt(employeeData.company.id),
-          position_id: parseInt(employeeData.position.id),
-          salary: (employeeData.salary * 100).toString(),
+          company_id: employeeData.company ? parseInt(employeeData.company.id) : null,
+          position_id: employeeData.position ? parseInt(employeeData.position.id) : null,
+          salary: employeeData.salary.toString(),
           photo: employeeData.photo,
           start_date: employeeData.startDate ? employeeData.startDate : null,
+          isActive: employeeData.status, // Mapear 'status' da API para 'isActive'
         };
 
         // Atualizar os selects
@@ -267,41 +287,19 @@ export default {
       }
     },
 
-    deactivateEmployee() {
-      Swal.fire({
-        title: 'Desativar funcionário?',
-        text: 'Isso removerá a associação deste funcionário com a empresa atual. Deseja continuar?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#6F08AF',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sim, desativar',
-        cancelButtonText: 'Cancelar'
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            await EmployeeService.terminateEmployee(this.employee.id);
+    handleStatusChange() {
+      if (!this.employee.isActive) {
+        this.employee.company_id = null;
+        this.employee.position_id = null;
+        this.employee.salary = '0'; // Salário zerado para inativos
 
-            Swal.fire({
-              icon: 'success',
-              title: 'Funcionário desativado com sucesso!',
-              showConfirmButton: false,
-              timer: 1500,
-            }).then(() => {
-              this.$emit('employee-updated');
-            });
-          } catch (error) {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erro ao desativar funcionário!',
-              text: error.message || 'Ocorreu um erro ao tentar desativar o funcionário.',
-              showConfirmButton: false,
-              timer: 3500,
-            });
-            console.error('Erro ao desativar funcionário:', error);
-          }
-        }
-      });
+        // Atualizar Select2 para refletir os valores nulos
+        this.$nextTick(() => {
+          $(this.$refs.companySelect).val(null).trigger('change');
+          $(this.$refs.positionSelect).val(null).trigger('change');
+        });
+      }
+      // Se se tornar ativo, os campos :required="employee.isActive" garantirão que o usuário precise preenchê-los.
     },
 
     submitForm() {
@@ -330,6 +328,7 @@ export default {
             salary: parseFloat(numericValue),
             photo: photoUrl,
             startDate: this.employee.start_date,
+            status: this.employee.isActive, // Enviar 'isActive' como 'status' para a API
           };
 
           return employeeToSubmit;
@@ -386,6 +385,17 @@ export default {
   color: #1e293b;
 }
 
+.form-row {
+  display: flex;
+  gap: 20px; /* Espaçamento entre os campos na linha */
+  width: 100%;
+}
+
+.form-row .form-group {
+  flex: 1; /* Faz com que cada form-group dentro da linha ocupe espaço igual */
+  /* margin-bottom é herdado de .form-group, o que é bom */
+}
+
 .form-group {
   width: 100%;
   margin-bottom: 8px;
@@ -422,28 +432,13 @@ input:disabled {
   margin-top: 20px;
 }
 
-/* Estilo para o botão de desativar */
-.deactivate-button {
-  flex: 1;
-  margin-right: 10px;
-  padding: 10px;
-  background-color: #e2e8f0;
-  color: #1f2937;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-  height: 40px;
-}
-
-.deactivate-button:hover {
-  background-color: #cbd5e1;
-}
-
 /* Estilo para o botão de atualizar */
 :deep(.update-button) {
+  /* flex: 1; // Removido para permitir que o botão ocupe a largura total se for o único */
+  /* margin-right: 10px; // Removido */
+}
+
+.full-width-button {
   flex: 1;
   margin-right: 10px;
   padding: 10px;
@@ -493,8 +488,22 @@ input[type="date"]:invalid {
   color: rgb(153, 153, 153);
 }
 
-.form-group input {
-  font-family: Nunito;
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 5px;
 }
 
+.radio-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0;
+  font-weight: normal;
+}
+
+.radio-group input[type="radio"] {
+  margin-right: 5px;
+}
 </style>

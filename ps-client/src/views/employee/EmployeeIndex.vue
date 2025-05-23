@@ -9,6 +9,10 @@
     <div class="buttons">
 
 
+      <button @click="toggleEmployeeView" class="toggle-view-button" :disabled="errorFetchingInactiveEmployees && !showActiveEmployees">
+        {{ toggleButtonText }}
+      </button>
+
       <CreateButton @click="showCreateEmployee" class="new-employee-button">
         + Novo funcionário
       </CreateButton>
@@ -17,21 +21,17 @@
 
   <div v-if="isCreatingEmployee" class="modal">
     <div class="modal-content">
-      <EmployeeCreate @go-back="hideCreateEmployee" @employee-created="fetchEmployee"/>
+      <EmployeeCreate @go-back="hideCreateEmployee" @employee-created="fetchAllEmployees"/>
     </div>
   </div>
 
   <div v-if="isEditingEmployee" class="modal">
     <div class="modal-content">
-      <EmployeeEdit :id="String(selectedEmployeeId)" @go-back="hideEditEmployee" @employee-updated="fetchEmployee"/>
+      <EmployeeEdit :id="String(selectedEmployeeId)" @go-back="hideEditEmployee" @employee-updated="fetchAllEmployees"/>
     </div>
   </div>
 
-  <div class="loading-overlay" v-if="isLoading">
-    <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
-  </div>
-
-  <EmployeeList v-else :employees="employees" @edit-employee="showEditEmployee"/>
+  <EmployeeList :employees="displayedEmployees" @edit-employee="showEditEmployee"/>
 
 
 </template>
@@ -57,11 +57,25 @@ export default {
       isCreatingEmployee: false,
       isEditingEmployee: false,
       selectedEmployeeId: null,
-      employees: [],
+      activeEmployees: [],
+      inactiveEmployees: [],
+      showActiveEmployees: true,
+      errorFetchingInactiveEmployees: false,
     };
   },
   mounted() {
-    this.fetchEmployee();
+    this.fetchAllEmployees();
+  },
+  computed: {
+    displayedEmployees() {
+      return this.showActiveEmployees ? this.activeEmployees : this.inactiveEmployees;
+    },
+    toggleButtonText() {
+      if (this.errorFetchingInactiveEmployees && !this.showActiveEmployees) {
+        return 'Falha ao carregar inativos';
+      }
+      return this.showActiveEmployees ? 'Mostrar Funcionários Inativos' : 'Mostrar Funcionários Ativos';
+    }
   },
   methods: {
     isLoaded() {
@@ -81,16 +95,42 @@ export default {
       this.isEditingEmployee = false;
       this.selectedEmployeeId = null;
     },
-    async fetchEmployee() {
-      try {
-        const data = await EmployeeService.getAllEmployees();
-        this.employees = data;
-        this.isLoaded();
-      } catch (error) {
-        console.error('Erro ao buscar empresas:', error);
+
+    toggleEmployeeView() {
+      this.showActiveEmployees = !this.showActiveEmployees;
+      if (!this.showActiveEmployees && (this.inactiveEmployees.length === 0 || this.errorFetchingInactiveEmployees)) {
+        this.fetchInactiveEmployees();
       }
     },
-  },
+
+    async fetchActiveEmployees() {
+      try {
+        const data = await EmployeeService.getAllEmployees();
+        this.activeEmployees = data;
+        this.errorFetchingInactiveEmployees = false; 
+      } catch (error) {
+        console.error('Erro ao buscar funcionários ativos:', error);
+        this.activeEmployees = [];
+      }
+    },
+
+    async fetchInactiveEmployees() {
+      try {
+        const data = await EmployeeService.getInactvatedEmployee();
+        this.inactiveEmployees = data;
+        this.errorFetchingInactiveEmployees = false;
+      }catch(error){
+        console.error('Erro ao buscar funcionários inativos:', error);
+        this.inactiveEmployees = [];
+        this.errorFetchingInactiveEmployees = true;
+      }
+    },
+
+    async fetchAllEmployees() {
+      await this.fetchActiveEmployees();
+      await this.fetchInactiveEmployees();
+    }
+  }
 };
 </script>
 
@@ -121,6 +161,19 @@ export default {
   padding: 8px 16px;
 }
 
+.toggle-view-button {
+  background-color: #e2e8f0; /* Cor similar ao UserIndex */
+  color: #1f2937; /* Cor similar ao UserIndex */
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-view-button:hover {
+  background-color: #cbd5e1; /* Cor similar ao UserIndex */
+}
 .modal {
   position: fixed;
   top: 0;

@@ -21,18 +21,35 @@
           <div class="obs"> Caso não queira alterar, apenas deixe em branco </div>
         </div>
 
-        <!--tipo usuario-->
-        <div class="form-group">
-          Tipo do Usuário
-          <select v-model="user.isAdmin" id="isAdmin" required>
-            <option :value="true">Administrador</option>
-            <option :value="false">Padrão</option>
-          </select>
-        </div>
+        <div class="form-row">
 
+          <!-- Tipo do Usuário -->
+          <div class="form-group">
+            Tipo do Usuário
+            <select v-model="user.isAdmin" id="isAdmin" required>
+              <option :value="true">Administrador</option>
+              <option :value="false">Padrão</option>
+            </select>
+          </div>
+
+          <!-- Status do Usuário -->
+          <div class="form-group">
+            Status:
+            <div class="radio-group">
+              <label for="statusActive">
+                <input type="radio" id="statusActive" :value="true" v-model="user.isActive" name="userStatus">
+                Ativo
+              </label>
+              <label for="statusInactive">
+                <input type="radio" id="statusInactive" :value="false" v-model="user.isActive" name="userStatus">
+                Inativo
+              </label>
+            </div>
+          </div>
+          
+        </div>
         
         <div class="button-container">
-          <CreateButton type="button" @click="deactivateUser" class="deactivate-button">Desativar</CreateButton>
           <CreateButton class="update-button"> Editar </CreateButton>
         </div>
       
@@ -70,6 +87,7 @@ export default {
         email: '',
         password: '',
         isAdmin: false,
+        isActive: true, // Valor padrão inicial
       },
       errorMessage: '',
     };
@@ -93,26 +111,6 @@ export default {
 
   methods: {
 
-    async deactivateUser() {
-      this.user.isActive = false;
-      try {
-        await UserService.updateUser(this.user.id, this.user);
-        Swal.fire({
-          icon: 'success',
-          title: 'Usuário desativado',
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro ao desativar usuário',
-          text: error.message || 'Ocorreu um erro ao tentar desativar o usuário.',
-          showConfirmButton: false,
-          timer: 3500,
-        });
-        console.error('Erro ao desativar usuário:', error);
-      }
-    },
-
     async fetchUserData() {
       try {
         const userData = await UserService.getUserById(this.userId);
@@ -123,6 +121,8 @@ export default {
           email: userData.email,
           password: '',
           isAdmin: userData.isAdmin,
+          // Assumindo que a API retorna 'isActive'. Se não, padrão para true.
+          isActive: userData.isActive !== undefined ? userData.isActive : true,
         };
 
       } catch (error) {
@@ -148,6 +148,7 @@ export default {
           username: this.user.username,
           email: this.user.email,
           isAdmin: this.user.isAdmin,
+          isActive: this.user.isActive, // Inclui o status de atividade
         };
 
         if (this.user.password && this.user.password.trim() !== '') {
@@ -199,6 +200,34 @@ export default {
   color: gray;
 }
 
+.form-row {
+  display: flex;
+  gap: 20px; /* Espaçamento entre os campos na linha */
+  width: 100%; 
+}
+
+.form-row .form-group {
+  flex: 1; /* Faz com que cada form-group dentro da linha ocupe espaço igual */
+  padding-bottom: 15px; /* Reduz o padding inferior para economizar espaço vertical */
+}
+
+.radio-group-column { /* Estilo para radio buttons empilhados */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espaçamento entre os radio buttons empilhados */
+}
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espaçamento entre os botões de rádio */
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
 .user-form {
     margin: 0 auto;
     background-color: #ffffff;
@@ -245,38 +274,13 @@ export default {
   }
 
   .button-container {
-  display: flex;
-  justify-content: space-between; /* Match EmployeeEditForm */
-  margin-top: 20px;
-  width: 100%; /* Match EmployeeEditForm */
-  /* gap: 10px; Will use margin on buttons like EmployeeEditForm */
-}
+    display: flex;
+    justify-content: space-between; 
+    width: 100%;
+    justify-content: center; 
+  }
 
-/* Style for Desativar button, matching EmployeeEditForm's .deactivate-button */
-:deep(.deactivate-button) {
-  flex: 1;
-  margin-right: 10px;
-  padding: 10px;
-  background-color: #e2e8f0;
-  color: #1f2937; /* Match EmployeeEditForm */
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-  height: 40px;
-}
-
-:deep(.deactivate-button):hover {
-  background-color: #cbd5e1; /* Match EmployeeEditForm */
-}
-
-/* Style for Editar (Update) button, matching EmployeeEditForm's :deep(.update-button) */
 :deep(.update-button) {
-  flex: 1;
-  margin-right: 10px; /* EmployeeEditForm's update button also has this */
-  padding: 10px;
   background-color: #6F08AF;
   color: #ffffff;
   border: none;
