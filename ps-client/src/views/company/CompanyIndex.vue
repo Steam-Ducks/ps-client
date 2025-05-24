@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <CompanyList :companies="companies"/>
+    <CompanyList :companies="companies" @company-updated="fetchCompanies"/>
   </div>
 
   
