@@ -62,12 +62,7 @@
                 </div>
 
                 <div>
-                    <div style="margin: 10px">
-                        <ReportButton>
-                            <DocumentArrowDownIcon/>
-                        </ReportButton>
-                    </div>
-                    <div style="display: flex; gap: 3%; margin-left: 5px;">
+                    <div style="display: flex; gap: 3%; margin-left: 5px; margin-top: 55%;">
                         <div class="button-coluna" @click="removeColuna">
                             -
                         </div>
@@ -190,7 +185,6 @@
 <script>
 
 import ReportButton from '@/components/ui/ReportButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
 import TimeRecordService from '@/services/TimeRecordService';
@@ -209,7 +203,6 @@ export default {
   },
   components: {
     ReportButton,
-    DocumentArrowDownIcon,
     MagnifyingGlassIcon,
     EmployeeEdit,
   },
