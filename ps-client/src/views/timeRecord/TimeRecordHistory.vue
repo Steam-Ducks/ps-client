@@ -13,20 +13,20 @@
     <p>Exibindo histórico de alterações no dia {{ recordDateInfo }} :</p>
 
     <div class="history-container" v-if="historyArray.length > 0">
-      <div class="timeline-vertical"></div> 
-      <div class="history-items"> 
-        <div class="history-item" v-for="(item, index) in historyArray" :key="index">
-          <div class="timeline-line1" v-if="index == 0"></div>
-          <div class="timeline-line0" v-if="index == historyArray.length - 1"></div>
-          <div class="timeline-dot"></div>
-          <div class="content">
-            <h4>{{ formatDateFromISO(item.updated) }}</h4>
-            <p>O registro {{ item.type }} foi alterado para: {{ item.time || '—' }}</p>
-          </div>
+    <div class="timeline-vertical"></div>
+    <div class="history-items">
+      <div class="history-item" v-for="(item, index) in historyArray" :key="index">
+        <div class="timeline-line1" v-if="index == 0"></div>
+        <div class="timeline-line0" v-if="index == historyArray.length - 1"></div>
+        <div class="timeline-dot"></div>
+        <div class="content">
+          <h4>{{ formatDateFromISO(item.createdAt) }}</h4>
+          <p><strong>{{ item.fieldLabel }}</strong> foi editado. Por: {{ item.username }}</p>
+          <p>De <strong>{{ formatDateTime(item.dateTimeBefore) }}</strong> Para <strong>{{ formatDateTime(item.dateTimeAfter) }}</strong></p>
         </div>
       </div>
     </div>
-    
+</div>
   </div>
 
 </template>
@@ -48,28 +48,19 @@ export default {
       type: String,
       required: true
     },
-    name:{
+    name: {
       type: String,
       required: true
     },
-    historyData: { 
-      type: Object, 
-      default: () => ({}) 
+    historyData: {
+      type: Object,
+      default: () => ({})
     }
   },
   computed: {
     historyArray() {
-      const data = this.historyData;
-
-      return [
-        { type: 'Entrada 1', time: data.entrada1, updated: data.entrada1Update },
-        { type: 'Saída 1',   time: data.saida1,   updated: data.saida1Update },
-        { type: 'Entrada 2', time: data.entrada2, updated: data.entrada2Update },
-        { type: 'Saída 2',   time: data.saida2,   updated: data.saida2Update },
-        { type: 'Entrada 3', time: data.entrada3, updated: data.entrada3Update },
-        { type: 'Saída 3',   time: data.saida3,   updated: data.saida3Update }
-      ].filter(item => item.updated)
-      .sort((a, b) => new Date(b.updated) - new Date(a.updated));
+      const rawArray = this.historyData.historyArray || [];
+      return rawArray.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
   },
   methods: {
@@ -91,6 +82,19 @@ export default {
       const formattedTime = date.toLocaleTimeString('pt-BR', optionsTime);
 
       return `${formattedDate} às ${formattedTime}`;
+    },
+    formatDateTime(dateTimeString) {
+      if (!dateTimeString) return '—';
+
+      const date = new Date(dateTimeString);
+
+      if (isNaN(date.getTime())) return '—';
+
+      const optionsTime = { hour: '2-digit', minute: '2-digit' };
+
+      const formattedTime = date.toLocaleTimeString('pt-BR', optionsTime);
+
+      return `${formattedTime}`;
     }
   },
 };
@@ -135,6 +139,16 @@ export default {
 
 .history-items {
   position: relative;
+}
+
+.content {
+  padding: 10px;
+  background-color: #8686860f;
+  border-radius: 10px;
+}
+
+.content h4, .content p{
+  margin: 1px;
 }
 
 .timeline-vertical {
