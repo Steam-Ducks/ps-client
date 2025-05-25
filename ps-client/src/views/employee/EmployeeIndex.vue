@@ -1,8 +1,7 @@
 <template>
   <div class="head">
-
     <div class="Title">
-      <h1 class="title-text"> Funcionários </h1>
+      <h1> Funcionários </h1>
       <p> Veja abaixo os Funcionários já cadastradas. Para adicionar um novo funcionário, clique no botão + Novo Funcionário. </p>
     </div>
     <div class="buttons">
