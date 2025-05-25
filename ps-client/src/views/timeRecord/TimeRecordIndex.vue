@@ -306,12 +306,71 @@ export default {
   
   methods: {
 
-    showEditedEmployee(recordRow) {
-      this.isCheckingHistory = true;
-      this.showRecordInfo = recordRow;     
+    async showEditedEmployee(recordRow) {
+        this.showRecordInfo = recordRow;
+
+        // Extrair IDs do registro clicado
+        const idsToFetch = ['id1', 'id2', 'id3', 'id4', 'id5', 'id6']
+            .map(key => recordRow[key])
+            .filter(id => id); // remover nulos
+
+        if (!idsToFetch.length) return;
+
+        try {
+            // Buscar histórico de cada ID
+            const allHistories = await Promise.all(
+            idsToFetch.map(async id => {
+                try {
+                const history = await TimeRecordService.getTimeRecordHistory(id);
+                return { id, history };
+                } catch (err) {
+                console.error(`Erro ao carregar histórico para ID ${id}:`, err);
+                return { id, history: [] };
+                }
+            })
+            );
+
+            // Ajustar o formato para mostrar no EmployeeEdit.vue
+            const formattedHistory = allHistories.flatMap(({ id, history }) =>
+            history.map(item => ({
+                ...item,
+                fieldLabel: this.getFieldLabelById(id)
+            }))
+            );
+
+            // Atualizar o objeto mostrado no modal
+            this.showRecordInfo = {
+            ...recordRow,
+            historyArray: formattedHistory
+            };
+
+
+        } catch (error) {
+            console.error('Erro ao carregar histórico:', error);
+            Swal.fire({
+            icon: 'error',
+            title: 'Erro ao carregar histórico',
+            text: 'Não foi possível carregar as alterações.',
+            timer: 2500
+            });
+        }
+
+        this.isCheckingHistory = true;
     },
     hideEditEmployee() {
       this.isCheckingHistory = false;
+    },
+
+    getFieldLabelById(id) {
+        const fieldMap = {
+        [this.showRecordInfo.id1]: 'Entrada 1',
+        [this.showRecordInfo.id2]: 'Saída 1',
+        [this.showRecordInfo.id3]: 'Entrada 2',
+        [this.showRecordInfo.id4]: 'Saída 2',
+        [this.showRecordInfo.id5]: 'Entrada 3',
+        [this.showRecordInfo.id6]: 'Saída 3'
+        };
+        return fieldMap[id] || 'Registro desconhecido';
     },
 
     // Seleciona o funcionáro e busca os pontos
