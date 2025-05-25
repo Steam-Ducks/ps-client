@@ -1,7 +1,5 @@
 <template>
-  <form @submit.prevent="updateCompany">
-    <h2>Editar empresa</h2>
-    <p>Atualize os campos abaixo para editar a empresa</p>
+  <form @submit.prevent="updateCompany" class="company-form">
 
     <div class="form-group">
       <label for="name">Nome da empresa</label>

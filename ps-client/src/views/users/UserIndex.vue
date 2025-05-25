@@ -8,27 +8,30 @@
     
 
     <div class="buttons">
-
       <ReportButton>
         <DocumentArrowDownIcon/>
       </ReportButton> 
-    
+
+      <button @click="toggleUserView" class="deactivate-button" :disabled="errorFetchingInactive && !showActiveUsers">
+        {{ toggleButtonText }}
+      </button>
+
       <CreateButton @click="showCreateUser">
         + Novo Usuário
       </CreateButton>
     </div>
   </div>
-  <div class="loading-overlay" v-if="isLoading">
+  <!--<div class="loading-overlay" v-if="isLoading">
     <img class="loading" src="../../assets/loading-icon.gif" alt="loading icon">
   </div>
 
-  <div v-else>
+  <div v-else>-->
     <div v-if="isCeatingUser" class="modal">
       <div class="modal-content">
         <UserCreate @go-back="hideCreateUser" @User-created="fetchUser"/>
       </div>
     </div>
-  </div>
+  <!--</div>-->
 
   <div v-if="isEditingUser" class="modal">
     <div class="modal-content">
@@ -36,16 +39,14 @@
     </div>
   </div>
 
-  <UserList :users="users" @edit-user="showEditUser"/>
+  <UserList :users="displayedUsers" @edit-user="showEditUser"/>
     
   
 </template>
 
 <script>
-import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
-import UserCreate from './UserCreate.vue';  
+import UserCreate from './UserCreate.vue';
 import UserList from '@/components/users/UserList.vue';
 import UserService from '@/services/UserService';
 import UserEdit from './UserEdit.vue';
@@ -53,8 +54,6 @@ import UserEdit from './UserEdit.vue';
 export default {
   name: 'UserIndex',
   components: {
-    ReportButton,
-    DocumentArrowDownIcon,
     CreateButton,
     UserCreate,
     UserList,
@@ -64,13 +63,30 @@ export default {
     return {
       isLoading: true,
       isCeatingUser: false,
-      users: [], 
+      activeUsers: [],
+      inactiveUsers: [],
+      showActiveUsers: true, 
       isEditingUser: false,
       selectedUserId: null,
+      errorFetchingInactive: false, 
     };
   },
   mounted() {
     this.fetchUser(); 
+  },
+  computed: {
+    displayedUsers() {
+      if (this.showActiveUsers) {
+        return this.activeUsers;
+      }
+      return this.inactiveUsers;
+    },
+    toggleButtonText() {
+      if (this.errorFetchingInactive && !this.showActiveUsers) {
+        return 'Falha ao carregar inativos';
+      }
+      return this.showActiveUsers ? 'Mostrar Usuários Inativos' : 'Mostrar Usuários Ativos';
+    }
   },
   methods: {
     loaded() {
@@ -90,14 +106,35 @@ export default {
       this.isEditingUser = false;
       this.selectedUserId = null;
     },
-    async fetchUser() {
+    toggleUserView() {
+      this.showActiveUsers = !this.showActiveUsers;
+      if (!this.showActiveUsers && (this.inactiveUsers.length === 0 || this.errorFetchingInactive)) {
+        this.fetchInactiveUsers();
+      }
+    },
+    async fetchActiveUsers() {
       try {
         const data = await UserService.getAllUsers();
-        this.users = data;
-        this.loaded()
+        this.activeUsers = data;
       } catch (error) {
-        console.error('Erro ao buscar empresas:', error);
+        console.error('Erro ao buscar usuários ativos:', error);
+        this.activeUsers = []; 
       }
+    },
+    async fetchInactiveUsers() {
+      try {
+        const data = await UserService.deletedUsers();
+        this.inactiveUsers = data;
+        this.errorFetchingInactive = false;
+      } catch (error) {
+        console.error('Erro ao buscar usuários inativos:', error);
+        this.inactiveUsers = []; 
+        this.errorFetchingInactive = true; 
+      }
+    },
+    async fetchUser() {
+      await this.fetchActiveUsers();
+      await this.fetchInactiveUsers();
     },
   },
 };
@@ -131,6 +168,19 @@ export default {
     -webkit-backdrop-filter: blur(3px);
   }
 
+  :deep(.deactivate-button) {
+    background-color: #e2e8f0;
+    color: #1f2937;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  :deep(.deactivate-button):hover {
+    background-color: #cbd5e1;
+  }
+
   .modal-content {
     width: 30%;
     max-width: 600px;
@@ -151,5 +201,4 @@ export default {
   .Title{
     width: 50%;
   }
- 
 </style>

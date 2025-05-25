@@ -17,15 +17,9 @@
   <!-- Modal de Edição de Empresa -->
   <div v-if="isEditingCompany" class="modal">
     <div class="modal-content">
-      <div class="close-button-container">
-        <button @click="hideEditCompany" class="transparent-button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="close-icon">
-            <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
-          </svg>
-        </button>
-      </div>
-      <CompanyEditForm
-          :company-id="selectedCompanyId"
+        <CompanyEdit
+          :id="selectedCompanyId"
+          @go-back="hideEditCompany"
           @company-updated="companyUpdated"
       />
     </div>
@@ -36,7 +30,7 @@
 import DataTable from 'datatables.net-vue3';
 import DataTablesCore from 'datatables.net';
 import OptionsButton from '@/components/ui/OptionsButton.vue';
-import CompanyEditForm from '@/components/company/CompanyEditForm.vue';
+import CompanyEdit from "@/views/company/CompanyEdit.vue";
 import languagePTBR from '@/assets/dataTable/language/pt-BR.json';
 
 export default {
@@ -44,7 +38,7 @@ export default {
   components: {
     DataTable,
     OptionsButton,
-    CompanyEditForm,
+    CompanyEdit,
   },
   props: {
     companies: {
@@ -198,10 +192,13 @@ export default {
   padding: 20px;
   border-radius: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  width: 500px;
+  width: 700px;
+  max-width: 90%;
+}
+.company-edit-view {
+  width: 100%;
   position: relative;
 }
-
 .close-button-container {
   position: absolute;
   top: 10px;

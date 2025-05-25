@@ -1,16 +1,10 @@
 <template>
   <div class="head">
-
     <div class="Title">
       <h1> Empresas </h1>
       <p> Veja abaixo as empresas já cadastradas. Para adicionar uma nova empresa, clique no botão + Nova Empresa. </p>
     </div>
-
     <div class="buttons">
-
-      <ReportButton>
-        <DocumentArrowDownIcon/>
-      </ReportButton>       
       <CreateButton @click="showCreateCompany">
         + Nova Empresa
       </CreateButton>
@@ -27,16 +21,14 @@
       </div>
     </div>
 
-    <CompanyList :companies="companies"/>
+    <CompanyList :companies="companies" @company-updated="fetchCompanies"/>
   </div>
 
   
   </template>
 
 <script>
-import ReportButton from '@/components/ui/ReportButton.vue';
 import CreateButton from '@/components/ui/CreateButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import CompanyCreate from './CompanyCreate.vue';  
 import CompanyList from '@/components/company/CompanyList.vue';
 import CompanyService from '@/services/CompanyService';
@@ -44,8 +36,6 @@ import CompanyService from '@/services/CompanyService';
 export default {
   name: 'CompanyIndex',
   components: {
-    ReportButton,
-    DocumentArrowDownIcon,
     CreateButton,
     CompanyCreate,
     CompanyList,

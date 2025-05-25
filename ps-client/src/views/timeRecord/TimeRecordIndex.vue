@@ -62,12 +62,7 @@
                 </div>
 
                 <div>
-                    <div style="margin: 10px">
-                        <ReportButton>
-                            <DocumentArrowDownIcon/>
-                        </ReportButton>
-                    </div>
-                    <div style="display: flex; gap: 3%; margin-left: 5px;">
+                    <div style="display: flex; gap: 3%; margin-left: 5px; margin-top: 55%;">
                         <div class="button-coluna" @click="removeColuna">
                             -
                         </div>
@@ -190,7 +185,6 @@
 <script>
 
 import ReportButton from '@/components/ui/ReportButton.vue';
-import { DocumentArrowDownIcon } from '@heroicons/vue/24/solid';
 import { MagnifyingGlassIcon } from '@heroicons/vue/24/solid';
 import EmployeeService from '@/services/EmployeeService'; 
 import TimeRecordService from '@/services/TimeRecordService';
@@ -209,7 +203,6 @@ export default {
   },
   components: {
     ReportButton,
-    DocumentArrowDownIcon,
     MagnifyingGlassIcon,
     EmployeeEdit,
   },
@@ -305,12 +298,72 @@ export default {
   },
   
   methods: {
-    showEditedEmployee(recordRow) {
-      this.isCheckingHistory = true;
-      this.showRecordInfo = recordRow;     
+
+    async showEditedEmployee(recordRow) {
+        this.showRecordInfo = recordRow;
+
+        // Extrair IDs do registro clicado
+        const idsToFetch = ['id1', 'id2', 'id3', 'id4', 'id5', 'id6']
+            .map(key => recordRow[key])
+            .filter(id => id); // remover nulos
+
+        if (!idsToFetch.length) return;
+
+        try {
+            // Buscar histórico de cada ID
+            const allHistories = await Promise.all(
+            idsToFetch.map(async id => {
+                try {
+                const history = await TimeRecordService.getTimeRecordHistory(id);
+                return { id, history };
+                } catch (err) {
+                console.error(`Erro ao carregar histórico para ID ${id}:`, err);
+                return { id, history: [] };
+                }
+            })
+            );
+
+            // Ajustar o formato para mostrar no EmployeeEdit.vue
+            const formattedHistory = allHistories.flatMap(({ id, history }) =>
+            history.map(item => ({
+                ...item,
+                fieldLabel: this.getFieldLabelById(id)
+            }))
+            );
+
+            // Atualizar o objeto mostrado no modal
+            this.showRecordInfo = {
+            ...recordRow,
+            historyArray: formattedHistory
+            };
+
+
+        } catch (error) {
+            console.error('Erro ao carregar histórico:', error);
+            Swal.fire({
+            icon: 'error',
+            title: 'Erro ao carregar histórico',
+            text: 'Não foi possível carregar as alterações.',
+            timer: 2500
+            });
+        }
+
+        this.isCheckingHistory = true;
     },
     hideEditEmployee() {
       this.isCheckingHistory = false;
+    },
+
+    getFieldLabelById(id) {
+        const fieldMap = {
+        [this.showRecordInfo.id1]: 'Entrada 1',
+        [this.showRecordInfo.id2]: 'Saída 1',
+        [this.showRecordInfo.id3]: 'Entrada 2',
+        [this.showRecordInfo.id4]: 'Saída 2',
+        [this.showRecordInfo.id5]: 'Entrada 3',
+        [this.showRecordInfo.id6]: 'Saída 3'
+        };
+        return fieldMap[id] || 'Registro desconhecido';
     },
 
     // Seleciona o funcionáro e busca os pontos
@@ -391,12 +444,53 @@ export default {
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            const tableRows = allDatesInRange.map(dateStr => {
-                const dailyRecords = groupedByDate[dateStr] || []; 
+            const toLocalISOString = (date) => {
+                const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+                return local.toISOString().slice(0, -1);
+            };
 
-                // Ordena os registros do dia
-                if (dailyRecords.length > 0) {
-                    dailyRecords.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+            const tableRows = allDatesInRange.map((dateStr, index) => {
+                const dailyRecords = groupedByDate[dateStr] || [];
+                const nextDateStr = allDatesInRange[index + 1] || null;
+                const dailyRecordsNextDay = nextDateStr ? (groupedByDate[nextDateStr] || []) : [];
+
+                // Ordena os registros
+                dailyRecords.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+                dailyRecordsNextDay.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+                // Último do dia atual e primeiro do dia seguinte
+                const ultimoRegistroHoje = dailyRecords[dailyRecords.length - 1];
+                const primeiroRegistroAmanha = dailyRecordsNextDay[0];
+
+                const ultimaData = ultimoRegistroHoje ? new Date(ultimoRegistroHoje.dateTime) : null;
+                const primeiraData = primeiroRegistroAmanha ? new Date(primeiroRegistroAmanha.dateTime) : null;
+
+                const diffHoras = (primeiraData && ultimaData)
+                    ? (primeiraData - ultimaData) / 3600000
+                    : null;
+
+                const precisaCorrigirJornadaNoturna = 
+                    (dailyRecords.length % 2 !== 0) &&
+                    diffHoras !== null &&
+                    diffHoras > 0 &&
+                    diffHoras <= 10;
+
+                if (precisaCorrigirJornadaNoturna) {
+                    // Saída fictícia: 23:59:59.999 local
+                    const saidaFicticia = new Date(ultimaData);
+                    saidaFicticia.setHours(23, 59, 59, 999);
+                    dailyRecords.push({ 
+                        dateTime: toLocalISOString(saidaFicticia), 
+                        isFicticio: true 
+                    });
+
+                    // Entrada fictícia: 00:00:00.000 local no próximo dia
+                    const entradaFicticia = new Date(primeiraData);
+                    entradaFicticia.setHours(0, 0, 0, 0);
+                    dailyRecordsNextDay.unshift({ 
+                        dateTime: toLocalISOString(entradaFicticia), 
+                        isFicticio: true 
+                    });
                 }
 
                 // Cria a linha para a tabela
@@ -415,7 +509,7 @@ export default {
                     id5: dailyRecords[4] ? dailyRecords[4].id : null,
                     saida3:   dailyRecords[5] ? this.formatTime(dailyRecords[5].dateTime) : null,
                     id6: dailyRecords[5] ? dailyRecords[5].id : null,
-
+                    
                     // Campos de atualização (valores brutos de updatedAt)
                     entrada1Update: dailyRecords[0] && dailyRecords[0].updatedAt ? dailyRecords[0].updatedAt : null,
                     saida1Update:   dailyRecords[1] && dailyRecords[1].updatedAt ? dailyRecords[1].updatedAt : null,
@@ -424,14 +518,11 @@ export default {
                     entrada3Update: dailyRecords[4] && dailyRecords[4].updatedAt ? dailyRecords[4].updatedAt : null,
                     saida3Update:   dailyRecords[5] && dailyRecords[5].updatedAt ? dailyRecords[5].updatedAt : null,
 
-                    // Calcula totais (funções devem tratar array vazio)
                     totalTrabalhadoDia: this.calculateDayWorked(dailyRecords),
                     totalSalaryDay: this.calculateDaySalary(dailyRecords),
-
-                    // Verifica se algum dos registros do dia foi editado
                     isEdited: dailyRecords.some(record => record.isEdit === true),
-
                 };
+
                 return row;
             });
 

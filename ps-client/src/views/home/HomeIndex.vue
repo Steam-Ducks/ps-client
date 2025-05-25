@@ -52,16 +52,15 @@
       <Card
           title="Total de Funcionários"
           :value="cardData.totalEmployees"
-          :subtext="`+${cardData.newEmployees} novos neste período`"
-          subtext-class="success"
+          :subtext="cardData.newEmployees > 0 ? `+${cardData.newEmployees} novos neste período` : 'nenhum funcionário novo'"
+          :subtext-class="cardData.newEmployees > 0 ? 'success' : 'note'"
       />
       <Card
           title="Folha Salarial"
-          :value="`R$ ${cardData.totalSalary.toFixed(2)}`"
-          :subtext="`Período anterior: R$${cardData.totalSalaryLastPeriod.toFixed(2)}`"
+          :value="`R$ ${new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cardData.totalSalary)}`"
+          :subtext="`Período anterior: R$ ${new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(cardData.totalSalaryLastPeriod)}`"
           subtext-class="note"
       />
-
     </div>
 
     <div class="charts-container">
@@ -95,7 +94,7 @@ import 'vue-multiselect/dist/vue-multiselect.min.css';
 import CreateButton from "@/components/ui/CreateButton.vue";
 import CompanyService from "@/services/CompanyService";
 import { debounce } from 'lodash';
-import DashboardService from "@/services/dashboardService";
+import DashboardService from "@/services/DashboardService";
 
 export default {
   name: 'HomeIndex',

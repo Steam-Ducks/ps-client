@@ -119,6 +119,19 @@ const TimeRecordService = {
       }
     },
 
+    async getTimeRecordHistory(id) {
+      try {
+        const url = `${API_URL}/history/${id}`;
+        const response = await axios.get(url, {
+          headers: UserService.getAuthHeaders(),
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Erro ao buscar histórico:', error);
+        throw error;
+      }
+    },
+
 }
 
 export default TimeRecordService;

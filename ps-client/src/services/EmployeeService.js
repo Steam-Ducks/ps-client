@@ -20,7 +20,18 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
   async getAllEmployees() {
     try {
       const response = await axios.get(`${API_URL}`, {
-        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+        headers: UserService.getAuthHeaders(), 
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error('Erro ao listar colaboradores: ' + error.message);
+    }
+  },
+
+  async getInactvatedEmployee() {
+    try {
+      const response = await axios.get(`${API_URL}/inactivated`, {
+        headers: UserService.getAuthHeaders(), 
       });
       return response.data;
     } catch (error) {
@@ -35,9 +46,20 @@ const EmployeeService = { // Aonde colocamos as funções para as requisições
       });
       return response.data;
     } catch (error) {
+      throw new Error('Erro ao achar funcionario: ' + error.message);
+    }
+  },
+  async getEmployeesByCompanyId(companyId) {
+    try {
+      const response = await axios.get(`${API_URL}/company/${companyId}`, {
+        headers: UserService.getAuthHeaders(), // Inclui os cabeçalhos de autenticação
+      });
+      return response.data;
+    } catch (error) {
       throw new Error('Erro ao achar empresa: ' + error.message);
     }
   },
+
   async updateEmployee(id, updateEmployee) {
     try {
       const response = await axios.put(`${API_URL}/${id}`, updateEmployee, {
