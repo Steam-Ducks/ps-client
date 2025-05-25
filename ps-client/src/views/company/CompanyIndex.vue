@@ -1,15 +1,10 @@
 <template>
   <div class="head">
-
     <div class="Title">
       <h1> Empresas </h1>
       <p> Veja abaixo as empresas já cadastradas. Para adicionar uma nova empresa, clique no botão + Nova Empresa. </p>
     </div>
-
     <div class="buttons">
-
-
-
       <CreateButton @click="showCreateCompany">
         + Nova Empresa
       </CreateButton>
@@ -26,7 +21,7 @@
       </div>
     </div>
 
-    <CompanyList :companies="companies"/>
+    <CompanyList :companies="companies" @company-updated="fetchCompanies"/>
   </div>
 
   

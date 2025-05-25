@@ -3,15 +3,14 @@
     <div class="Title">
       <h1> Cargos </h1>
       <p> Veja abaixo os cargos já cadastrados. Para adicionar um novo cargo, clique no botão + Novo cargo. </p>
-    </div>
-
+   </div>
     <div class="buttons">
       <CreateButton @click="showCreatePosition">
         + Novo Cargo
       </CreateButton>
     </div>
-  </div>
-
+ </div>
+ 
   <div v-if="isCreatingPosition" class="modal">
     <div class="modal-content modal-content-position">
       <PositionCreate @go-back="hideCreatePosition" />

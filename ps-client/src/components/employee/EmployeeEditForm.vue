@@ -252,7 +252,7 @@ export default {
           cpf: employeeData.cpf,
           company_id: employeeData.company ? parseInt(employeeData.company.id) : null,
           position_id: employeeData.position ? parseInt(employeeData.position.id) : null,
-          salary: employeeData.salary.toString(),
+          salary: employeeData.salary.toFixed(2).replace('.', ','),
           photo: employeeData.photo,
           start_date: employeeData.startDate ? employeeData.startDate : null,
           isActive: employeeData.status, // Mapear 'status' da API para 'isActive'

@@ -5,15 +5,12 @@
       <h1 class="title-text"> Funcionários </h1>
       <p> Veja abaixo os Funcionários já cadastradas. Para adicionar um novo funcionário, clique no botão + Novo Funcionário. </p>
     </div>
-
     <div class="buttons">
-
-
       <button @click="toggleEmployeeView" class="toggle-view-button" :disabled="errorFetchingInactiveEmployees && !showActiveEmployees">
         {{ toggleButtonText }}
       </button>
 
-      <CreateButton @click="showCreateEmployee" class="new-employee-button">
+      <CreateButton @click="showCreateEmployee">
         + Novo funcionário
       </CreateButton>
     </div>

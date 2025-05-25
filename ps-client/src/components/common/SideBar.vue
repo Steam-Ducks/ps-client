@@ -2,9 +2,8 @@
   <div class="side-bar">
 
     <div>
-      <router-link to="/home">
         <img src="@/assets/PontualLogo.png" alt="Logo" class="logo-top">
-      </router-link>
+
     </div>
 
     <div class="nav-section">
@@ -145,7 +144,7 @@ export default {
 
 
   .router-link-exact-active {
-    background-color: #e8d4f5; 
+    background-color: #f0f0f0; 
     font-weight: bold;
   }
 
